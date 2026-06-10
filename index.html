@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="KENALTAK ialah hub sandbox idea KENAL — ruang eksperimen web app, salasilah, negara, budaya, permata, tokoh dan cabang-cabang kecil sebelum dimatangkan." />
+  <meta name="theme-color" content="#243b2f" />
+  <title>KENALTAK · Hub Eksperimen KENAL</title>
+  <style>
+    :root {
+      --ink: #19231d;
+      --muted: #657067;
+      --soft: #f4efe4;
+      --paper: #fffdf7;
+      --leaf: #243b2f;
+      --leaf-2: #3f6d54;
+      --gold: #c89f52;
+      --gold-soft: #f3e4bf;
+      --line: rgba(36, 59, 47, 0.14);
+      --shadow: 0 24px 70px rgba(31, 42, 35, 0.12);
+      --radius: 28px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(200,159,82,0.24), transparent 28rem),
+        radial-gradient(circle at 90% 8%, rgba(63,109,84,0.16), transparent 22rem),
+        linear-gradient(180deg, #f7f1e7 0%, #fffdf7 48%, #f4efe4 100%);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .nav {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 12px auto 0;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.55);
+      background: rgba(255, 253, 247, 0.78);
+      backdrop-filter: blur(16px);
+      border-radius: 999px;
+      box-shadow: 0 12px 40px rgba(36, 59, 47, 0.08);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      color: #fffdf7;
+      background: linear-gradient(145deg, var(--leaf), var(--leaf-2));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18), 0 10px 18px rgba(36,59,47,0.18);
+      font-size: 18px;
+    }
+
+    .navlinks {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .navlinks a {
+      text-decoration: none;
+      color: #445248;
+      font-size: 13px;
+      padding: 9px 12px;
+      border-radius: 999px;
+    }
+
+    .navlinks a:hover { background: rgba(36, 59, 47, 0.08); }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 28px;
+      align-items: center;
+      padding: 70px 0 36px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 253, 247, 0.72);
+      border: 1px solid var(--line);
+      color: var(--leaf);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 5px rgba(200,159,82,0.16);
+    }
+
+    h1 {
+      margin: 18px 0 16px;
+      font-size: clamp(48px, 9vw, 96px);
+      line-height: 0.9;
+      letter-spacing: -0.085em;
+    }
+
+    .tagline {
+      max-width: 630px;
+      color: #354139;
+      font-size: clamp(18px, 2.4vw, 26px);
+      line-height: 1.35;
+      margin: 0 0 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .subtext {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.75;
+      max-width: 660px;
+      margin: 0;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 46px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 14px;
+      border: 1px solid transparent;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .btn.primary {
+      background: var(--leaf);
+      color: #fffdf7;
+      box-shadow: 0 14px 36px rgba(36,59,47,0.24);
+    }
+
+    .btn.secondary {
+      background: rgba(255,255,255,0.58);
+      color: var(--leaf);
+      border-color: var(--line);
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .oracle-card {
+      position: relative;
+      overflow: hidden;
+      padding: 26px;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(160deg, rgba(36,59,47,0.96), rgba(53,87,68,0.94)),
+        radial-gradient(circle at top right, rgba(200,159,82,0.28), transparent 16rem);
+      color: #fffdf7;
+      box-shadow: var(--shadow);
+      min-height: 430px;
+    }
+
+    .oracle-card:before {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 22px;
+      pointer-events: none;
+    }
+
+    .lab-title {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      margin-bottom: 64px;
+    }
+
+    .lab-title span {
+      color: rgba(255,253,247,0.68);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .lab-title strong {
+      display: block;
+      font-size: 20px;
+      margin-top: 4px;
+    }
+
+    .mini-badge {
+      white-space: nowrap;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.08);
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: rgba(255,253,247,0.78);
+    }
+
+    .quote {
+      position: relative;
+      z-index: 1;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.05;
+      letter-spacing: -0.06em;
+      margin: 0;
+      max-width: 420px;
+    }
+
+    .quote em {
+      color: var(--gold-soft);
+      font-style: normal;
+    }
+
+    .lab-note {
+      position: relative;
+      z-index: 1;
+      margin: 26px 0 0;
+      color: rgba(255,253,247,0.74);
+      line-height: 1.65;
+      font-size: 15px;
+      max-width: 430px;
+    }
+
+    .ring {
+      position: absolute;
+      right: -70px;
+      bottom: -84px;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      border: 42px solid rgba(200,159,82,0.15);
+    }
+
+    .section {
+      padding: 42px 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(28px, 5vw, 46px);
+      line-height: 1;
+      letter-spacing: -0.06em;
+    }
+
+    .section-head p {
+      margin: 0;
+      max-width: 470px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 15px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .branch {
+      position: relative;
+      overflow: hidden;
+      min-height: 250px;
+      padding: 20px;
+      border-radius: 24px;
+      background: rgba(255, 253, 247, 0.76);
+      border: 1px solid rgba(36,59,47,0.11);
+      box-shadow: 0 14px 42px rgba(36,59,47,0.06);
+      text-decoration: none;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .branch:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 55px rgba(36,59,47,0.1);
+      border-color: rgba(63,109,84,0.25);
+    }
+
+    .branch .topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 34px;
+    }
+
+    .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: #f2ead9;
+      color: var(--leaf);
+      font-size: 22px;
+    }
+
+    .status {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--leaf);
+      background: #edf4eb;
+      border: 1px solid rgba(63,109,84,0.14);
+      padding: 7px 9px;
+      border-radius: 999px;
+    }
+
+    .status.soon { color: #8a6723; background: #fbf2d8; border-color: rgba(200,159,82,0.25); }
+    .status.idea { color: #50606a; background: #eef2f1; border-color: rgba(80,96,106,0.14); }
+
+    .branch h3 {
+      margin: 0 0 10px;
+      font-size: 24px;
+      letter-spacing: -0.04em;
+    }
+
+    .branch p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .branch .path {
+      position: absolute;
+      left: 20px;
+      bottom: 18px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      color: rgba(36,59,47,0.62);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+    }
+
+    .manifesto {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .panel {
+      border-radius: var(--radius);
+      background: rgba(255, 253, 247, 0.78);
+      border: 1px solid rgba(36,59,47,0.1);
+      box-shadow: 0 14px 42px rgba(36,59,47,0.06);
+      padding: 26px;
+    }
+
+    .panel.dark {
+      background: linear-gradient(150deg, #263c31, #17251d);
+      color: #fffdf7;
+      border-color: rgba(255,255,255,0.11);
+      box-shadow: var(--shadow);
+    }
+
+    .panel h3 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      letter-spacing: -0.05em;
+    }
+
+    .panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .panel.dark p { color: rgba(255,253,247,0.72); }
+
+    .principles {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .principle {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(244,239,228,0.72);
+      border: 1px solid rgba(36,59,47,0.08);
+      line-height: 1.55;
+      color: #465148;
+      font-size: 14px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 13px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .num {
+      width: 32px;
+      height: 32px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: rgba(200,159,82,0.18);
+      color: #f4dfae;
+      font-weight: 900;
+    }
+
+    .step strong { display: block; margin-bottom: 3px; }
+    .step span { color: rgba(255,253,247,0.68); font-size: 13px; line-height: 1.45; }
+
+    .links-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .quicklink {
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255, 253, 247, 0.74);
+      border: 1px solid rgba(36,59,47,0.1);
+      text-decoration: none;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .quicklink:hover { transform: translateY(-3px); box-shadow: 0 16px 36px rgba(36,59,47,0.08); }
+    .quicklink strong { display: block; margin-bottom: 6px; }
+    .quicklink span { display: block; color: var(--muted); font-size: 13px; line-height: 1.45; }
+
+    .footer {
+      padding: 46px 0 34px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    .footer strong { color: var(--leaf); }
+
+    .floating-note {
+      margin-top: 18px;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,253,247,0.64);
+      border: 1px solid var(--line);
+      color: #58635c;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .manifesto { grid-template-columns: 1fr; }
+      .hero { padding-top: 44px; }
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .section-head { align-items: start; flex-direction: column; }
+      .links-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .page { width: min(100% - 22px, 1120px); }
+      .nav { border-radius: 24px; align-items: flex-start; }
+      .navlinks { display: none; }
+      .hero { padding: 34px 0 24px; }
+      .hero-actions { flex-direction: column; }
+      .btn { width: 100%; }
+      .oracle-card { min-height: 370px; padding: 22px; }
+      .lab-title { margin-bottom: 46px; }
+      .grid,
+      .principles { grid-template-columns: 1fr; }
+      .branch { min-height: 230px; }
+      .panel { padding: 22px; }
+      .section { padding: 30px 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <nav class="nav" aria-label="Navigasi utama">
+      <a class="brand" href="#top" aria-label="KENALTAK Home">
+        <span class="mark">ك</span>
+        <span>KENALTAK</span>
+      </a>
+      <div class="navlinks">
+        <a href="#cabang">Cabang</a>
+        <a href="#ruh">Ruh</a>
+        <a href="#pautan">Pautan</a>
+      </div>
+    </nav>
+
+    <header class="hero" id="top">
+      <section>
+        <div class="eyebrow"><span class="dot"></span> Sandbox idea sebelum jadi produk</div>
+        <h1>Kenal tak?</h1>
+        <p class="tagline">Satu rumah kecil untuk idea-idea KENAL bertunas, diuji, dibaiki dan perlahan-lahan dimatangkan.</p>
+        <p class="subtext">
+          KENALTAK bukan sekadar laman kosong. Ia ialah hub eksperimen untuk cabang seperti KENALfamili,
+          KENALnegara, KENALjalan, KENALtokoh, KENALadat, KENALkafe dan idea-idea lain yang lahir daripada semangat
+          mengenal diri, keluarga, tempat, budaya dan makna hidup.
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="./kenalfamili/">Masuk KENALfamili →</a>
+          <a class="btn secondary" href="#cabang">Lihat semua cabang</a>
+        </div>
+      </section>
+
+      <aside class="oracle-card" aria-label="Nota KENALTAK">
+        <div class="ring"></div>
+        <div class="lab-title">
+          <div>
+            <span>Catatan Dapur</span>
+            <strong>KENALTAK Lab</strong>
+          </div>
+          <div class="mini-badge">v0.1 hub</div>
+        </div>
+        <p class="quote">Kenal sebelum menilai. <em>Kenal untuk menyusun.</em> Kenal agar tidak hilang arah.</p>
+        <p class="lab-note">
+          Di sini, setiap idea boleh bermula kecil: satu halaman, satu prototaip, satu eksperimen.
+          Yang penting, ia hidup, boleh diuji dan boleh bertambah baik dari semasa ke semasa.
+        </p>
+      </aside>
+    </header>
+
+    <main>
+      <section class="section" id="cabang">
+        <div class="section-head">
+          <h2>Cabang KENALTAK</h2>
+          <p>Setiap kad ini boleh jadi folder sendiri dalam GitHub. Bila satu app sudah siap, hanya masukkan failnya sebagai <strong>index.html</strong> dalam folder yang sepadan.</p>
+        </div>
+
+        <div class="grid">
+          <a class="branch" href="./kenalfamili/">
+            <div class="topline">
+              <div class="icon">🌳</div>
+              <span class="status">Aktif</span>
+            </div>
+            <h3>KENALfamili</h3>
+            <p>Salasilah, cabang waris, peta hubungan, matrix mahram dan rekod keluarga yang lebih hidup daripada sekadar senarai nama.</p>
+            <div class="path"><span>/kenalfamili/</span><span>→</span></div>
+          </a>
+
+          <a class="branch" href="./kenalnegara/">
+            <div class="topline">
+              <div class="icon">🇲🇾</div>
+              <span class="status soon">Prototype</span>
+            </div>
+            <h3>KENALnegara</h3>
+            <p>Negeri, daerah, budaya, tempat, fakta rakyat dan rasa Malaysia — bukan sekadar data, tetapi jiwa sebuah negara.</p>
+            <div class="path"><span>/kenalnegara/</span><span>→</span></div>
+          </a>
+
+          <a class="branch" href="./kenaljalan/">
+            <div class="topline">
+              <div class="icon">🛣️</div>
+              <span class="status soon">Prototype</span>
+            </div>
+            <h3>KENALjalan</h3>
+            <p>Laluan, route mood, R&R, hidden gems, masjid, makanan lokal dan perjalanan yang bukan hanya cepat tetapi bermakna.</p>
+            <div class="path"><span>/kenaljalan/</span><span>→</span></div>
+          </a>
+
+          <a class="branch" href="./kenaladat/">
+            <div class="topline">
+              <div class="icon">🧵</div>
+              <span class="status idea">Idea</span>
+            </div>
+            <h3>KENALadat</h3>
+            <p>Warisan, adat resam, pakaian, rumah tradisional, permainan, petua, seni tangan dan adab lintas budaya.</p>
+            <div class="path"><span>/kenaladat/</span><span>→</span></div>
+          </a>
+
+          <a class="branch" href="./kenaltokoh/">
+            <div class="topline">
+              <div class="icon">🧭</div>
+              <span class="status idea">Idea</span>
+            </div>
+            <h3>KENALtokoh</h3>
+            <p>Mengenal tokoh, kerjaya, perjalanan hidup, nilai, perjuangan dan pelajaran yang boleh dipinjam untuk membina diri.</p>
+            <div class="path"><span>/kenaltokoh/</span><span>→</span></div>
+          </a>
+
+          <a class="branch" href="./kenalpermata/">
+            <div class="topline">
+              <div class="icon">💎</div>
+              <span class="status soon">QAMARA</span>
+            </div>
+            <h3>KENALpermata</h3>
+            <p>Dunia warna, kristal, spektrum personaliti, galeri QAMARA dan penerokaan permata sebagai bahasa refleksi.</p>
+            <div class="path"><span>/kenalpermata/</span><span>→</span></div>
+          </a>
+
+          <a class="branch" href="./kenalkafe/">
+            <div class="topline">
+              <div class="icon">☕</div>
+              <span class="status idea">Idea</span>
+            </div>
+            <h3>KENALkafe</h3>
+            <p>Kafe, tempat singgah, suasana kerja, ruang sembang dan cadangan lokasi kecil yang ada cerita.</p>
+            <div class="path"><span>/kenalkafe/</span><span>→</span></div>
+          </a>
+
+          <a class="branch" href="./kenalnota/">
+            <div class="topline">
+              <div class="icon">📓</div>
+              <span class="status idea">Idea</span>
+            </div>
+            <h3>KENALnota</h3>
+            <p>Nota HD, refleksi harian, terapi DIY, doa, afirmasi dan latihan kecil untuk kembali menyusun diri.</p>
+            <div class="path"><span>/kenalnota/</span><span>→</span></div>
+          </a>
+
+          <a class="branch" href="./kenalini/">
+            <div class="topline">
+              <div class="icon">✨</div>
+              <span class="status idea">Sandbox</span>
+            </div>
+            <h3>KENALini</h3>
+            <p>Ruang bebas untuk “kenal itu, kenal ini” — idea spontan, demo kecil, kajian ringkas dan eksperimen yang belum bernama.</p>
+            <div class="path"><span>/kenalini/</span><span>→</span></div>
+          </a>
+        </div>
+      </section>
+
+      <section class="section" id="ruh">
+        <div class="manifesto">
+          <div class="panel dark">
+            <h3>Ruh KENALTAK</h3>
+            <p>
+              Biar kecil, asal hidup. Biar belum sempurna, asal boleh diuji. Biar bermula sebagai sandbox,
+              asal ada arah untuk menjadi manfaat.
+            </p>
+            <div class="timeline">
+              <div class="step">
+                <div class="num">1</div>
+                <div><strong>Letak idea</strong><span>Nama, fungsi, rasa dan sasaran awal.</span></div>
+              </div>
+              <div class="step">
+                <div class="num">2</div>
+                <div><strong>Naikkan prototaip</strong><span>Satu HTML pun cukup untuk mula rasa alirannya.</span></div>
+              </div>
+              <div class="step">
+                <div class="num">3</div>
+                <div><strong>Uji dengan manusia</strong><span>Lihat mana yang difahami, mana yang berat, mana yang ada nilai.</span></div>
+              </div>
+              <div class="step">
+                <div class="num">4</div>
+                <div><strong>Matangkan produk</strong><span>Yang kuat boleh keluar jadi app, servis, katalog atau langganan.</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Prinsip dapur</h3>
+            <p>
+              KENALTAK boleh jadi tempat Doc menyimpan demo, menguji UIUX, mengikat idea KENAL dan memberi orang rasa awal
+              sebelum sesuatu cabang dimonetize atau dibina lebih serius.
+            </p>
+            <div class="principles">
+              <div class="principle"><strong>Ringan dahulu.</strong><br>Jangan tunggu sempurna untuk hidupkan idea.</div>
+              <div class="principle"><strong>Mobile-first.</strong><br>Semua cabang perlu sedap dibuka dari telefon.</div>
+              <div class="principle"><strong>Berjiwa lokal.</strong><br>Bahasa, budaya dan rasa Malaysia diberi tempat.</div>
+              <div class="principle"><strong>Boleh berkembang.</strong><br>Folder hari ini boleh jadi produk esok.</div>
+              <div class="principle"><strong>Data dijaga.</strong><br>Terutama untuk salasilah, keluarga dan rekod peribadi.</div>
+              <div class="principle"><strong>Ada manfaat.</strong><br>Bukan sekadar cantik, tetapi membantu orang lebih kenal.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="pautan">
+        <div class="section-head">
+          <h2>Pautan hidup</h2>
+          <p>Pautan ini boleh Doc ubah kemudian. Buat masa ini ia jadi jambatan kepada projek KENAL yang sudah ada atau sedang dibangunkan.</p>
+        </div>
+
+        <div class="links-row">
+          <a class="quicklink" href="https://kenalidiri.com" target="_blank" rel="noopener">
+            <strong>kenalidiri.com</strong>
+            <span>Ruang operasi KENAL Diri, Nota HD dan app berkaitan psikometrik/refleksi.</span>
+          </a>
+          <a class="quicklink" href="https://kristal2u.com" target="_blank" rel="noopener">
+            <strong>kristal2u.com</strong>
+            <span>Ruang QAMARA, kristal, permata, katalog dan dunia warna.</span>
+          </a>
+          <a class="quicklink" href="./kenalfamili/">
+            <strong>KENALfamili</strong>
+            <span>Laluan terus ke app salasilah dalam hub KENALTAK.</span>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <strong>KENALTAK</strong> · Kenal itu. Kenal ini. Kenal sebelum menilai.<br />
+      Hub eksperimen idea oleh Mir Hazil. Dibina untuk diuji, diperbaiki dan dikembangkan.
+      <div class="floating-note">Versi awal · sesuai upload sebagai <strong>index.html</strong> di root GitHub Pages</div>
+    </footer>
+  </div>
+
+  <script>
+    document.querySelectorAll('a[href^="./"]').forEach(function(link) {
+      link.addEventListener('click', function(event) {
+        var href = link.getAttribute('href');
+        if (href && href !== './kenalfamili/' && href !== './') {
+          // Folder cabang boleh dibuat kemudian. Jika belum ada, browser mungkin papar 404.
+          // Link sengaja dibiarkan hidup supaya struktur sandbox sudah nampak dari awal.
+        }
+      });
+    });
+  </script>
+</body>
+</html>
