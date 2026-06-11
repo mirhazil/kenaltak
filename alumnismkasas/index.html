@@ -172,6 +172,10 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
 @media(max-width:820px){.smkasas-page .smkasas-hero{padding:0 10px;margin-top:10px}.smkasas-page .smkasas-cover-card{border-radius:20px}.smkasas-page .menu-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.smkasas-page .menu-card{min-height:128px;}}
 @media(max-width:520px){.smkasas-page .menu-grid{grid-template-columns:1fr}.smkasas-page .menu-card{min-height:auto;}.smkasas-page .smkasas-cover-card{border-radius:16px;}}
 
+
+/* === Supabase Phase 1 status === */
+.supabase-sync-note{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(29,122,91,.24);background:#eef9f3;color:#14533f;border-radius:999px;padding:7px 11px;font-weight:950;font-size:12px;margin:8px 0 0}
+.supabase-sync-note.warn{background:#fff8e5;border-color:#edd49a;color:#70480d}
 </style>
 </head>
 <body class="smkasas-page">
@@ -183,7 +187,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
 
   <main class="shell">
     <section class="menu-grid" id="menuGrid"></section>
-    <p class="footer-note">KENAL Alumni SMKASAS · Private preview · Data sebenar hanya dimasukkan selepas akses admin disahkan dan ahli diverifikasi.</p>
+    <p class="footer-note">KENAL Alumni SMKASAS · Private preview · Supabase Phase 1 aktif: pendaftaran alumni masuk database online sebagai pending.</p>
   </main>
 
   <div class="section-modal" id="sectionModal" aria-hidden="true">
@@ -248,6 +252,87 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
   let currentSection = 0;
   let explorer = {institutionId:null, groupId:null, personId:null};
   let importPreview = {type:null, rows:[]};
+
+  const SUPABASE_URL = 'https://lliyonpjrecdlpykxwqg.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsaXlvbnBqcmVjZGxweWt4d3FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNzQwMzUsImV4cCI6MjA5Njc1MDAzNX0.iJBUDzPERFMZyPC2X0NqdjN2nDrso0aqrpe99twdsKY';
+  const SUPABASE_BATCH_MAP_KEY = 'kenal_alumni_smkasas_supabase_batch_map_v1';
+  function supabaseReady(){ return !!(SUPABASE_URL && SUPABASE_KEY && SUPABASE_URL.includes('.supabase.co')); }
+  function getSupabaseBatchMap(){ try{ return JSON.parse(localStorage.getItem(SUPABASE_BATCH_MAP_KEY)||'{}'); }catch(e){ return {}; } }
+  function saveSupabaseBatchMap(map){ localStorage.setItem(SUPABASE_BATCH_MAP_KEY, JSON.stringify(map||{})); }
+  function toIntOrNull(v){ const n=parseInt(String(v||'').trim(),10); return Number.isFinite(n)?n:null; }
+  function nullIfBlank(v){ v=String(v??'').trim(); return v? v : null; }
+  async function supabaseFetch(path, options={}){
+    if(!supabaseReady()) throw new Error('Supabase belum dikonfigurasi.');
+    const headers = Object.assign({
+      apikey: SUPABASE_KEY,
+      Authorization: 'Bearer '+SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      Prefer: 'return=representation'
+    }, options.headers||{});
+    const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, Object.assign({}, options, {headers}));
+    const text = await res.text();
+    let data = null;
+    try{ data = text ? JSON.parse(text) : null; }catch(e){ data = text; }
+    if(!res.ok){
+      const msg = (data && (data.message||data.details||data.hint)) || text || ('Supabase error '+res.status);
+      throw new Error(msg);
+    }
+    return data;
+  }
+  async function syncBatchToSupabase(group){
+    if(!group || !group.id) return null;
+    const map = getSupabaseBatchMap();
+    if(map[group.id]) return map[group.id];
+    const payload = {
+      batch_name: group.name,
+      short_name: nullIfBlank(group.shortName),
+      year_start: toIntOrNull(group.yearStart),
+      year_end: toIntOrNull(group.yearEnd),
+      start_date: nullIfBlank(group.startDate),
+      end_date: nullIfBlank(group.endDate),
+      description: nullIfBlank(group.description)
+    };
+    const data = await supabaseFetch('smkasas_batches', {method:'POST', body: JSON.stringify(payload)});
+    const id = Array.isArray(data) && data[0] && data[0].id;
+    if(id){ map[group.id]=id; saveSupabaseBatchMap(map); }
+    return id || null;
+  }
+  async function syncAlumniToSupabase(formData, person, membership){
+    const group = findGroup(formData.groupId);
+    let remoteBatchId = null;
+    const map = getSupabaseBatchMap();
+    if(group){ remoteBatchId = map[group.id] || null; }
+    // Jika batch belum pernah sync, cuba sync batch dahulu. Jika gagal, alumni masih akan masuk pending tanpa batch_id.
+    if(group && !remoteBatchId){ try{ remoteBatchId = await syncBatchToSupabase(group); }catch(e){ console.warn('Batch sync skipped:', e.message); } }
+    const payload = {
+      batch_id: remoteBatchId,
+      full_name: formData.name,
+      nickname: nullIfBlank(formData.nickname),
+      gender: nullIfBlank(formData.gender),
+      dob: nullIfBlank(formData.dob),
+      phone: nullIfBlank(formData.phone),
+      email: nullIfBlank(formData.email),
+      location: nullIfBlank(formData.location),
+      state: nullIfBlank(formData.state),
+      country: nullIfBlank(formData.country) || 'Malaysia',
+      profession: nullIfBlank(formData.profession),
+      industry: nullIfBlank(formData.industry),
+      company: nullIfBlank(formData.company),
+      marital_status: nullIfBlank(formData.maritalStatus),
+      spouse_name: nullIfBlank(formData.spouseName),
+      spouse_phone: nullIfBlank(formData.spousePhone),
+      spouse_profession: nullIfBlank(formData.spouseProfession),
+      spouse_note: nullIfBlank(formData.spouseNote),
+      class_name: nullIfBlank(formData.className),
+      member_no: nullIfBlank(formData.memberNo),
+      year_end: toIntOrNull(formData.yearEnd || group?.yearEnd),
+      role: 'Alumni',
+      privacy: nullIfBlank(formData.privacy) || 'group',
+      status: 'pending',
+      admin_note: nullIfBlank(['Batch/Kelas: '+(group?.name||'-'), formData.note ? 'Nota: '+formData.note : ''].filter(Boolean).join(' | '))
+    };
+    return await supabaseFetch('smkasas_alumni', {method:'POST', body: JSON.stringify(payload)});
+  }
 
   function blankState(){ return {institutions:[],groups:[],persons:[],memberships:[],spouses:[],imports:[],correctionRequests:[],verificationLogs:[],reunion:{},reunionEvent:null,impact:{careCases:[],testimonials:[],achievements:[],missingCampaigns:[]}}; }
   function loadState(){
@@ -369,7 +454,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
   }
 
   function renderGroup(){
-    return `<section class="panel"><h3>Batch & Kelas SMKASAS</h3><p>Versi ini khusus untuk Alumni SMKASAS. Institusi sudah dikunci kepada SMKASAS; admin hanya perlu susun batch, tahun tamat, kelas atau aliran.</p></section>
+    return `<section class="panel"><h3>Batch & Kelas SMKASAS</h3><p>Versi ini khusus untuk Alumni SMKASAS. Institusi sudah dikunci kepada SMKASAS; admin hanya perlu susun batch, tahun tamat, kelas atau aliran.</p><div class="supabase-sync-note warn">Supabase Phase 1: batch akan cuba disync ke database online</div></section>
       <section class="grid2">
         <div class="form-card"><h4>Daftar Batch / Kelas</h4><form id="groupForm" class="form-grid">
           <input type="hidden" name="institutionId" value="${esc(defaultInstitutionId())}">
@@ -389,7 +474,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
 
   function renderMember(){
     const groupOptions = state.groups.filter(g=>g.institutionId===defaultInstitutionId()).map(g=>option(g.id, `${g.name}${g.yearEnd?' ('+g.yearEnd+')':''}`)).join('');
-    return `<section class="panel"><h3>Daftar Alumni</h3><p>Versi SMKASAS ini dikunci kepada alumni sahaja. Institusi: <strong>SMKASAS</strong>. Role: <strong>Alumni</strong>.</p></section>
+    return `<section class="panel"><h3>Daftar Alumni</h3><p>Versi SMKASAS ini dikunci kepada alumni sahaja. Institusi: <strong>SMKASAS</strong>. Role: <strong>Alumni</strong>.</p><div class="supabase-sync-note">Supabase aktif: pendaftaran akan masuk database online sebagai pending</div></section>
       <section class="form-card"><form id="memberForm">
         <div class="form-card"><h4>A. Batch & Kelas</h4><div class="form-grid">
           <input type="hidden" name="institutionId" id="memberInstitution" value="${esc(defaultInstitutionId())}">
@@ -783,7 +868,21 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
   }
   function bindGroup(){
     const form=document.getElementById('groupForm');
-    form.addEventListener('submit',e=>{e.preventDefault(); const d=Object.fromEntries(new FormData(form).entries()); d.type='Batch / Kelas'; d.institutionId=defaultInstitutionId(); d.id=uid('grp'); d.createdAt=today(); state.groups.push(d); log('created_group', d.id, d.name, 'Batch/kelas didaftarkan'); saveState(); toast('Batch / kelas disimpan'); renderSection();});
+    form.addEventListener('submit', async e=>{
+      e.preventDefault();
+      const d=Object.fromEntries(new FormData(form).entries());
+      d.type='Batch / Kelas'; d.institutionId=defaultInstitutionId(); d.id=uid('grp'); d.createdAt=today();
+      state.groups.push(d); log('created_group', d.id, d.name, 'Batch/kelas didaftarkan'); saveState();
+      toast('Batch / kelas disimpan lokal. Sync Supabase...');
+      try{
+        await syncBatchToSupabase(d);
+        toast('Batch / kelas disimpan + synced ke Supabase');
+      }catch(err){
+        console.error(err);
+        toast('Batch lokal disimpan. Supabase batch belum sync: '+err.message);
+      }
+      renderSection();
+    });
     document.querySelectorAll('[data-jump-group]').forEach(b=>b.addEventListener('click',()=>{ const g=findGroup(b.dataset.jumpGroup); explorer.institutionId=g?.institutionId||null; explorer.groupId=b.dataset.jumpGroup; explorer.personId=null; currentSection=0; renderSection(); }));
   }
   function updateGroupSelect(instSelId, groupSelId){
@@ -798,18 +897,29 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
     document.getElementById('maritalStatus').addEventListener('change',e=>{ document.getElementById('spousePanel').classList.toggle('hidden', e.target.value!=='Berkahwin'); });
     document.getElementById('btnPickPhone').addEventListener('click',()=>pickContact(false));
     document.getElementById('btnPickNamePhone').addEventListener('click',()=>pickContact(true));
-    document.getElementById('memberForm').addEventListener('submit',e=>{
+    document.getElementById('memberForm').addEventListener('submit', async e=>{
       e.preventDefault(); const fd=new FormData(e.currentTarget); const d=Object.fromEntries(fd.entries());
+      d.role='Alumni'; d.verified='pending';
       let p = state.persons.find(x => (d.phone && x.phone===d.phone) || (d.email && x.email===d.email));
       if(!p){ p={id:uid('per'),createdAt:today()}; state.persons.push(p); }
       Object.assign(p, {name:d.name,nickname:d.nickname,gender:d.gender,dob:d.dob,aliveStatus:d.aliveStatus,deathDate:d.deathDate,phone:d.phone,email:d.email,location:d.location,state:d.state,country:d.country,profession:d.profession,industry:d.industry,company:d.company,maritalStatus:d.maritalStatus,privacy:d.privacy,note:d.note,updatedAt:today()});
       const existingMem = state.memberships.find(m=>m.personId===p.id && m.groupId===d.groupId);
       const mem = existingMem || {id:uid('mem'),personId:p.id,createdAt:today()};
-      Object.assign(mem,{institutionId:d.institutionId,groupId:d.groupId,role:d.role,className:d.className,memberNo:d.memberNo,yearEnd:d.yearEnd,verified:d.verified,source:'manual_form',updatedAt:today()});
+      Object.assign(mem,{institutionId:d.institutionId,groupId:d.groupId,role:'Alumni',className:d.className,memberNo:d.memberNo,yearEnd:d.yearEnd,verified:'pending',source:'manual_form_supabase_pending',updatedAt:today()});
       if(!existingMem) state.memberships.push(mem);
       state.spouses = state.spouses.filter(s=>s.personId!==p.id);
       if(d.maritalStatus==='Berkahwin' && (d.spouseName || d.spousePhone)) state.spouses.push({id:uid('spo'),personId:p.id,name:d.spouseName,dob:d.spouseDob,phone:d.spousePhone,profession:d.spouseProfession,note:d.spouseNote,visibility:'admin-only',createdAt:today()});
-      log(existingMem?'updated_member':'created_member', p.id, p.name, `${d.role} dalam ${findGroup(d.groupId)?.name||'-'}`); saveState(); toast('Ahli disimpan'); e.currentTarget.reset(); updateGroupSelect('memberInstitution','memberGroup'); document.getElementById('spousePanel').classList.add('hidden');
+      log(existingMem?'updated_member':'created_member', p.id, p.name, `Alumni dalam ${findGroup(d.groupId)?.name||'-'} · pending Supabase`); saveState();
+      toast('Alumni disimpan lokal. Hantar ke Supabase...');
+      try{
+        await syncAlumniToSupabase(d,p,mem);
+        toast('Alumni berjaya masuk Supabase sebagai pending');
+        e.currentTarget.reset(); updateGroupSelect('memberInstitution','memberGroup'); document.getElementById('spousePanel').classList.add('hidden');
+        renderSection();
+      }catch(err){
+        console.error(err);
+        toast('Lokal disimpan, tapi Supabase gagal: '+err.message);
+      }
     });
   }
   async function pickContact(withName){
