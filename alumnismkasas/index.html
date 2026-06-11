@@ -267,7 +267,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
       apikey: SUPABASE_KEY,
       Authorization: 'Bearer '+SUPABASE_KEY,
       'Content-Type': 'application/json',
-      Prefer: 'return=representation'
+      Prefer: 'return=minimal'
     }, options.headers||{});
     const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, Object.assign({}, options, {headers}));
     const text = await res.text();
@@ -292,7 +292,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
       end_date: nullIfBlank(group.endDate),
       description: nullIfBlank(group.description)
     };
-    const data = await supabaseFetch('smkasas_batches', {method:'POST', body: JSON.stringify(payload)});
+    const data = await supabaseFetch('smkasas_batches', {method:'POST', body: JSON.stringify(payload), headers:{Prefer:'return=representation'}});
     const id = Array.isArray(data) && data[0] && data[0].id;
     if(id){ map[group.id]=id; saveSupabaseBatchMap(map); }
     return id || null;
@@ -331,7 +331,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
       status: 'pending',
       admin_note: nullIfBlank(['Batch/Kelas: '+(group?.name||'-'), formData.note ? 'Nota: '+formData.note : ''].filter(Boolean).join(' | '))
     };
-    return await supabaseFetch('smkasas_alumni', {method:'POST', body: JSON.stringify(payload)});
+    return await supabaseFetch('smkasas_alumni', {method:'POST', body: JSON.stringify(payload), headers:{Prefer:'return=minimal'}});
   }
 
   function blankState(){ return {institutions:[],groups:[],persons:[],memberships:[],spouses:[],imports:[],correctionRequests:[],verificationLogs:[],reunion:{},reunionEvent:null,impact:{careCases:[],testimonials:[],achievements:[],missingCampaigns:[]}}; }
