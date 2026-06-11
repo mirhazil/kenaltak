@@ -1418,6 +1418,128 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
   function renderPlanRegList(planId,status){ const pl=state.reunionPlans.find(p=>p.id===planId); if(!pl)return; let rows=planMembers(pl); if(status==='Hadir'||status==='Tidak Hadir'||status==='Belum Confirm') rows=rows.filter(x=>(x.r.status||'Belum Confirm')===status); if(status==='Meninggal') rows=rows.filter(x=>x.p.aliveStatus==='Meninggal'); const el=document.getElementById('planRegList'); const title=status==='all'?'Semua ahli':status; el.innerHTML=rows.length?`<div class="plan-panel-tools"><div><strong>Senarai ${esc(title)}</strong><small>${rows.length} rekod</small></div><button class="mini" data-clear-reg-list="1">× Tutup Senarai</button></div><div class="status-list">${rows.map(x=>`<div class="status-person"><div class="avatar">${esc(initials(x.p.name))}</div><div><strong>${esc(x.p.name)}</strong><span>${esc(x.p.phone||'-')} · ${esc(x.p.profession||'-')} · ${esc(x.p.aliveStatus||'-')}</span></div>${status==='Meninggal'?`<div class="row-actions"><span class="chip">Tahlil / ziarah</span></div>`:`<div class="row-actions"><select data-plan-rsvp="${x.m.id}"><option ${(!x.r.status||x.r.status==='Belum Confirm')?'selected':''}>Belum Confirm</option><option ${x.r.status==='Hadir'?'selected':''}>Hadir</option><option ${x.r.status==='Tidak Hadir'?'selected':''}>Tidak Hadir</option></select></div>`}</div>`).join('')}</div><div class="save-row"><button class="btn" data-clear-reg-list="1">× Tutup Senarai</button></div>`:'<div class="empty">Tiada nama untuk kategori ini.<br><button class="mini" data-clear-reg-list="1">× Tutup</button></div>'; document.querySelectorAll('[data-clear-reg-list]').forEach(b=>b.addEventListener('click',()=>{el.innerHTML='<div class="empty">Senarai ditutup. Klik dashboard untuk buka semula.</div>';})); document.querySelectorAll('[data-plan-rsvp]').forEach(sel=>sel.addEventListener('change',()=>{state.reunion[sel.dataset.planRsvp]=state.reunion[sel.dataset.planRsvp]||{}; state.reunion[sel.dataset.planRsvp].status=sel.value; saveState(); toast('RSVP dikemas kini');})); }
 
 
+  /* =========================
+     PHASE 2A - SUPABASE ADMIN VERIFY + VERIFIED DIRECTORY
+     PIN sementara: ASASIANS1984 (disemak di fungsi SQL Supabase, bukan dalam HTML)
+     ========================= */
+  async function supabaseRpc(functionName, payload){
+    return await supabaseFetch('rpc/'+functionName, {
+      method:'POST',
+      body: JSON.stringify(payload||{}),
+      headers:{Prefer:'return=representation'}
+    });
+  }
+  async function fetchPendingAlumniFromSupabase(pin){
+    return await supabaseRpc('smkasas_admin_pending', {p_pin: pin});
+  }
+  async function updateAlumniStatusSupabase(pin, alumniId, status){
+    return await supabaseRpc('smkasas_admin_update_status', {p_pin: pin, p_alumni_id: alumniId, p_status: status});
+  }
+  async function fetchSupabaseBatches(){
+    try{
+      const rows = await supabaseFetch('smkasas_batches?select=id,batch_name,short_name,year_end&order=batch_name.asc', {method:'GET', headers:{Prefer:'return=representation'}});
+      return Array.isArray(rows)?rows:[];
+    }catch(e){ console.warn('Fetch batches failed:', e.message); return []; }
+  }
+  async function fetchVerifiedAlumniFromSupabase(){
+    const path = 'smkasas_alumni?select=id,batch_id,full_name,nickname,phone,email,location,state,country,profession,industry,company,class_name,year_end,status,created_at&status=eq.verified&order=full_name.asc';
+    const rows = await supabaseFetch(path, {method:'GET', headers:{Prefer:'return=representation'}});
+    return Array.isArray(rows)?rows:[];
+  }
+  function batchMapFromSupabase(rows){
+    const map = {}; (rows||[]).forEach(b=>{ map[b.id]=b; }); return map;
+  }
+  function alumniRowCard(row, batchMap, mode='directory'){
+    const b = batchMap?.[row.batch_id] || {};
+    const batchLabel = b.batch_name || row.year_end || 'Batch belum dipilih';
+    const meta = [batchLabel, row.class_name, row.profession, row.state].filter(Boolean).join(' · ');
+    const contact = [row.phone, row.email].filter(Boolean).join(' · ') || 'Contact belum dipaparkan';
+    return `<div class="result-card"><div><strong>${esc(row.full_name||'-')}</strong><p>${esc(meta||'-')}<br>${esc(contact)}</p><div class="chips"><span class="chip ok">Verified</span>${row.industry?`<span class="chip">${esc(row.industry)}</span>`:''}</div></div>${mode==='admin'?`<button class="mini" data-admin-view-row="${esc(row.id)}">Lihat</button>`:''}</div>`;
+  }
+  function pendingRowCard(row){
+    const batchLabel = row.batch_name || row.year_end || 'Batch belum dipilih';
+    const contact = [row.phone, row.email].filter(Boolean).join(' · ') || 'Contact belum diisi';
+    return `<div class="row-card"><div class="avatar">${esc(initials(row.full_name))}</div><div><strong>${esc(row.full_name||'-')}</strong><span>${esc(batchLabel)} · ${esc(row.class_name||'-')}<br>${esc(contact)}<br>${esc(row.profession||'-')} · ${esc(row.state||'-')}</span><div class="chips"><span class="chip warn">Pending</span>${row.created_at?`<span class="chip">${esc(String(row.created_at).slice(0,10))}</span>`:''}</div></div><div class="row-actions"><button class="mini gold" data-verify-supa="${esc(row.id)}">Verify</button><button class="mini danger" data-reject-supa="${esc(row.id)}">Reject</button></div></div>`;
+  }
+
+  renderAdminTools = function(){
+    return `<section class="panel admin-hero"><h3>Pusat Admin SMKASAS</h3><p>Phase 2A: semak pendaftaran alumni yang masuk ke Supabase sebagai <strong>pending</strong>. Admin masukkan PIN sementara, kemudian klik Verify atau Reject.</p><div class="note"><strong>PIN admin sementara:</strong> digunakan untuk pilot sahaja. Production nanti kita tukar kepada login Supabase Auth.</div></section>
+      <section class="grid2">
+        <div class="form-card"><h4>Admin Verification</h4><div class="form-grid"><label class="field wide">PIN Admin<input id="adminVerifyPin" type="password" placeholder="Masukkan PIN admin"></label></div><div class="save-row"><button class="btn gold" id="btnLoadPendingSupabase">Load Pending Alumni</button><button class="btn ghost" id="btnClearAdminPin">Clear</button></div><div class="safe-note">Senarai pending ditarik terus dari Supabase. Direktori awam hanya memaparkan alumni yang sudah verified.</div></div>
+        <div class="form-card"><h4>Status Phase 2A</h4><div class="stats"><div class="stat"><strong>PIN</strong><span>Admin sementara</span></div><div class="stat"><strong>Pending</strong><span>Load dari Supabase</span></div><div class="stat"><strong>Verified</strong><span>Papar di Direktori</span></div></div></div>
+      </section>
+      <section class="panel"><h3>Senarai Pending</h3><div id="adminPendingArea" class="empty">Masukkan PIN dan klik Load Pending Alumni.</div></section>`;
+  };
+  bindAdminTools = function(){
+    document.getElementById('btnLoadPendingSupabase')?.addEventListener('click', loadPendingAdminList);
+    document.getElementById('btnClearAdminPin')?.addEventListener('click',()=>{ const i=document.getElementById('adminVerifyPin'); if(i)i.value=''; document.getElementById('adminPendingArea').innerHTML='<div class="empty">PIN dikosongkan.</div>'; });
+  };
+  async function loadPendingAdminList(){
+    const pin = document.getElementById('adminVerifyPin')?.value || '';
+    const area = document.getElementById('adminPendingArea');
+    if(!pin){ toast('Masukkan PIN admin dahulu'); return; }
+    area.innerHTML = '<div class="empty">Memuatkan pending alumni dari Supabase...</div>';
+    try{
+      const rows = await fetchPendingAlumniFromSupabase(pin);
+      if(!Array.isArray(rows) || !rows.length){ area.innerHTML='<div class="empty">Tiada alumni pending untuk disemak.</div>'; return; }
+      area.innerHTML = `<div class="safe-note"><strong>${rows.length}</strong> pendaftaran pending ditemui.</div><div class="list">${rows.map(pendingRowCard).join('')}</div>`;
+      area.querySelectorAll('[data-verify-supa]').forEach(b=>b.addEventListener('click',()=>adminSetAlumniStatus(b.dataset.verifySupa,'verified')));
+      area.querySelectorAll('[data-reject-supa]').forEach(b=>b.addEventListener('click',()=>adminSetAlumniStatus(b.dataset.rejectSupa,'rejected')));
+    }catch(e){ area.innerHTML = `<div class="note">Gagal load pending: ${esc(e.message||e)}</div>`; toast('Gagal load pending'); }
+  }
+  async function adminSetAlumniStatus(id,status){
+    const pin = document.getElementById('adminVerifyPin')?.value || '';
+    if(!pin){ toast('Masukkan PIN admin dahulu'); return; }
+    if(status==='rejected' && !confirm('Reject alumni ini?')) return;
+    try{
+      await updateAlumniStatusSupabase(pin,id,status);
+      toast(status==='verified'?'Alumni disahkan':'Alumni ditolak');
+      await loadPendingAdminList();
+    }catch(e){ toast('Gagal update: '+(e.message||e)); }
+  }
+
+  renderDirectory = function(){
+    return `<section class="panel"><h3>Direktori Alumni Verified</h3><p>Direktori ini hanya memaparkan alumni yang telah disahkan oleh admin. Data ditarik dari Supabase, bukan lagi local device.</p></section>
+      <section class="form-card"><h4>Carian Alumni</h4><div class="form-grid">
+        <label class="field wide">Carian bebas<input id="dirQuery" placeholder="Nama, telefon, email, kerjaya, lokasi..."></label>
+        <label class="field">Batch / Kelas<select id="dirBatch"><option value="">Semua batch</option></select></label>
+        <label class="field">Profesi<input id="dirProfession" placeholder="Guru / Doktor / Usahawan"></label>
+        <label class="field">Negeri<input id="dirState" placeholder="Perak / Selangor"></label>
+      </div><div class="save-row"><button class="btn gold" id="btnLoadVerifiedDirectory">Load Direktori Verified</button><button class="btn ghost" id="btnClearDirectoryFilters">Clear Filter</button></div></section>
+      <section class="panel"><h3>Hasil Direktori</h3><div id="directoryResults" class="empty">Klik Load Direktori Verified untuk paparkan alumni yang sudah disahkan.</div></section>`;
+  };
+  bindDirectory = function(){
+    loadDirectoryBatchOptions();
+    document.getElementById('btnLoadVerifiedDirectory')?.addEventListener('click', loadVerifiedDirectory);
+    document.getElementById('btnClearDirectoryFilters')?.addEventListener('click',()=>{ ['dirQuery','dirProfession','dirState'].forEach(id=>{const el=document.getElementById(id); if(el)el.value='';}); const b=document.getElementById('dirBatch'); if(b)b.value=''; loadVerifiedDirectory(); });
+  };
+  async function loadDirectoryBatchOptions(){
+    const sel=document.getElementById('dirBatch'); if(!sel) return;
+    try{ const batches=await fetchSupabaseBatches(); sel.innerHTML='<option value="">Semua batch</option>'+batches.map(b=>option(b.id, `${b.batch_name}${b.short_name?' · '+b.short_name:''}`)).join(''); }catch(e){}
+  }
+  async function loadVerifiedDirectory(){
+    const area=document.getElementById('directoryResults'); if(!area) return;
+    area.innerHTML='<div class="empty">Memuatkan direktori verified dari Supabase...</div>';
+    try{
+      const [rows,batches]=await Promise.all([fetchVerifiedAlumniFromSupabase(), fetchSupabaseBatches()]);
+      const bm=batchMapFromSupabase(batches);
+      const q=normalize(document.getElementById('dirQuery')?.value||'');
+      const batch=document.getElementById('dirBatch')?.value||'';
+      const prof=normalize(document.getElementById('dirProfession')?.value||'');
+      const st=normalize(document.getElementById('dirState')?.value||'');
+      let filtered=rows.filter(r=>{
+        const text=normalize([r.full_name,r.nickname,r.phone,r.email,r.profession,r.industry,r.company,r.location,r.state,bm[r.batch_id]?.batch_name].join(' '));
+        if(q && !text.includes(q)) return false;
+        if(batch && r.batch_id!==batch) return false;
+        if(prof && !normalize(r.profession).includes(prof)) return false;
+        if(st && !normalize(r.state).includes(st)) return false;
+        return true;
+      });
+      area.innerHTML = filtered.length ? `<div class="safe-note"><strong>${filtered.length}</strong> alumni verified ditemui.</div><div class="results">${filtered.map(r=>alumniRowCard(r,bm)).join('')}</div>` : '<div class="empty">Belum ada alumni verified untuk filter ini.</div>';
+    }catch(e){ area.innerHTML=`<div class="note">Gagal load direktori: ${esc(e.message||e)}</div>`; }
+  }
+
+
 
 
   function initSMKASASBranding(){
