@@ -507,11 +507,13 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
         </div><div class="spouse-panel hidden" id="spousePanel"><h4>Maklumat Pasangan — optional & admin-only</h4><div class="note">Untuk tujuan kecemasan, kebajikan alumni, tahlil, ziarah atau bantuan jika berlaku kematian/musibah. Paparan ini terhad kepada admin.</div><div class="form-grid">
           <label class="field">Nama Pasangan<input name="spouseName"></label><label class="field">Tarikh Lahir Pasangan<input type="date" name="spouseDob"></label><label class="field">No Telefon Pasangan<input name="spousePhone"></label><label class="field">Kerjaya Pasangan<input name="spouseProfession"></label><label class="field wide">Nota Kebajikan<textarea name="spouseNote"></textarea></label>
         </div></div></div>
-        <div class="form-card"><h4>E. Privacy & Verification</h4><div class="form-grid">
-          <label class="field">Privacy<select name="privacy"><option value="group">Group sahaja</option><option value="public">Public directory</option><option value="admin">Admin sahaja</option></select></label>
-          <label class="field">Status Verification<select name="verified"><option value="pending">Pending</option><option value="verified">Verified</option><option value="draft">Draft</option></select></label>
-          <label class="field wide">Nota Admin<textarea name="note"></textarea></label>
-        </div><div class="save-row"><button class="btn gold" type="submit">Simpan Alumni</button></div></div>
+        <div class="form-card"><h4>E. Hantar Pendaftaran</h4>
+          <input type="hidden" name="privacy" value="group">
+          <input type="hidden" name="verified" value="pending">
+          <input type="hidden" name="note" value="Daftar alumni self-submit; menunggu semakan admin.">
+          <div class="safe-note"><strong>Status:</strong> Pendaftaran akan dihantar sebagai <b>pending</b> untuk semakan admin. Maklumat privacy dan verification tidak dipaparkan kepada alumni.</div>
+          <div class="save-row"><button class="btn gold" type="submit">Simpan Alumni</button></div>
+        </div>
       </form></section>`;
   }
 
@@ -898,8 +900,10 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
     document.getElementById('btnPickPhone').addEventListener('click',()=>pickContact(false));
     document.getElementById('btnPickNamePhone').addEventListener('click',()=>pickContact(true));
     document.getElementById('memberForm').addEventListener('submit', async e=>{
-      e.preventDefault(); const fd=new FormData(e.currentTarget); const d=Object.fromEntries(fd.entries());
-      d.role='Alumni'; d.verified='pending';
+      e.preventDefault();
+      const form = e.currentTarget;
+      const fd=new FormData(form); const d=Object.fromEntries(fd.entries());
+      d.role='Alumni'; d.verified='pending'; d.privacy='group';
       let p = state.persons.find(x => (d.phone && x.phone===d.phone) || (d.email && x.email===d.email));
       if(!p){ p={id:uid('per'),createdAt:today()}; state.persons.push(p); }
       Object.assign(p, {name:d.name,nickname:d.nickname,gender:d.gender,dob:d.dob,aliveStatus:d.aliveStatus,deathDate:d.deathDate,phone:d.phone,email:d.email,location:d.location,state:d.state,country:d.country,profession:d.profession,industry:d.industry,company:d.company,maritalStatus:d.maritalStatus,privacy:d.privacy,note:d.note,updatedAt:today()});
@@ -914,7 +918,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
       try{
         await syncAlumniToSupabase(d,p,mem);
         toast('Alumni berjaya masuk Supabase sebagai pending');
-        e.currentTarget.reset(); updateGroupSelect('memberInstitution','memberGroup'); document.getElementById('spousePanel').classList.add('hidden');
+        form.reset(); updateGroupSelect('memberInstitution','memberGroup'); document.getElementById('spousePanel').classList.add('hidden');
         renderSection();
       }catch(err){
         console.error(err);
