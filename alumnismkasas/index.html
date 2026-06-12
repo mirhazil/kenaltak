@@ -209,6 +209,18 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
 .sop-board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.sop-card{background:#fff;border:1px solid var(--line);border-left:6px solid var(--gold);border-radius:20px;padding:14px}.sop-card h4{margin:0 0 8px;color:var(--navy)}.sop-card ul{margin:0;padding-left:20px;color:var(--muted);font-weight:850;line-height:1.55}.task-check{display:grid;gap:8px;margin-top:10px}.task-check label{background:#fffdf8;border:1px solid var(--line);border-radius:14px;padding:10px;font-weight:850;color:var(--navy);display:flex;gap:8px;align-items:flex-start}.task-check input{width:auto;margin-top:3px}
 @media(max-width:900px){.sop-board{grid-template-columns:1fr}.success-foot{display:grid}.success-foot .btn,.success-foot .mini{width:100%}}
 
+
+/* v3K Admin Detail View */
+.admin-detail-grid-v3k{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:10px}
+.admin-detail-card-v3k{background:#fff;border:1px solid var(--line);border-radius:18px;padding:13px;box-shadow:0 10px 22px rgba(7,27,53,.05)}
+.admin-detail-card-v3k h4{margin:0 0 8px;color:var(--navy);font-size:15px}
+.detail-line-v3k{display:grid;grid-template-columns:130px 1fr;gap:10px;border-top:1px dashed #e6edf7;padding:7px 0;font-size:13px}
+.detail-line-v3k:first-of-type{border-top:0}
+.detail-line-v3k b{color:#536173;font-weight:950}.detail-line-v3k span{color:#11213a;font-weight:850;word-break:break-word}
+.name-link-v3k{appearance:none;border:0;background:transparent;color:var(--navy);font:inherit;font-weight:950;padding:0;text-align:left;cursor:pointer;text-decoration:underline;text-decoration-thickness:2px;text-decoration-color:#ead28a;text-underline-offset:3px}
+.name-link-v3k:hover{color:#0B3D91}.detail-actions-v3k{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.sensitive-note-v3k{background:#fff8e5;border:1px solid #edd49a;color:#70480d;border-radius:16px;padding:10px;font-weight:850;line-height:1.45;margin:10px 0}
+@media(max-width:760px){.admin-detail-grid-v3k{grid-template-columns:1fr}.detail-line-v3k{grid-template-columns:1fr;gap:2px}}
+
 </style>
 
   <style id="kenal-v3j-public-dashboard-css">
@@ -885,7 +897,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
 .sop-board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.sop-card{background:#fff;border:1px solid var(--line);border-left:6px solid var(--gold);border-radius:20px;padding:14px}.sop-card h4{margin:0 0 8px;color:var(--navy)}.sop-card ul{margin:0;padding-left:20px;color:var(--muted);font-weight:850;line-height:1.55}.task-check{display:grid;gap:8px;margin-top:10px}.task-check label{background:#fffdf8;border:1px solid var(--line);border-radius:14px;padding:10px;font-weight:850;color:var(--navy);display:flex;gap:8px;align-items:flex-start}.task-check input{width:auto;margin-top:3px}
 @media(max-width:900px){.sop-board{grid-template-columns:1fr}.success-foot{display:grid}.success-foot .btn,.success-foot .mini{width:100%}}
 
-</style></head><body class="smkasas-page"><header class="hero"><div class="wrap"><small style="color:#F3D88B;font-weight:950;letter-spacing:.1em">KENAL ALUMNI · BORANG AHLI</small><h1>Borang Alumni / Kohort</h1><p>Isi dan hantar balik fail jawapan <b>.json</b> kepada admin.</p></div></header><main class="wrap"><section class="card"><h2>Kepala Borang</h2><div class="grid"><div><b>Institusi</b><br>${esc(form.institution)}</div><div><b>Group / Batch / Kohort</b><br>${esc(form.group)}</div><div><b>Role</b><br>${esc(form.role)}</div><div><b>Tahun Tamat</b><br>${esc(form.yearEnd||'-')}</div></div></section><section class="card note"><b>Nota iPhone / WhatsApp</b><br>Jika butang tidak berfungsi dalam preview WhatsApp, buka fail ini melalui Safari/Chrome. Tidak perlu sempurna; isi setakat yang anda tahu dahulu.</section><form id="alumniForm" class="card"><h2>Maklumat Diri</h2><div class="grid"><label class="field wide">Nama Penuh *<input name="name" required></label><label class="field">Nama Panggilan<input name="nickname"></label><label class="field">Jantina<select name="gender"><option></option><option>Lelaki</option><option>Perempuan</option><option>Tidak mahu nyatakan</option></select></label><label class="field">Tarikh Lahir<input type="date" name="dob"></label><label class="field">Status Hidup<select name="aliveStatus"><option>Hidup</option><option>Meninggal</option><option>Tidak pasti</option></select></label><label class="field">No Telefon / WhatsApp<input name="phone" placeholder="6012xxxxxxx"></label><label class="field">Email<input type="email" name="email"></label><label class="field">Lokasi<input name="location"></label><label class="field">Negeri<input name="state"></label><label class="field">Negara<input name="country" value="Malaysia"></label><label class="field">Kerjaya / Profesi<input name="profession"></label><label class="field">Industri<input name="industry"></label><label class="field">Syarikat / Organisasi<input name="company"></label><label class="field">Status Kahwin<select name="maritalStatus" id="marital"><option>Bujang</option><option>Berkahwin</option><option>Duda</option><option>Janda</option><option>Balu</option><option>Tidak mahu nyatakan</option></select></label></div><div id="spouseBox" style="display:none" class="card"><h2>Maklumat Pasangan / Kecemasan</h2><p style="color:var(--muted);font-weight:800">Optional. Untuk tujuan kecemasan, kebajikan, tahlil, ziarah atau bantuan jika berlaku kematian/musibah.</p><div class="grid"><label class="field">Nama Pasangan<input name="spouseName"></label><label class="field">Telefon Pasangan<input name="spousePhone"></label><label class="field">Kerjaya Pasangan<input name="spouseProfession"></label><label class="field wide">Nota Pasangan<textarea name="spouseNote"></textarea></label></div></div><label class="field wide">Nota tambahan<textarea name="note"></textarea></label><div class="actions"><button class="btn gold" type="submit">Jana Jawapan JSON</button><button class="btn" type="button" id="btnCopy">Copy JSON</button><button class="btn" type="button" id="btnShare">Share / WhatsApp</button></div></form><section class="card"><h2>Jawapan</h2><div id="result" class="result">Belum dijana.</div></section></main><script>const locked=${formJson};let latest='';function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}function collect(){const fd=new FormData(document.getElementById('alumniForm'));const d=Object.fromEntries(fd.entries());return {...locked,submittedAt:new Date().toISOString(),person:{name:d.name,nickname:d.nickname,gender:d.gender,dob:d.dob,aliveStatus:d.aliveStatus,phone:d.phone,email:d.email,location:d.location,state:d.state,country:d.country,profession:d.profession,industry:d.industry,company:d.company,maritalStatus:d.maritalStatus,note:d.note},spouse:{name:d.spouseName,phone:d.spousePhone,profession:d.spouseProfession,note:d.spouseNote},privacy:'group',consent:'Saya membenarkan data ini digunakan untuk tujuan direktori alumni mengikut tetapan privasi.'};}function download(name,content){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}document.getElementById('marital').addEventListener('change',e=>{document.getElementById('spouseBox').style.display=e.target.value==='Berkahwin'||e.target.value==='Balu'?'block':'none'});document.getElementById('alumniForm').addEventListener('submit',e=>{e.preventDefault();latest=JSON.stringify(collect(),null,2);document.getElementById('result').textContent=latest;download('KENAL_ALUMNI_jawapan_'+Date.now()+'.json',latest);});document.getElementById('btnCopy').addEventListener('click',()=>{if(!latest)latest=JSON.stringify(collect(),null,2);navigator.clipboard&&navigator.clipboard.writeText(latest);alert('JSON dicopy. Hantar kepada admin jika download gagal.');});document.getElementById('btnShare').addEventListener('click',()=>{if(!latest)latest=JSON.stringify(collect(),null,2);const msg='Assalamualaikum admin. Ini jawapan borang KENAL Alumni saya. Jika fail JSON tidak boleh attach, saya akan paste JSON selepas mesej ini.'; if(navigator.share){navigator.share({title:'Jawapan KENAL Alumni',text:msg+'\\n\\n'+latest}).catch(()=>{});}else{location.href='https://wa.me/?text='+encodeURIComponent(msg+'\\n\\n'+latest);}});<\/script><!-- KENAL Alumni SMKASAS v3J: public dashboard progress -->
+</style></head><body class="smkasas-page"><header class="hero"><div class="wrap"><small style="color:#F3D88B;font-weight:950;letter-spacing:.1em">KENAL ALUMNI · BORANG AHLI</small><h1>Borang Alumni / Kohort</h1><p>Isi dan hantar balik fail jawapan <b>.json</b> kepada admin.</p></div></header><main class="wrap"><section class="card"><h2>Kepala Borang</h2><div class="grid"><div><b>Institusi</b><br>${esc(form.institution)}</div><div><b>Group / Batch / Kohort</b><br>${esc(form.group)}</div><div><b>Role</b><br>${esc(form.role)}</div><div><b>Tahun Tamat</b><br>${esc(form.yearEnd||'-')}</div></div></section><section class="card note"><b>Nota iPhone / WhatsApp</b><br>Jika butang tidak berfungsi dalam preview WhatsApp, buka fail ini melalui Safari/Chrome. Tidak perlu sempurna; isi setakat yang anda tahu dahulu.</section><form id="alumniForm" class="card"><h2>Maklumat Diri</h2><div class="grid"><label class="field wide">Nama Penuh *<input name="name" required></label><label class="field">Nama Panggilan<input name="nickname"></label><label class="field">Jantina<select name="gender"><option></option><option>Lelaki</option><option>Perempuan</option><option>Tidak mahu nyatakan</option></select></label><label class="field">Tarikh Lahir<input type="date" name="dob"></label><label class="field">Status Hidup<select name="aliveStatus"><option>Hidup</option><option>Meninggal</option><option>Tidak pasti</option></select></label><label class="field">No Telefon / WhatsApp<input name="phone" placeholder="6012xxxxxxx"></label><label class="field">Email<input type="email" name="email"></label><label class="field">Lokasi<input name="location"></label><label class="field">Negeri<input name="state"></label><label class="field">Negara<input name="country" value="Malaysia"></label><label class="field">Kerjaya / Profesi<input name="profession"></label><label class="field">Industri<input name="industry"></label><label class="field">Syarikat / Organisasi<input name="company"></label><label class="field">Status Kahwin<select name="maritalStatus" id="marital"><option>Bujang</option><option>Berkahwin</option><option>Duda</option><option>Janda</option><option>Balu</option><option>Tidak mahu nyatakan</option></select></label></div><div id="spouseBox" style="display:none" class="card"><h2>Maklumat Pasangan / Kecemasan</h2><p style="color:var(--muted);font-weight:800">Optional. Untuk tujuan kecemasan, kebajikan, tahlil, ziarah atau bantuan jika berlaku kematian/musibah.</p><div class="grid"><label class="field">Nama Pasangan<input name="spouseName"></label><label class="field">Telefon Pasangan<input name="spousePhone"></label><label class="field">Kerjaya Pasangan<input name="spouseProfession"></label><label class="field wide">Nota Pasangan<textarea name="spouseNote"></textarea></label></div></div><label class="field wide">Nota tambahan<textarea name="note"></textarea></label><div class="actions"><button class="btn gold" type="submit">Jana Jawapan JSON</button><button class="btn" type="button" id="btnCopy">Copy JSON</button><button class="btn" type="button" id="btnShare">Share / WhatsApp</button></div></form><section class="card"><h2>Jawapan</h2><div id="result" class="result">Belum dijana.</div></section></main><script>const locked=${formJson};let latest='';function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}function collect(){const fd=new FormData(document.getElementById('alumniForm'));const d=Object.fromEntries(fd.entries());return {...locked,submittedAt:new Date().toISOString(),person:{name:d.name,nickname:d.nickname,gender:d.gender,dob:d.dob,aliveStatus:d.aliveStatus,phone:d.phone,email:d.email,location:d.location,state:d.state,country:d.country,profession:d.profession,industry:d.industry,company:d.company,maritalStatus:d.maritalStatus,note:d.note},spouse:{name:d.spouseName,phone:d.spousePhone,profession:d.spouseProfession,note:d.spouseNote},privacy:'group',consent:'Saya membenarkan data ini digunakan untuk tujuan direktori alumni mengikut tetapan privasi.'};}function download(name,content){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}document.getElementById('marital').addEventListener('change',e=>{document.getElementById('spouseBox').style.display=e.target.value==='Berkahwin'||e.target.value==='Balu'?'block':'none'});document.getElementById('alumniForm').addEventListener('submit',e=>{e.preventDefault();latest=JSON.stringify(collect(),null,2);document.getElementById('result').textContent=latest;download('KENAL_ALUMNI_jawapan_'+Date.now()+'.json',latest);});document.getElementById('btnCopy').addEventListener('click',()=>{if(!latest)latest=JSON.stringify(collect(),null,2);navigator.clipboard&&navigator.clipboard.writeText(latest);alert('JSON dicopy. Hantar kepada admin jika download gagal.');});document.getElementById('btnShare').addEventListener('click',()=>{if(!latest)latest=JSON.stringify(collect(),null,2);const msg='Assalamualaikum admin. Ini jawapan borang KENAL Alumni saya. Jika fail JSON tidak boleh attach, saya akan paste JSON selepas mesej ini.'; if(navigator.share){navigator.share({title:'Jawapan KENAL Alumni',text:msg+'\\n\\n'+latest}).catch(()=>{});}else{location.href='https://wa.me/?text='+encodeURIComponent(msg+'\\n\\n'+latest);}});<\/script><!-- KENAL Alumni SMKASAS v3K: admin detail view / borang penuh -->
 </body></html>`;
   }
 
@@ -2930,10 +2942,165 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
   }
 
 
+  /* =========================
+     v3K - Admin Detail View / Borang Penuh
+     ========================= */
+  async function fetchAdminAlumniDetailV3K(pin, alumniId){
+    return await supabaseRpc('smkasas_admin_alumni_detail_scope', {p_pin: pin, p_alumni_id: alumniId});
+  }
+  function valueAnyV3K(row, keys){
+    for(const k of keys){
+      const v = row ? row[k] : null;
+      if(v !== undefined && v !== null && String(v).trim() !== '') return v;
+    }
+    return '';
+  }
+  function prettyDateV3K(v){
+    if(!v) return '-';
+    try{ return new Date(v).toLocaleString('ms-MY'); }catch(e){ return String(v); }
+  }
+  function detailLineV3K(label, value){
+    const v = (value===undefined || value===null || String(value).trim()==='') ? '-' : value;
+    return `<div class="detail-line-v3k"><b>${esc(label)}</b><span>${esc(v)}</span></div>`;
+  }
+  function detailSectionV3K(title, lines){
+    return `<div class="admin-detail-card-v3k"><h4>${esc(title)}</h4>${lines.join('')}</div>`;
+  }
+  function alumniSummaryTextV3K(row){
+    const batch = row.batch_name || (row.year_end ? `SPM ${row.year_end}` : '-');
+    return [
+      `Nama: ${row.full_name||'-'}`,
+      `Batch/SPM: ${batch}`,
+      `Telefon: ${row.phone||'-'}`,
+      `Email: ${row.email||'-'}`,
+      `Kelas: ${row.class_name||'-'}`,
+      `Lokasi: ${[row.location,row.state,row.country].filter(Boolean).join(', ')||'-'}`,
+      `Kerjaya: ${[row.profession,row.industry,row.company].filter(Boolean).join(' · ')||'-'}`,
+      `Status: ${row.status||'-'}`
+    ].join('\n');
+  }
+  function renderAdminDetailHtmlV3K(row){
+    const status = String(row.status||'').toLowerCase();
+    const phone = waPhoneV3D(row.phone || row.spouse_phone || '');
+    const waMsg = `Assalamualaikum/Salam ${row.full_name||''}. Saya admin Alumni SMKASAS/ASASIANS. Kami sedang menyemak/mengemas kini data alumni. Mohon sahkan maklumat asas anda bila berkelapangan. Terima kasih.`;
+    const batchLabel = row.batch_name || (row.year_end ? smkasasBatchLabelFromSPM(row.year_end) : '-');
+    const adminNote = row.admin_note || row.note || '-';
+    const spouseLines = [
+      detailLineV3K('Status kahwin', valueAnyV3K(row,['marital_status','maritalStatus'])),
+      detailLineV3K('Nama pasangan', valueAnyV3K(row,['spouse_name','spouseName'])),
+      detailLineV3K('Telefon pasangan', valueAnyV3K(row,['spouse_phone','spousePhone'])),
+      detailLineV3K('Kerjaya pasangan', valueAnyV3K(row,['spouse_profession','spouseProfession'])),
+      detailLineV3K('Nota pasangan', valueAnyV3K(row,['spouse_note','spouseNote']))
+    ];
+    return `<div class="sensitive-note-v3k"><strong>Borang penuh admin.</strong> Paparan ini untuk semakan dalaman sahaja. Jangan forward screenshot atau kongsi nombor telefon tanpa izin.</div>
+      <div class="chips"><span class="chip ${status==='verified'?'ok':status==='pending'?'warn':'red'}">${esc(row.status||'-')}</span><span class="chip gold">${esc(batchLabel)}</span><span class="chip">${esc(adminScopeLabelV3E(adminScopeV3E))}</span></div>
+      <div class="admin-detail-grid-v3k">
+        ${detailSectionV3K('A. Ringkasan', [
+          detailLineV3K('Nama penuh', row.full_name),
+          detailLineV3K('Nama panggilan', row.nickname),
+          detailLineV3K('Jantina', row.gender),
+          detailLineV3K('Status hidup', valueAnyV3K(row,['alive_status','aliveStatus'])),
+          detailLineV3K('Tarikh lahir', valueAnyV3K(row,['dob','birth_date'])),
+          detailLineV3K('Tarikh daftar', prettyDateV3K(row.created_at))
+        ])}
+        ${detailSectionV3K('B. Sekolah / Batch', [
+          detailLineV3K('Batch', batchLabel),
+          detailLineV3K('Tahun SPM', row.year_end),
+          detailLineV3K('Kelas / aliran', row.class_name),
+          detailLineV3K('No pelajar', row.member_no),
+          detailLineV3K('Batch ID', row.batch_id)
+        ])}
+        ${detailSectionV3K('C. Contact', [
+          detailLineV3K('Telefon / WhatsApp', row.phone),
+          detailLineV3K('Email', row.email),
+          detailLineV3K('Lokasi', row.location),
+          detailLineV3K('Negeri', row.state),
+          detailLineV3K('Negara', row.country)
+        ])}
+        ${detailSectionV3K('D. Kerjaya', [
+          detailLineV3K('Profesion', row.profession),
+          detailLineV3K('Industri', row.industry),
+          detailLineV3K('Syarikat / organisasi', row.company)
+        ])}
+        ${detailSectionV3K('E. Keluarga / Kecemasan', spouseLines)}
+        ${detailSectionV3K('F. Admin', [
+          detailLineV3K('Status', row.status),
+          detailLineV3K('Role', row.role),
+          detailLineV3K('Privacy', row.privacy),
+          detailLineV3K('Admin note', adminNote),
+          detailLineV3K('Updated at', prettyDateV3K(row.updated_at)),
+          detailLineV3K('Record ID', row.id)
+        ])}
+      </div>
+      <div class="detail-actions-v3k">
+        <button class="btn ghost" id="btnCopyDetailV3K">Copy Ringkasan</button>
+        ${phone?`<a class="btn blue" target="_blank" rel="noopener" href="${esc(waLinkV3D(phone,waMsg))}">WhatsApp</a>`:''}
+        ${status==='pending'?`<button class="btn gold" id="btnDetailVerifyV3K">Verify</button><button class="btn danger" id="btnDetailRejectV3K">Reject</button>`:''}
+        <button class="btn" onclick="closeEditDialog()">Tutup</button>
+      </div>`;
+  }
+  async function openAdminAlumniDetailV3K(id){
+    if(!adminPinV3C){ toast('Masukkan PIN admin dahulu'); return; }
+    openEditDialog('Memuatkan borang penuh','ADMIN DETAIL',`<div class="empty">Memuatkan borang penuh dari Supabase...</div>`);
+    try{
+      let row = await fetchAdminAlumniDetailV3K(adminPinV3C, id);
+      if(Array.isArray(row)) row = row[0] || {};
+      if(row && row.data && typeof row.data === 'object') row = row.data;
+      if(!row || !row.id){ throw new Error('Rekod tidak ditemui atau fungsi SQL v3K belum dijalankan.'); }
+      openEditDialog(row.full_name || 'Borang Penuh Alumni','ADMIN DETAIL',renderAdminDetailHtmlV3K(row));
+      document.getElementById('btnCopyDetailV3K')?.addEventListener('click',()=>copyTextV3D(alumniSummaryTextV3K(row)));
+      document.getElementById('btnDetailVerifyV3K')?.addEventListener('click',async()=>{
+        await updateAlumniStatusSupabase(adminPinV3C,row.id,'verified');
+        closeEditDialog();
+        await loadPendingAdminList2(adminPinV3C); await loadAdminStats(); await updateAdminBadgeV3D();
+        showVerifiedNoticeV3D(row);
+      });
+      document.getElementById('btnDetailRejectV3K')?.addEventListener('click',async()=>{
+        if(!confirm('Reject alumni ini?')) return;
+        await updateAlumniStatusSupabase(adminPinV3C,row.id,'rejected');
+        closeEditDialog();
+        toast('Alumni ditolak');
+        await loadPendingAdminList2(adminPinV3C); await loadAdminStats(); await updateAdminBadgeV3D();
+      });
+    }catch(e){
+      openEditDialog('Borang penuh tidak dapat dibuka','ADMIN DETAIL',`<div class="note"><strong>Gagal buka borang penuh.</strong><br>${esc(e.message||e)}<br><br>Pastikan SQL v3K sudah dijalankan di Supabase.</div>`);
+    }
+  }
+  function bindAdminDetailButtonsV3K(){
+    document.querySelectorAll('[data-admin-detail-row]').forEach(b=>{
+      if(b.dataset.boundDetailV3k) return;
+      b.dataset.boundDetailV3k='1';
+      b.addEventListener('click',()=>openAdminAlumniDetailV3K(b.dataset.adminDetailRow));
+    });
+  }
+  pendingRowCardV3C = function(row){
+    const batchLabel = row.batch_name || (row.year_end ? `SPM ${row.year_end}` : 'Batch belum dipilih');
+    const contact = [row.phone, row.email].filter(Boolean).join(' · ') || 'Contact belum diisi';
+    const date = row.created_at ? String(row.created_at).slice(0,10) : '-';
+    return `<div class="row-card"><div class="avatar">${esc(initials(row.full_name))}</div><div><strong><button class="name-link-v3k" data-admin-detail-row="${esc(row.id)}">${esc(row.full_name||'-')}</button></strong><span>${esc(batchLabel)} · ${esc(row.class_name||'-')}<br>${esc(contact)}<br>${esc(row.profession||'-')} · ${esc(row.state||'-')}</span><div class="chips"><span class="chip warn">Pending</span><span class="chip">${esc(date)}</span><span class="chip gold">Klik nama = borang penuh</span></div><div class="pending-detail hidden" id="pendingDetail_${esc(row.id)}"><div><strong>Profil ringkas</strong><span>Nama panggilan: ${esc(row.nickname||'-')}<br>Kelas: ${esc(row.class_name||'-')}<br>SPM: ${esc(row.year_end||'-')}</span></div><div><strong>Contact / Kerjaya</strong><span>${esc(contact)}<br>${esc(row.profession||'-')}<br>${esc(row.state||'-')}</span></div></div></div><div class="row-actions"><button class="mini" data-admin-detail-row="${esc(row.id)}">Borang Penuh</button><button class="mini" data-toggle-pending-detail="${esc(row.id)}">Ringkas</button><button class="mini gold" data-verify-supa="${esc(row.id)}">Verify</button><button class="mini danger" data-reject-supa="${esc(row.id)}">Reject</button></div></div>`;
+  };
+  alumniRowCardScopedV3E = function(row){
+    const batchLabel = row.batch_name || (row.year_end ? `SPM ${row.year_end}` : 'Batch belum dipilih');
+    const meta = [batchLabel, row.class_name, row.profession, row.state].filter(Boolean).join(' · ');
+    const contact = [row.phone, row.email].filter(Boolean).join(' · ') || 'Contact belum dipaparkan';
+    return `<div class="result-card"><div><strong><button class="name-link-v3k" data-admin-detail-row="${esc(row.id)}">${esc(row.full_name||'-')}</button></strong><p>${esc(meta||'-')}<br>${esc(contact)}</p><div class="chips"><span class="chip ok">Verified</span>${row.industry?`<span class="chip">${esc(row.industry)}</span>`:''}<span class="chip gold">Borang penuh</span></div></div><button class="mini" data-admin-detail-row="${esc(row.id)}">Lihat</button></div>`;
+  };
+  const bindPendingListV3KPrev = bindPendingListV3C;
+  bindPendingListV3C = function(){
+    bindPendingListV3KPrev();
+    bindAdminDetailButtonsV3K();
+  };
+  const loadAdminDirectoryV3KPrev = loadAdminDirectory;
+  loadAdminDirectory = async function(){
+    await loadAdminDirectoryV3KPrev();
+    bindAdminDetailButtonsV3K();
+  };
+
+
   initSMKASASBranding();
   renderMenu();
 })();
 </script>
-<!-- KENAL Alumni SMKASAS v3J: public dashboard progress -->
+<!-- KENAL Alumni SMKASAS v3K: admin detail view / borang penuh -->
 </body>
 </html>
