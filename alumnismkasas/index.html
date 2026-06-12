@@ -2304,6 +2304,249 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
     }catch(e){area.innerHTML=`<div class="note">Gagal load batch: ${esc(e.message||e)}</div>`;}
   };
 
+
+  /* ==========================================================
+     KENAL Alumni SMKASAS v3F - Import CSV + Backup Ringan
+     - Super Admin boleh import/export semua batch
+     - Batch Admin boleh import/export skop tahun SPM sendiri
+     - CSV masuk Supabase sebagai pending, bukan auto verified
+     ========================================================== */
+  let csvImportRowsV3F = [];
+  let csvImportPreviewV3F = [];
+
+  const renderAdminWorkspaceV3E_Base = renderAdminWorkspace;
+  renderAdminWorkspace = async function(){
+    const pin=document.getElementById('adminMasterPin')?.value||adminPinV3C||'';
+    if(!pin){toast('Masukkan PIN admin');return;}
+    adminPinV3C=pin;
+    const w=document.getElementById('adminWorkspace'); if(!w)return;
+    w.innerHTML = `<div class="panel"><h3>Menyemak akses admin...</h3><p class="muted">Sistem sedang mengenal pasti skop PIN.</p></div>`;
+    try{
+      adminScopeV3E = await fetchAdminScopeV3E(pin);
+    }catch(e){
+      adminScopeV3E = null;
+      w.innerHTML = `<div class="note"><strong>PIN tidak sah / gagal disemak.</strong><br>${esc(e.message||e)}</div>`;
+      return;
+    }
+    const scope=adminScopeV3E||{};
+    const batchTabLabel = scope.role === 'super_admin' ? 'Batch Setup' : 'Batch Saya';
+    w.innerHTML = `<div class="panel"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap"><div><h3 style="margin-bottom:4px">Admin Workspace</h3><p class="muted" style="margin:0;font-weight:850">${esc(adminScopeLabelV3E(scope))}</p><p class="muted" style="margin:6px 0 0;font-weight:750;line-height:1.4">${esc(adminScopeNoteV3E(scope))}</p><div class="chips" style="margin-top:8px">${adminScopeBadgeV3E(scope)}<span class="chip gold">v3F Import CSV</span></div></div><span class="admin-pin-status">PIN: ${esc(adminMaskPin(pin))}</span></div></div><div class="tabs admin-tabs"><button class="tab active" data-admin-public-tab="verify">Verify Alumni</button><button class="tab" data-admin-public-tab="directory">Direktori Dalaman</button><button class="tab" data-admin-public-tab="stats">Analisa Ringkas</button><button class="tab" data-admin-public-tab="batch">${esc(batchTabLabel)}</button><button class="tab" data-admin-public-tab="import">Import CSV</button><button class="tab" data-admin-public-tab="export">Export / Backup</button><button class="tab" data-admin-public-tab="sop">SOP / JD</button><button class="tab" data-admin-public-tab="future">Reunion Tools</button></div>
+      <section id="adminTabVerify" class="admin-subpanel"><div class="form-card"><h4>Pending Alumni</h4><p class="muted">Senarai pendaftaran baru dalam skop akses ini. Klik Detail sebelum Verify jika perlu.</p><div id="adminPendingList2" class="empty">Memuatkan pending...</div></div></section>
+      <section id="adminTabDirectory" class="admin-subpanel hidden"><div class="form-card"><h4>Direktori Dalaman Verified</h4><p class="muted">Paparan dalaman admin. Batch Admin hanya melihat verified batch sendiri.</p><div class="form-grid"><label class="field wide">Carian<input id="adminDirQuery" placeholder="Nama, phone, batch, kerja, lokasi..."></label></div><div class="save-row"><button class="btn gold" id="btnAdminLoadDirectory">Load Direktori</button></div><div id="adminDirectoryList" class="empty">Klik Load Direktori.</div></div></section>
+      <section id="adminTabStats" class="admin-subpanel hidden"><div class="form-card"><h4>Analisa Ringkas</h4><p class="muted">Statistik dalam skop akses admin semasa.</p><div id="adminStatsArea" class="empty">Memuatkan statistik...</div></div></section>
+      <section id="adminTabBatch" class="admin-subpanel hidden"><div class="form-card"><h4>${esc(batchTabLabel)}</h4><p>${scope.role==='super_admin'?'Batch rasmi disediakan oleh sistem/admin. Public tidak boleh cipta batch sendiri.':'Batch Admin hanya ditugaskan kepada batch yang dipadankan dengan PIN tahun SPM.'}</p><div class="save-row"><button class="btn gold" id="btnAdminLoadBatches">Load Batch</button></div><div id="adminBatchList" class="empty">Klik Load Batch.</div></div></section>
+      <section id="adminTabImport" class="admin-subpanel hidden">${renderCsvImportV3F(scope)}</section>
+      <section id="adminTabExport" class="admin-subpanel hidden">${renderExportBackupV3F(scope)}</section>
+      <section id="adminTabSop" class="admin-subpanel hidden">${renderAdminSopBoardV3D()}${renderBatchAdminSopAddonV3E(scope)}</section>
+      <section id="adminTabFuture" class="admin-subpanel hidden"><div class="form-card"><h4>Reunion Tools</h4><p>Batch Admin kelak boleh urus RSVP dan reunion untuk batch sendiri sahaja.</p><div class="empty">Coming next</div></div></section>`;
+    bindAdminWorkspace(pin);
+    bindCsvImportV3F();
+    bindExportBackupV3F();
+    loadPendingAdminList2(pin);
+    loadAdminStats();
+  };
+
+  bindAdminWorkspace = function(pin){
+    document.querySelectorAll('[data-admin-public-tab]').forEach(tab=>tab.addEventListener('click',()=>{
+      document.querySelectorAll('[data-admin-public-tab]').forEach(t=>t.classList.remove('active')); tab.classList.add('active');
+      ['Verify','Directory','Stats','Batch','Sop','Future','Import','Export'].forEach(k=>document.getElementById('adminTab'+k)?.classList.add('hidden'));
+      const k=cap(tab.dataset.adminPublicTab); document.getElementById('adminTab'+k)?.classList.remove('hidden');
+      if(tab.dataset.adminPublicTab==='stats') loadAdminStats();
+      if(tab.dataset.adminPublicTab==='directory') loadAdminDirectory();
+      if(tab.dataset.adminPublicTab==='batch') loadAdminBatches();
+      if(tab.dataset.adminPublicTab==='import') refreshImportScopeNoteV3F();
+    }));
+    document.getElementById('btnAdminLoadDirectory')?.addEventListener('click',()=>loadAdminDirectory());
+    document.getElementById('btnAdminLoadBatches')?.addEventListener('click',()=>loadAdminBatches());
+  };
+
+  function renderCsvImportV3F(scope){
+    const locked = scope?.role === 'batch_admin';
+    const yearInfo = locked ? `CSV untuk PIN ini dikunci kepada <strong>SPM ${esc(scope.year_end||'')}</strong>. Row tahun lain akan ditolak.` : 'Super Admin boleh import banyak tahun SPM dalam satu CSV.';
+    return `<section class="panel"><h3>Import CSV Alumni</h3><p>Untuk admin batch yang sudah ada senarai Excel/CSV. Data import akan masuk sebagai <strong>pending</strong>, bukan auto verified.</p><div class="safe-note">${yearInfo}</div></section>
+      <section class="grid2"><div class="form-card"><h4>1. Pilih CSV</h4><p class="muted">Header disokong: <code>full_name, phone, email, year_spm, class_name, nickname, gender, location, state, profession, industry, company, stpm_year</code></p><input class="file-input" type="file" id="csvImportFileV3F" accept=".csv,text/csv"><div class="save-row"><button class="btn ghost" id="btnDownloadCsvTemplateV3F">Download Template CSV</button><button class="btn gold" id="btnPreviewCsvV3F">Preview CSV</button></div></div>
+      <div class="form-card"><h4>2. Skop Import</h4><div id="csvImportScopeNoteV3F" class="note">${adminScopeLabelV3E(scope)}</div><p class="muted">Sistem auto padankan Tahun SPM kepada batch rasmi. BATCH 1 = SPM 1988.</p><div class="save-row"><button class="btn gold" id="btnImportCsvToSupabaseV3F" disabled>Import ke Supabase Pending</button></div></div></section>
+      <section class="panel"><h3>Preview CSV</h3><div id="csvPreviewAreaV3F" class="empty">Pilih file CSV dan klik Preview CSV.</div></section>`;
+  }
+
+  function refreshImportScopeNoteV3F(){
+    const el=document.getElementById('csvImportScopeNoteV3F'); if(!el)return;
+    const scope=adminScopeV3E||{};
+    el.innerHTML = `${esc(adminScopeLabelV3E(scope))}<br><span class="muted">${esc(adminScopeNoteV3E(scope))}</span>`;
+  }
+
+  function bindCsvImportV3F(){
+    document.getElementById('btnDownloadCsvTemplateV3F')?.addEventListener('click',downloadCsvTemplateV3F);
+    document.getElementById('btnPreviewCsvV3F')?.addEventListener('click',previewCsvImportV3F);
+    document.getElementById('csvImportFileV3F')?.addEventListener('change',()=>{csvImportRowsV3F=[];csvImportPreviewV3F=[]; const btn=document.getElementById('btnImportCsvToSupabaseV3F'); if(btn)btn.disabled=true;});
+    document.getElementById('btnImportCsvToSupabaseV3F')?.addEventListener('click',importCsvToSupabaseV3F);
+  }
+
+  function downloadCsvTemplateV3F(){
+    const sampleYear = adminScopeV3E?.role==='batch_admin' ? adminScopeV3E.year_end : '1995';
+    const csv = 'full_name,phone,email,year_spm,class_name,nickname,gender,location,state,profession,industry,company,stpm_year\n' +
+      `Nama Contoh,60123456789,contoh@email.com,${sampleYear},5 Sains 1,Contoh,Lelaki,Ipoh,Perak,Guru,Pendidikan,SMK Contoh,\n`;
+    downloadFile(`SMKASAS_template_import_${sampleYear||'alumni'}.csv`, csv, 'text/csv');
+  }
+
+  async function previewCsvImportV3F(){
+    const input=document.getElementById('csvImportFileV3F');
+    const file=input?.files?.[0];
+    const area=document.getElementById('csvPreviewAreaV3F');
+    if(!file){toast('Pilih file CSV dahulu'); return;}
+    area.innerHTML='<div class="empty">Membaca CSV...</div>';
+    const text=await file.text();
+    let raw=[];
+    try{ raw=parseCsv(text); }catch(e){ area.innerHTML=`<div class="note">CSV tidak dapat dibaca: ${esc(e.message||e)}</div>`; return; }
+    const batches=await fetchSupabaseBatches();
+    const byYear={}; batches.forEach(b=>{ if(b.year_end) byYear[String(b.year_end)] = b; });
+    csvImportPreviewV3F = normalizeCsvRowsV3F(raw, byYear);
+    csvImportRowsV3F = csvImportPreviewV3F.filter(r=>r.ok).map(r=>r.payload);
+    const ok=csvImportPreviewV3F.filter(r=>r.ok).length;
+    const bad=csvImportPreviewV3F.length-ok;
+    const btn=document.getElementById('btnImportCsvToSupabaseV3F'); if(btn) btn.disabled = ok===0;
+    area.innerHTML = csvImportPreviewV3F.length ? `<div class="safe-note"><strong>${ok}</strong> row sedia import. ${bad?`<strong>${bad}</strong> row perlu semak.`:'Tiada isu besar dikesan.'}</div><div class="table-wrap"><table class="table"><thead><tr><th>Status</th><th>Nama</th><th>Telefon</th><th>SPM</th><th>Batch</th><th>Isu</th></tr></thead><tbody>${csvImportPreviewV3F.slice(0,80).map(r=>`<tr><td data-label="Status">${r.ok?'<span class="chip ok">OK</span>':'<span class="chip red">Semak</span>'}</td><td data-label="Nama">${esc(r.full_name||'-')}</td><td data-label="Telefon">${esc(r.phone||'-')}</td><td data-label="SPM">${esc(r.year_spm||'-')}</td><td data-label="Batch">${esc(r.batch_name||'-')}</td><td data-label="Isu">${esc(r.issues.join(' · ')||'-')}</td></tr>`).join('')}</tbody></table></div>${csvImportPreviewV3F.length>80?'<div class="note">Preview 80 row pertama sahaja.</div>':''}` : '<div class="empty">CSV kosong atau header tidak dikenali.</div>';
+  }
+
+  function normalizeCsvRowsV3F(rows, batchByYear){
+    const seen={};
+    const scope=adminScopeV3E||{};
+    return (rows||[]).map((r,idx)=>{
+      const full_name = nullIfBlank(r.full_name || r.name || r.nama || r.nama_penuh);
+      const phone = cleanPhoneV3F(r.phone || r.telefon || r.whatsapp || r.no_tel || r.no_whatsapp);
+      const email = nullIfBlank(r.email || r.emel);
+      let year = String(r.year_spm || r.spm_year || r.tahun_spm || r.year_end || r.tahun || '').trim();
+      if(scope.role==='batch_admin' && !year) year = String(scope.year_end||'');
+      const issues=[];
+      if(!full_name) issues.push('Nama wajib');
+      if(!phone) issues.push('Telefon wajib');
+      if(!year) issues.push('Tahun SPM wajib');
+      const y=parseInt(year,10);
+      if(year && (!Number.isFinite(y) || y<1988 || y>new Date().getFullYear()+1)) issues.push('Tahun SPM tidak munasabah');
+      if(scope.role==='batch_admin' && String(y)!==String(scope.year_end)) issues.push(`Luar skop Batch Admin SPM ${scope.year_end}`);
+      const batch = batchByYear[String(y)];
+      if(y && !batch) issues.push('Batch belum wujud dalam Supabase');
+      const dupKey = phone || (email?email.toLowerCase():'') || `${(full_name||'').toLowerCase()}_${y}`;
+      if(dupKey && seen[dupKey]) issues.push('Duplicate dalam CSV');
+      seen[dupKey]=true;
+      const stpm = nullIfBlank(r.stpm_year || r.tahun_stpm);
+      const adminNote = ['CSV import v3F', stpm?`STPM: ${stpm}`:'', scope.role==='batch_admin'?`Batch Admin SPM ${scope.year_end}`:'Super Admin'].filter(Boolean).join(' | ');
+      const payload={
+        batch_id: batch?.id || null,
+        full_name,
+        nickname: nullIfBlank(r.nickname || r.nama_panggilan),
+        gender: nullIfBlank(r.gender || r.jantina),
+        phone,
+        email,
+        location: nullIfBlank(r.location || r.lokasi),
+        state: nullIfBlank(r.state || r.negeri),
+        country: 'Malaysia',
+        profession: nullIfBlank(r.profession || r.kerjaya || r.profesi),
+        industry: nullIfBlank(r.industry || r.industri),
+        company: nullIfBlank(r.company || r.syarikat || r.organisasi),
+        class_name: nullIfBlank(r.class_name || r.kelas || r.aliran),
+        member_no: nullIfBlank(r.member_no || r.no_pelajar),
+        year_end: Number.isFinite(y)?y:null,
+        role: 'Alumni',
+        privacy: 'group',
+        status: 'pending',
+        admin_note: adminNote
+      };
+      return {index:idx+1, ok:issues.length===0, issues, full_name, phone, year_spm:year, batch_name:batch?.batch_name||'', payload};
+    }).filter(x=>x.full_name || x.phone || x.year_spm);
+  }
+
+  function cleanPhoneV3F(v){
+    v=String(v||'').trim();
+    if(!v) return null;
+    let s=v.replace(/[^0-9+]/g,'');
+    if(s.startsWith('+')) s=s.slice(1);
+    if(s.startsWith('0')) s='6'+s;
+    return s || null;
+  }
+
+  async function importCsvToSupabaseV3F(){
+    const area=document.getElementById('csvPreviewAreaV3F');
+    if(!csvImportRowsV3F.length){ toast('Tiada row OK untuk import'); return; }
+    if(!confirm(`Import ${csvImportRowsV3F.length} alumni sebagai pending ke Supabase?`)) return;
+    area.innerHTML='<div class="empty">Mengimport ke Supabase...</div>';
+    try{
+      const chunkSize=100;
+      let total=0;
+      for(let i=0;i<csvImportRowsV3F.length;i+=chunkSize){
+        const chunk=csvImportRowsV3F.slice(i,i+chunkSize);
+        await supabaseFetch('smkasas_alumni', {method:'POST', body: JSON.stringify(chunk), headers:{Prefer:'return=minimal'}});
+        total += chunk.length;
+      }
+      area.innerHTML=`<div class="safe-note"><strong>${total}</strong> row berjaya diimport sebagai pending. Admin boleh semak di tab Verify Alumni.</div>`;
+      csvImportRowsV3F=[]; csvImportPreviewV3F=[];
+      const btn=document.getElementById('btnImportCsvToSupabaseV3F'); if(btn)btn.disabled=true;
+      toast('CSV berjaya diimport');
+      loadPendingAdminList2(adminPinV3C);
+    }catch(e){
+      area.innerHTML=`<div class="note"><strong>Import gagal.</strong><br>${esc(e.message||e)}</div>`;
+      toast('Import gagal');
+    }
+  }
+
+  function renderExportBackupV3F(scope){
+    return `<section class="panel"><h3>Export / Backup Ringan</h3><p>Export data dalam skop admin semasa. Super Admin export semua; Batch Admin export batch sendiri sahaja.</p><div class="safe-note"><strong>Skop:</strong> ${esc(adminScopeLabelV3E(scope))}</div></section>
+      <section class="grid2"><div class="form-card"><h4>Export CSV</h4><p class="muted">Sesuai untuk laporan, semakan offline dan backup ringkas.</p><div class="save-row"><button class="btn gold" id="btnExportVerifiedV3F">Export Verified CSV</button><button class="btn ghost" id="btnExportPendingV3F">Export Pending CSV</button><button class="btn blue" id="btnExportAllScopeV3F">Export Pending + Verified</button></div></div>
+      <div class="form-card"><h4>Backup JSON</h4><p class="muted">Backup skop semasa sebagai fail JSON. Simpan di Google Drive / laptop admin.</p><div class="save-row"><button class="btn gold" id="btnBackupScopeJsonV3F">Backup Scope JSON</button></div></div></section>
+      <section class="panel"><h3>Status Export</h3><div id="exportStatusV3F" class="empty">Pilih jenis export.</div></section>`;
+  }
+
+  function bindExportBackupV3F(){
+    document.getElementById('btnExportVerifiedV3F')?.addEventListener('click',()=>exportScopeCsvV3F('verified'));
+    document.getElementById('btnExportPendingV3F')?.addEventListener('click',()=>exportScopeCsvV3F('pending'));
+    document.getElementById('btnExportAllScopeV3F')?.addEventListener('click',()=>exportScopeCsvV3F('all'));
+    document.getElementById('btnBackupScopeJsonV3F')?.addEventListener('click',backupScopeJsonV3F);
+  }
+
+  async function scopedRowsV3F(kind){
+    const pending = (kind==='pending'||kind==='all') ? await fetchPendingAlumniFromSupabase(adminPinV3C) : [];
+    const verified = (kind==='verified'||kind==='all') ? await fetchScopedVerifiedAlumniV3E(adminPinV3C) : [];
+    const rows=[];
+    pending.forEach(r=>rows.push(Object.assign({},r,{export_status:'pending'})));
+    verified.forEach(r=>rows.push(Object.assign({},r,{export_status:'verified'})));
+    return rows;
+  }
+
+  async function exportScopeCsvV3F(kind){
+    const area=document.getElementById('exportStatusV3F'); if(area) area.innerHTML='<div class="empty">Menjana CSV...</div>';
+    try{
+      const rows=await scopedRowsV3F(kind);
+      if(!rows.length){ if(area) area.innerHTML='<div class="empty">Tiada data untuk export.</div>'; return; }
+      const header=['status','full_name','phone','email','batch_name','year_spm','class_name','profession','industry','company','state','created_at'];
+      const lines=[header.join(',')].concat(rows.map(r=>header.map(h=>csvCellV3F(h==='status'?(r.export_status||r.status):h==='year_spm'?(r.year_end||''):h==='batch_name'?(r.batch_name||''):(r[h]||''))).join(',')));
+      const label=(adminScopeV3E?.role==='batch_admin')?`SPM${adminScopeV3E.year_end}`:'ALL';
+      downloadFile(`SMKASAS_${label}_${kind}_export.csv`, lines.join('\n'), 'text/csv');
+      if(area) area.innerHTML=`<div class="safe-note"><strong>${rows.length}</strong> row diexport sebagai CSV.</div>`;
+    }catch(e){ if(area) area.innerHTML=`<div class="note">Export gagal: ${esc(e.message||e)}</div>`; }
+  }
+
+  async function backupScopeJsonV3F(){
+    const area=document.getElementById('exportStatusV3F'); if(area) area.innerHTML='<div class="empty">Menjana backup JSON...</div>';
+    try{
+      const [pending,verified,stats] = await Promise.all([
+        fetchPendingAlumniFromSupabase(adminPinV3C),
+        fetchScopedVerifiedAlumniV3E(adminPinV3C),
+        fetchScopedStatsV3E(adminPinV3C).catch(()=>null)
+      ]);
+      const backup={version:'SMKASAS_v3F_scope_backup',generated_at:new Date().toISOString(),scope:adminScopeV3E,pending,verified,stats};
+      const label=(adminScopeV3E?.role==='batch_admin')?`SPM${adminScopeV3E.year_end}`:'ALL';
+      downloadFile(`SMKASAS_${label}_backup_v3F.json`, JSON.stringify(backup,null,2), 'application/json');
+      if(area) area.innerHTML=`<div class="safe-note">Backup JSON siap. Pending: <strong>${pending.length}</strong>, Verified: <strong>${verified.length}</strong>.</div>`;
+    }catch(e){ if(area) area.innerHTML=`<div class="note">Backup gagal: ${esc(e.message||e)}</div>`; }
+  }
+
+  function csvCellV3F(v){
+    v=String(v??'');
+    return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v;
+  }
+
+
+
   initSMKASASBranding();
   renderMenu();
 })();
