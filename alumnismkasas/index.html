@@ -2304,7 +2304,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
 
 
   /* ==========================================================
-     KENAL Alumni SMKASAS v3F - Import CSV + Backup Ringan
+     KENAL Alumni SMKASAS v3I - Import Review + Duplicate Control
      - Super Admin boleh import/export semua batch
      - Batch Admin boleh import/export skop tahun SPM sendiri
      - CSV masuk Supabase sebagai pending, bukan auto verified
@@ -2328,7 +2328,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
     }
     const scope=adminScopeV3E||{};
     const batchTabLabel = scope.role === 'super_admin' ? 'Batch Setup' : 'Batch Saya';
-    w.innerHTML = `<div class="panel"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap"><div><h3 style="margin-bottom:4px">Admin Workspace</h3><p class="muted" style="margin:0;font-weight:850">${esc(adminScopeLabelV3E(scope))}</p><p class="muted" style="margin:6px 0 0;font-weight:750;line-height:1.4">${esc(adminScopeNoteV3E(scope))}</p><div class="chips" style="margin-top:8px">${adminScopeBadgeV3E(scope)}<span class="chip gold">v3F Import CSV</span></div></div><span class="admin-pin-status">PIN: ${esc(adminMaskPin(pin))}</span></div></div><div class="tabs admin-tabs"><button class="tab active" data-admin-public-tab="verify">Verify Alumni</button><button class="tab" data-admin-public-tab="directory">Direktori Dalaman</button><button class="tab" data-admin-public-tab="stats">Analisa Ringkas</button><button class="tab" data-admin-public-tab="batch">${esc(batchTabLabel)}</button><button class="tab" data-admin-public-tab="import">Import CSV</button><button class="tab" data-admin-public-tab="export">Export / Backup</button><button class="tab" data-admin-public-tab="sop">SOP / JD</button><button class="tab" data-admin-public-tab="future">Reunion Tools</button></div>
+    w.innerHTML = `<div class="panel"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap"><div><h3 style="margin-bottom:4px">Admin Workspace</h3><p class="muted" style="margin:0;font-weight:850">${esc(adminScopeLabelV3E(scope))}</p><p class="muted" style="margin:6px 0 0;font-weight:750;line-height:1.4">${esc(adminScopeNoteV3E(scope))}</p><div class="chips" style="margin-top:8px">${adminScopeBadgeV3E(scope)}<span class="chip gold">v3I Import Review</span></div></div><span class="admin-pin-status">PIN: ${esc(adminMaskPin(pin))}</span></div></div><div class="tabs admin-tabs"><button class="tab active" data-admin-public-tab="verify">Verify Alumni</button><button class="tab" data-admin-public-tab="directory">Direktori Dalaman</button><button class="tab" data-admin-public-tab="stats">Analisa Ringkas</button><button class="tab" data-admin-public-tab="batch">${esc(batchTabLabel)}</button><button class="tab" data-admin-public-tab="import">Import CSV</button><button class="tab" data-admin-public-tab="export">Export / Backup</button><button class="tab" data-admin-public-tab="sop">SOP / JD</button><button class="tab" data-admin-public-tab="future">Reunion Tools</button></div>
       <section id="adminTabVerify" class="admin-subpanel"><div class="form-card"><h4>Pending Alumni</h4><p class="muted">Senarai pendaftaran baru dalam skop akses ini. Klik Detail sebelum Verify jika perlu.</p><div id="adminPendingList2" class="empty">Memuatkan pending...</div></div></section>
       <section id="adminTabDirectory" class="admin-subpanel hidden"><div class="form-card"><h4>Direktori Dalaman Verified</h4><p class="muted">Paparan dalaman admin. Batch Admin hanya melihat verified batch sendiri.</p><div class="form-grid"><label class="field wide">Carian<input id="adminDirQuery" placeholder="Nama, phone, batch, kerja, lokasi..."></label></div><div class="save-row"><button class="btn gold" id="btnAdminLoadDirectory">Load Direktori</button></div><div id="adminDirectoryList" class="empty">Klik Load Direktori.</div></div></section>
       <section id="adminTabStats" class="admin-subpanel hidden"><div class="form-card"><h4>Analisa Ringkas</h4><p class="muted">Statistik dalam skop akses admin semasa.</p><div id="adminStatsArea" class="empty">Memuatkan statistik...</div></div></section>
@@ -2601,6 +2601,218 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
     return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v;
   }
 
+
+
+
+
+  /* ==========================================================
+     KENAL Alumni SMKASAS v3I - Import Review & Duplicate Control
+     - Preview CSV lebih jelas: OK · Duplicate · Semak · Luar Skop
+     - Admin boleh pilih Import / Skip / Semak Manual untuk setiap row
+     - Duplicate detail: banding data CSV dengan rekod sedia ada / duplicate dalam CSV
+     - Import summary selepas hantar ke Supabase
+     ========================================================== */
+  function renderCsvImportV3F(scope){
+    const locked = scope?.role === 'batch_admin';
+    const yearInfo = locked
+      ? `Import sesi ini dikunci kepada <strong>SPM ${esc(scope.year_end||'')}</strong>. Row tahun lain akan ditanda <strong>Luar Skop</strong> dan tidak diimport.`
+      : 'Super Admin boleh import banyak tahun SPM dalam satu CSV. Setiap row tetap dipreview sebelum import.';
+    return `<section class="panel"><h3>Import CSV Alumni</h3><p>Gunakan template kosong rasmi. Data import akan masuk sebagai <strong>pending</strong> dan perlu disemak/verified oleh admin.</p><div class="safe-note">${yearInfo}</div></section>
+      <section class="grid2"><div class="form-card"><h4>1. Download Template CSV Kosong</h4><p class="muted">Format wajib: <code>full_name, phone, email, year_spm, class_name, nickname, gender, location, state, profession, industry, company, stpm_year</code></p><div class="note">Jangan ubah nama header. Medan wajib untuk import bersih: <strong>full_name</strong>, <strong>phone</strong>, dan <strong>year_spm</strong>.</div><div class="save-row"><button class="btn gold" id="btnDownloadCsvTemplateV3F">Download Template CSV Kosong</button><button class="btn ghost" id="btnOpenCsvUploadV3F">Saya sudah isi template — buka upload</button></div></div>
+      <div class="form-card"><h4>2. Upload CSV Yang Sudah Diisi</h4><div id="csvUploadBoxV3F" class="hidden"><input class="file-input" type="file" id="csvImportFileV3F" accept=".csv,text/csv"><p class="muted">Pilih fail CSV yang sudah diisi. Sistem akan semak duplicate, luar skop dan row bermasalah sebelum import.</p><div class="save-row"><button class="btn gold" id="btnPreviewCsvV3F">Preview & Semak CSV</button></div></div><div id="csvUploadLockedV3F" class="empty">Download template dahulu atau klik “Saya sudah isi template — buka upload”.</div></div></section>
+      <section class="grid2"><div class="form-card"><h4>3. Skop Import</h4><div id="csvImportScopeNoteV3F" class="note">${adminScopeLabelV3E(scope)}</div><p class="muted">Sistem auto padankan Tahun SPM kepada batch rasmi. BATCH 1 = SPM 1988.</p></div><div class="form-card"><h4>4. Review Action</h4><p class="muted">Selepas preview, pilih tindakan untuk setiap row: <strong>Import</strong>, <strong>Skip</strong>, atau <strong>Semak Manual</strong>.</p><div class="save-row"><button class="btn ghost" id="btnCsvMarkAllImportV3I" disabled>Mark OK untuk Import</button><button class="btn gold" id="btnImportCsvToSupabaseV3F" disabled>Import Terpilih ke Supabase</button></div></div></section>
+      <section class="panel"><h3>Preview & Review CSV</h3><div id="csvPreviewAreaV3F" class="empty">Upload CSV dan klik Preview & Semak CSV.</div></section>`;
+  }
+
+  function bindCsvImportV3F(){
+    document.getElementById('btnDownloadCsvTemplateV3F')?.addEventListener('click',()=>{downloadCsvTemplateV3F(); showCsvUploadV3F();});
+    document.getElementById('btnOpenCsvUploadV3F')?.addEventListener('click',showCsvUploadV3F);
+    document.getElementById('btnPreviewCsvV3F')?.addEventListener('click',previewCsvImportV3F);
+    document.getElementById('csvImportFileV3F')?.addEventListener('change',()=>{csvImportRowsV3F=[];csvImportPreviewV3F=[]; toggleCsvImportButtonsV3I();});
+    document.getElementById('btnImportCsvToSupabaseV3F')?.addEventListener('click',importCsvToSupabaseV3F);
+    document.getElementById('btnCsvMarkAllImportV3I')?.addEventListener('click',()=>{
+      csvImportPreviewV3F.forEach(r=>{ if(r.canImport && r.action!=='skip') r.action='import'; });
+      renderCsvReviewTableV3I();
+    });
+  }
+
+  function toggleCsvImportButtonsV3I(){
+    const importable = (csvImportPreviewV3F||[]).filter(r=>r.action==='import' && r.canImport).length;
+    const anyReview = (csvImportPreviewV3F||[]).length > 0;
+    const btn=document.getElementById('btnImportCsvToSupabaseV3F'); if(btn) btn.disabled = importable===0;
+    const mark=document.getElementById('btnCsvMarkAllImportV3I'); if(mark) mark.disabled = !anyReview;
+  }
+
+  async function previewCsvImportV3F(){
+    const input=document.getElementById('csvImportFileV3F');
+    const file=input?.files?.[0];
+    const area=document.getElementById('csvPreviewAreaV3F');
+    if(!file){toast('Pilih file CSV dahulu'); return;}
+    area.innerHTML='<div class="empty">Membaca CSV dan menyemak duplicate...</div>';
+    let text = await file.text();
+    let raw=[];
+    try{ raw=parseCsvV3H(text); }catch(e){ area.innerHTML=`<div class="note">CSV tidak dapat dibaca: ${esc(e.message||e)}</div>`; return; }
+    const batches=await fetchSupabaseBatches();
+    const byYear={}; batches.forEach(b=>{ if(b.year_end) byYear[String(b.year_end)] = b; });
+    let existing=[];
+    try{
+      const [pending, verified] = await Promise.all([
+        fetchPendingAlumniFromSupabase(adminPinV3C).catch(()=>[]),
+        fetchScopedVerifiedAlumniV3E(adminPinV3C).catch(()=>[])
+      ]);
+      existing = ([]).concat(pending||[], verified||[]);
+    }catch(e){ existing=[]; }
+    const duplicateIndex = buildExistingDuplicateIndexV3I(existing);
+    csvImportPreviewV3F = normalizeCsvRowsV3I(raw, byYear, duplicateIndex);
+    renderCsvReviewTableV3I();
+  }
+
+  function buildExistingDuplicateIndexV3I(rows){
+    const idx={phone:{},email:{},nameYear:{}};
+    (rows||[]).forEach(r=>{
+      const rec={id:r.id||'',full_name:r.full_name||r.name||'',phone:cleanPhoneV3F(r.phone),email:(r.email||'').toLowerCase(),year_end:r.year_end||r.year_spm||'',batch_name:r.batch_name||'',status:r.status||r.export_status||''};
+      if(rec.phone) idx.phone[rec.phone]=rec;
+      if(rec.email) idx.email[rec.email]=rec;
+      const ny=dupNameYearKeyV3I(rec.full_name, rec.year_end);
+      if(ny) idx.nameYear[ny]=rec;
+    });
+    return idx;
+  }
+
+  function dupNameYearKeyV3I(name, year){
+    const n=String(name||'').toLowerCase().replace(/[^a-z0-9]+/g,'').trim();
+    const y=String(year||'').trim();
+    return n && y ? `${n}_${y}` : '';
+  }
+
+  function normalizeCsvRowsV3I(rows, batchByYear, duplicateIndex){
+    const seen={phone:{},email:{},nameYear:{}};
+    const scope=adminScopeV3E||{};
+    return (rows||[]).map((r,idx)=>{
+      const full_name = nullIfBlank(r.full_name || r.name || r.nama || r.nama_penuh);
+      const phone = cleanPhoneV3F(r.phone || r.telefon || r.whatsapp || r.no_tel || r.no_whatsapp);
+      const email = nullIfBlank(r.email || r.emel);
+      let year = String(r.year_spm || r.spm_year || r.tahun_spm || r.year_end || r.tahun || '').trim();
+      if(scope.role==='batch_admin' && !year) year = String(scope.year_end||'');
+      const issues=[];
+      const warnings=[];
+      let category='ok';
+      if(!full_name) issues.push('Nama wajib');
+      if(!phone) issues.push('Telefon wajib');
+      if(!year) issues.push('Tahun SPM wajib');
+      const y=parseInt(year,10);
+      if(year && (!Number.isFinite(y) || y<1988 || y>new Date().getFullYear()+1)) issues.push('Tahun SPM tidak munasabah');
+      if(scope.role==='batch_admin' && String(y)!==String(scope.year_end)){ issues.push(`Luar skop Batch Admin SPM ${scope.year_end}`); category='scope'; }
+      const batch = batchByYear[String(y)];
+      if(y && !batch) issues.push('Batch belum wujud dalam Supabase');
+      const ny=dupNameYearKeyV3I(full_name,y);
+      const csvDup=[];
+      if(phone && seen.phone[phone]) csvDup.push(`Telefon sama dengan row ${seen.phone[phone]}`);
+      if(email && seen.email[email.toLowerCase()]) csvDup.push(`Email sama dengan row ${seen.email[email.toLowerCase()]}`);
+      if(ny && seen.nameYear[ny]) csvDup.push(`Nama + SPM sama dengan row ${seen.nameYear[ny]}`);
+      if(phone) seen.phone[phone]=idx+1;
+      if(email) seen.email[email.toLowerCase()]=idx+1;
+      if(ny) seen.nameYear[ny]=idx+1;
+      const existingMatches=[];
+      if(phone && duplicateIndex.phone[phone]) existingMatches.push({type:'Telefon sama',record:duplicateIndex.phone[phone]});
+      if(email && duplicateIndex.email[email.toLowerCase()]) existingMatches.push({type:'Email sama',record:duplicateIndex.email[email.toLowerCase()]});
+      if(ny && duplicateIndex.nameYear[ny]) existingMatches.push({type:'Nama + SPM sama',record:duplicateIndex.nameYear[ny]});
+      if(csvDup.length || existingMatches.length){ category = category==='scope' ? 'scope' : 'duplicate'; }
+      if(csvDup.length) warnings.push(...csvDup);
+      if(existingMatches.length) warnings.push(...existingMatches.map(x=>`${x.type} dengan rekod ${x.record.status||'sedia ada'}`));
+      if(issues.length && category!=='scope') category='review';
+      const stpm = nullIfBlank(r.stpm_year || r.tahun_stpm);
+      const adminNote = ['CSV import v3I', stpm?`STPM: ${stpm}`:'', scope.role==='batch_admin'?`Batch Admin SPM ${scope.year_end}`:'Super Admin', `Row CSV: ${idx+1}`].filter(Boolean).join(' | ');
+      const payload={
+        batch_id: batch?.id || null,
+        full_name,
+        nickname: nullIfBlank(r.nickname || r.nama_panggilan),
+        gender: nullIfBlank(r.gender || r.jantina),
+        phone,
+        email,
+        location: nullIfBlank(r.location || r.lokasi),
+        state: nullIfBlank(r.state || r.negeri),
+        country: 'Malaysia',
+        profession: nullIfBlank(r.profession || r.kerjaya || r.profesi),
+        industry: nullIfBlank(r.industry || r.industri),
+        company: nullIfBlank(r.company || r.syarikat || r.organisasi),
+        class_name: nullIfBlank(r.class_name || r.kelas || r.aliran),
+        member_no: nullIfBlank(r.member_no || r.no_pelajar),
+        year_end: Number.isFinite(y)?y:null,
+        role: 'Alumni',
+        privacy: 'group',
+        status: 'pending',
+        admin_note: adminNote
+      };
+      const canImport = issues.length===0 && category!=='scope';
+      let action = canImport && category==='ok' ? 'import' : (category==='duplicate' ? 'skip' : 'review');
+      return {index:idx+1, canImport, action, category, issues, warnings, existingMatches, csvDup, full_name, phone, email, year_spm:year, batch_name:batch?.batch_name||'', payload};
+    }).filter(x=>x.full_name || x.phone || x.year_spm);
+  }
+
+  function renderCsvReviewTableV3I(){
+    const area=document.getElementById('csvPreviewAreaV3F'); if(!area) return;
+    if(!csvImportPreviewV3F.length){ area.innerHTML='<div class="empty">CSV kosong atau header tidak dikenali.</div>'; toggleCsvImportButtonsV3I(); return; }
+    const counts = csvImportPreviewV3F.reduce((a,r)=>{a[r.category]=(a[r.category]||0)+1; a.action[r.action]=(a.action[r.action]||0)+1; return a;},{ok:0,duplicate:0,review:0,scope:0,action:{import:0,skip:0,review:0}});
+    area.innerHTML = `<div class="safe-note"><strong>${counts.action.import||0}</strong> row dipilih untuk import. <strong>${counts.duplicate||0}</strong> duplicate. <strong>${counts.review||0}</strong> semak manual. <strong>${counts.scope||0}</strong> luar skop.</div>
+      <div class="report-pill-row"><span class="report-pill">OK: ${counts.ok||0}</span><span class="report-pill">Duplicate: ${counts.duplicate||0}</span><span class="report-pill">Semak: ${counts.review||0}</span><span class="report-pill">Luar Skop: ${counts.scope||0}</span></div>
+      <div class="note"><strong>Prinsip selamat:</strong> duplicate dan row bermasalah tidak diimport automatik. Admin boleh tukar tindakan jika benar-benar yakin.</div>
+      <div class="table-wrap"><table class="table"><thead><tr><th>Status</th><th>Tindakan</th><th>Nama</th><th>Telefon</th><th>SPM</th><th>Batch</th><th>Isu / Duplicate Detail</th></tr></thead><tbody>${csvImportPreviewV3F.slice(0,120).map(r=>renderCsvReviewRowV3I(r)).join('')}</tbody></table></div>${csvImportPreviewV3F.length>120?'<div class="note">Preview 120 row pertama sahaja. Row selebihnya masih ikut tindakan default.</div>':''}`;
+    area.querySelectorAll('[data-csv-action-row]').forEach(sel=>sel.addEventListener('change',()=>{
+      const idx=Number(sel.dataset.csvActionRow)-1;
+      if(csvImportPreviewV3F[idx]) csvImportPreviewV3F[idx].action=sel.value;
+      toggleCsvImportButtonsV3I();
+      const note=document.getElementById('csvActionSummaryV3I');
+      if(note){ const n=csvImportPreviewV3F.filter(r=>r.action==='import'&&r.canImport).length; note.textContent=`${n} row dipilih untuk import`; }
+    }));
+    area.insertAdjacentHTML('beforeend',`<div class="save-row"><span id="csvActionSummaryV3I" class="mini gold">${(counts.action.import||0)} row dipilih untuk import</span></div>`);
+    toggleCsvImportButtonsV3I();
+  }
+
+  function renderCsvReviewRowV3I(r){
+    const statusHtml = r.category==='ok' ? '<span class="chip ok">OK</span>' : r.category==='duplicate' ? '<span class="chip warn">Duplicate</span>' : r.category==='scope' ? '<span class="chip red">Luar Skop</span>' : '<span class="chip red">Semak</span>';
+    const disableImport = !r.canImport ? 'disabled' : '';
+    const detail = buildCsvIssueDetailV3I(r);
+    return `<tr><td data-label="Status">${statusHtml}</td><td data-label="Tindakan"><select data-csv-action-row="${r.index}"><option value="import" ${r.action==='import'?'selected':''} ${disableImport}>Import</option><option value="skip" ${r.action==='skip'?'selected':''}>Skip</option><option value="review" ${r.action==='review'?'selected':''}>Semak Manual</option></select></td><td data-label="Nama">${esc(r.full_name||'-')}</td><td data-label="Telefon">${esc(r.phone||'-')}</td><td data-label="SPM">${esc(r.year_spm||'-')}</td><td data-label="Batch">${esc(r.batch_name||'-')}</td><td data-label="Isu">${detail}</td></tr>`;
+  }
+
+  function buildCsvIssueDetailV3I(r){
+    const bits=[];
+    if(r.issues?.length) bits.push(`<strong>Isu:</strong> ${esc(r.issues.join(' · '))}`);
+    if(r.warnings?.length) bits.push(`<strong>Amaran:</strong> ${esc(r.warnings.join(' · '))}`);
+    if(r.existingMatches?.length){
+      const details = r.existingMatches.slice(0,3).map(x=>`${x.type}: ${x.record.full_name||'-'} · ${x.record.phone||'-'} · SPM ${x.record.year_end||'-'} · ${x.record.status||'-'}`).join(' | ');
+      bits.push(`<strong>Rekod sedia ada:</strong> ${esc(details)}`);
+    }
+    return bits.length ? bits.join('<br>') : '-';
+  }
+
+  async function importCsvToSupabaseV3F(){
+    const area=document.getElementById('csvPreviewAreaV3F');
+    const selected = (csvImportPreviewV3F||[]).filter(r=>r.action==='import' && r.canImport).map(r=>r.payload);
+    const skipped = (csvImportPreviewV3F||[]).filter(r=>r.action==='skip').length;
+    const review = (csvImportPreviewV3F||[]).filter(r=>r.action==='review').length;
+    if(!selected.length){ toast('Tiada row dipilih untuk import'); return; }
+    if(!confirm(`Import ${selected.length} row sebagai pending?\nSkip: ${skipped}\nSemak Manual: ${review}`)) return;
+    area.innerHTML='<div class="empty">Mengimport row terpilih ke Supabase...</div>';
+    try{
+      const chunkSize=100;
+      let total=0;
+      for(let i=0;i<selected.length;i+=chunkSize){
+        const chunk=selected.slice(i,i+chunkSize);
+        await supabaseFetch('smkasas_alumni', {method:'POST', body: JSON.stringify(chunk), headers:{Prefer:'return=minimal'}});
+        total += chunk.length;
+      }
+      area.innerHTML=`<div class="safe-note"><strong>${total}</strong> row berjaya diimport sebagai pending.</div><div class="stats"><div class="stat"><strong>${total}</strong><span>Imported</span></div><div class="stat"><strong>${skipped}</strong><span>Skipped</span></div><div class="stat"><strong>${review}</strong><span>Semak Manual</span></div><div class="stat"><strong>${(csvImportPreviewV3F||[]).filter(r=>r.category==='duplicate').length}</strong><span>Duplicate dikesan</span></div></div><div class="note">Admin boleh semak data import di tab <strong>Verify Alumni</strong>. Duplicate/semak manual tidak diimport.</div>`;
+      csvImportRowsV3F=[]; csvImportPreviewV3F=[];
+      toggleCsvImportButtonsV3I();
+      toast('Import review berjaya');
+      loadPendingAdminList2(adminPinV3C);
+    }catch(e){
+      area.innerHTML=`<div class="note"><strong>Import gagal.</strong><br>${esc(e.message||e)}</div>`;
+      toast('Import gagal');
+    }
+  }
 
 
   initSMKASASBranding();
