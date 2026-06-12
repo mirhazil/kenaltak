@@ -2170,6 +2170,140 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
   }
 
 
+
+
+  /* ==========================================================
+     KENAL Alumni SMKASAS v3E - Batch Admin Lite
+     - Super Admin PIN: ASASIANS1984 (semua batch)
+     - Batch Admin PIN: ASASIANS + Tahun SPM, contoh ASASIANS1995
+     - Pending / Direktori / Analisa scoped ikut batch admin
+     ========================================================== */
+  let adminScopeV3E = null;
+
+  async function fetchAdminScopeV3E(pin){
+    return await supabaseRpc('smkasas_admin_scope', {p_pin: pin});
+  }
+  async function fetchScopedVerifiedAlumniV3E(pin){
+    return await supabaseRpc('smkasas_admin_verified_scope', {p_pin: pin});
+  }
+  async function fetchScopedStatsV3E(pin){
+    return await supabaseRpc('smkasas_admin_stats_scope', {p_pin: pin});
+  }
+
+  fetchPendingAlumniFromSupabase = async function(pin){
+    return await supabaseRpc('smkasas_admin_pending_scope', {p_pin: pin});
+  };
+  updateAlumniStatusSupabase = async function(pin, alumniId, status){
+    return await supabaseRpc('smkasas_admin_update_status_scope', {p_pin: pin, p_alumni_id: alumniId, p_status: status});
+  };
+
+  function adminScopeLabelV3E(scope){
+    if(!scope) return 'Belum dikenal pasti';
+    if(scope.role === 'super_admin') return 'Super Admin · Semua batch';
+    return `Batch Admin · ${scope.batch_name || ('SPM '+(scope.year_end||''))}`;
+  }
+  function adminScopeNoteV3E(scope){
+    if(!scope) return '';
+    if(scope.role === 'super_admin'){
+      return 'Akses penuh untuk semakan semua batch, direktori dalaman dan laporan keseluruhan.';
+    }
+    return `Akses dihadkan kepada alumni SPM ${scope.year_end}. Data batch lain tidak dipaparkan di workspace ini.`;
+  }
+  function adminScopeBadgeV3E(scope){
+    if(!scope) return '<span class="chip warn">PIN belum disahkan</span>';
+    if(scope.role === 'super_admin') return '<span class="chip gold">Super Admin</span><span class="chip">Semua batch</span>';
+    return `<span class="chip ok">Batch Admin</span><span class="chip gold">SPM ${esc(scope.year_end||'-')}</span>`;
+  }
+
+  renderAdminGate = function(){
+    return `<section class="admin-gate-grid"><div class="admin-gate-card"><h4>Pusat Admin SMKASAS</h4><p>Masukkan PIN Super Admin atau PIN Batch Admin. Batch Admin hanya nampak data batch sendiri.</p><div class="admin-quick-grid"><div class="admin-quick"><strong>Super</strong><span>ASASIANS1984</span></div><div class="admin-quick"><strong>Batch</strong><span>ASASIANS + Tahun SPM</span></div><div class="admin-quick"><strong>Scope</strong><span>ikut role</span></div></div><div class="safe-note" style="margin-top:12px"><strong>Contoh:</strong> Batch Admin SPM 1995 guna PIN <b>ASASIANS1995</b>.</div></div><div class="form-card"><h4>Admin PIN</h4><div class="form-grid"><label class="field wide">PIN Admin<input id="adminMasterPin" type="password" placeholder="ASASIANS1984 / ASASIANS1995"></label></div><div class="save-row"><button class="btn gold" id="btnEnterAdmin">Masuk Admin</button></div><div class="admin-small-note">PIN pilot. Versi production nanti guna login sebenar dan audit log.</div></div></section><section id="adminWorkspace" style="margin-top:14px"></section>`;
+  };
+
+  bindAdminGate = function(){
+    const input=document.getElementById('adminMasterPin');
+    input?.addEventListener('keydown',e=>{ if(e.key==='Enter') renderAdminWorkspace(); });
+    document.getElementById('btnEnterAdmin')?.addEventListener('click',()=>renderAdminWorkspace());
+  };
+
+  renderAdminWorkspace = async function(){
+    const pin=document.getElementById('adminMasterPin')?.value||adminPinV3C||'';
+    if(!pin){toast('Masukkan PIN admin');return;}
+    adminPinV3C=pin;
+    const w=document.getElementById('adminWorkspace'); if(!w)return;
+    w.innerHTML = `<div class="panel"><h3>Menyemak akses admin...</h3><p class="muted">Sistem sedang mengenal pasti skop PIN.</p></div>`;
+    try{
+      adminScopeV3E = await fetchAdminScopeV3E(pin);
+    }catch(e){
+      adminScopeV3E = null;
+      w.innerHTML = `<div class="note"><strong>PIN tidak sah / gagal disemak.</strong><br>${esc(e.message||e)}</div>`;
+      return;
+    }
+    const scope=adminScopeV3E||{};
+    const batchTabLabel = scope.role === 'super_admin' ? 'Batch Setup' : 'Batch Saya';
+    w.innerHTML = `<div class="panel"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap"><div><h3 style="margin-bottom:4px">Admin Workspace</h3><p class="muted" style="margin:0;font-weight:850">${esc(adminScopeLabelV3E(scope))}</p><p class="muted" style="margin:6px 0 0;font-weight:750;line-height:1.4">${esc(adminScopeNoteV3E(scope))}</p><div class="chips" style="margin-top:8px">${adminScopeBadgeV3E(scope)}</div></div><span class="admin-pin-status">PIN: ${esc(adminMaskPin(pin))}</span></div></div><div class="tabs admin-tabs"><button class="tab active" data-admin-public-tab="verify">Verify Alumni</button><button class="tab" data-admin-public-tab="directory">Direktori Dalaman</button><button class="tab" data-admin-public-tab="stats">Analisa Ringkas</button><button class="tab" data-admin-public-tab="batch">${esc(batchTabLabel)}</button><button class="tab" data-admin-public-tab="sop">SOP / JD</button><button class="tab" data-admin-public-tab="future">Import / Reunion Tools</button></div>
+      <section id="adminTabVerify" class="admin-subpanel"><div class="form-card"><h4>Pending Alumni</h4><p class="muted">Senarai pendaftaran baru dalam skop akses ini. Klik Detail sebelum Verify jika perlu.</p><div id="adminPendingList2" class="empty">Memuatkan pending...</div></div></section>
+      <section id="adminTabDirectory" class="admin-subpanel hidden"><div class="form-card"><h4>Direktori Dalaman Verified</h4><p class="muted">Paparan dalaman admin. Batch Admin hanya melihat verified batch sendiri.</p><div class="form-grid"><label class="field wide">Carian<input id="adminDirQuery" placeholder="Nama, phone, batch, kerja, lokasi..."></label></div><div class="save-row"><button class="btn gold" id="btnAdminLoadDirectory">Load Direktori</button></div><div id="adminDirectoryList" class="empty">Klik Load Direktori.</div></div></section>
+      <section id="adminTabStats" class="admin-subpanel hidden"><div class="form-card"><h4>Analisa Ringkas</h4><p class="muted">Statistik dalam skop akses admin semasa.</p><div id="adminStatsArea" class="empty">Memuatkan statistik...</div></div></section>
+      <section id="adminTabBatch" class="admin-subpanel hidden"><div class="form-card"><h4>${esc(batchTabLabel)}</h4><p>${scope.role==='super_admin'?'Batch rasmi disediakan oleh sistem/admin. Public tidak boleh cipta batch sendiri.':'Batch Admin hanya ditugaskan kepada batch yang dipadankan dengan PIN tahun SPM.'}</p><div class="save-row"><button class="btn gold" id="btnAdminLoadBatches">Load Batch</button></div><div id="adminBatchList" class="empty">Klik Load Batch.</div></div></section>
+      <section id="adminTabSop" class="admin-subpanel hidden">${renderAdminSopBoardV3D()}${renderBatchAdminSopAddonV3E(scope)}</section>
+      <section id="adminTabFuture" class="admin-subpanel hidden"><div class="grid2"><div class="form-card"><h4>Import CSV</h4><p>Modul CSV akan dimasukkan semula dengan mapping Tahun SPM → Batch rasmi.</p><div class="empty">Coming next</div></div><div class="form-card"><h4>Reunion Tools</h4><p>Batch Admin kelak boleh urus RSVP dan reunion untuk batch sendiri sahaja.</p><div class="empty">Coming next</div></div></div></section>`;
+    bindAdminWorkspace(pin);
+    loadPendingAdminList2(pin);
+    loadAdminStats();
+  };
+
+  function renderBatchAdminSopAddonV3E(scope){
+    return `<section class="panel"><h3>Watikah & Skop Akses</h3><p>Rangka ini menyediakan asas lantikan Batch Admin sebelum sistem login penuh dibina.</p><div class="grid2"><div class="form-card"><h4>Skop Sesi Semasa</h4><p><strong>${esc(adminScopeLabelV3E(scope))}</strong></p><p class="muted" style="font-weight:850;line-height:1.45">${esc(adminScopeNoteV3E(scope))}</p></div><div class="form-card"><h4>Prinsip Amanah Data</h4><ul><li>Guna data untuk tujuan alumni sahaja</li><li>Jangan kongsi nombor telefon tanpa izin</li><li>Verify hanya alumni yang diyakini</li><li>Rujuk Super Admin jika ragu</li></ul></div></div></section>`;
+  }
+
+  bindAdminWorkspace = function(pin){
+    document.querySelectorAll('[data-admin-public-tab]').forEach(tab=>tab.addEventListener('click',()=>{
+      document.querySelectorAll('[data-admin-public-tab]').forEach(t=>t.classList.remove('active')); tab.classList.add('active');
+      ['Verify','Directory','Stats','Batch','Sop','Future'].forEach(k=>document.getElementById('adminTab'+k)?.classList.add('hidden'));
+      const k=cap(tab.dataset.adminPublicTab); document.getElementById('adminTab'+k)?.classList.remove('hidden');
+      if(tab.dataset.adminPublicTab==='stats') loadAdminStats();
+      if(tab.dataset.adminPublicTab==='directory') loadAdminDirectory();
+      if(tab.dataset.adminPublicTab==='batch') loadAdminBatches();
+    }));
+    document.getElementById('btnAdminLoadDirectory')?.addEventListener('click',()=>loadAdminDirectory());
+    document.getElementById('btnAdminLoadBatches')?.addEventListener('click',()=>loadAdminBatches());
+  };
+
+  loadAdminDirectory = async function(){
+    const area=document.getElementById('adminDirectoryList'); if(!area)return;
+    area.innerHTML='<div class="empty">Memuatkan direktori...</div>';
+    try{
+      const rows=await fetchScopedVerifiedAlumniV3E(adminPinV3C);
+      const q=normalize(document.getElementById('adminDirQuery')?.value||'');
+      const filtered=rows.filter(r=>!q || normalize([r.full_name,r.phone,r.email,r.profession,r.state,r.batch_name,r.year_end].join(' ')).includes(q));
+      area.innerHTML = filtered.length ? `<div class="safe-note"><strong>${filtered.length}</strong> verified dipaparkan. ${esc(adminScopeLabelV3E(adminScopeV3E))}</div><div class="results">${filtered.map(alumniRowCardScopedV3E).join('')}</div>` : '<div class="empty">Tiada verified dalam skop ini.</div>';
+    }catch(e){area.innerHTML=`<div class="note">Gagal load direktori: ${esc(e.message||e)}</div>`;}
+  };
+
+  function alumniRowCardScopedV3E(row){
+    const batchLabel = row.batch_name || (row.year_end ? `SPM ${row.year_end}` : 'Batch belum dipilih');
+    const meta = [batchLabel, row.class_name, row.profession, row.state].filter(Boolean).join(' · ');
+    const contact = [row.phone, row.email].filter(Boolean).join(' · ') || 'Contact belum dipaparkan';
+    return `<div class="result-card"><div><strong>${esc(row.full_name||'-')}</strong><p>${esc(meta||'-')}<br>${esc(contact)}</p><div class="chips"><span class="chip ok">Verified</span>${row.industry?`<span class="chip">${esc(row.industry)}</span>`:''}</div></div></div>`;
+  }
+
+  loadAdminStats = async function(){
+    const area=document.getElementById('adminStatsArea'); if(!area)return;
+    try{
+      const d=await fetchScopedStatsV3E(adminPinV3C);
+      area.innerHTML=`<div class="safe-note"><strong>${esc(adminScopeLabelV3E(adminScopeV3E))}</strong></div><div class="stats"><div class="stat"><strong>${esc(d.total_registered??0)}</strong><span>Total daftar</span></div><div class="stat"><strong>${esc(d.total_verified??0)}</strong><span>Verified</span></div><div class="stat"><strong>${esc(d.total_pending??0)}</strong><span>Pending</span></div><div class="stat"><strong>${esc(d.total_rejected??0)}</strong><span>Rejected</span></div><div class="stat"><strong>${esc(d.total_batches??0)}</strong><span>Batch scope</span></div></div>`;
+    }catch(e){area.innerHTML=`<div class="note">Gagal load statistik: ${esc(e.message||e)}</div>`;}
+  };
+
+  loadAdminBatches = async function(){
+    const area=document.getElementById('adminBatchList'); if(!area)return;
+    try{
+      let batches=await fetchSupabaseBatches();
+      if(adminScopeV3E?.role==='batch_admin') batches=batches.filter(b=>String(b.year_end)===String(adminScopeV3E.year_end));
+      area.innerHTML = batches.length ? `<div class="table-wrap"><table class="table"><thead><tr><th>Batch</th><th>Short</th><th>SPM</th><th>Skop</th></tr></thead><tbody>${batches.map(b=>`<tr><td data-label="Batch">${esc(b.batch_name)}</td><td data-label="Short">${esc(b.short_name||'-')}</td><td data-label="SPM">${esc(b.year_end||'-')}</td><td data-label="Skop">${adminScopeV3E?.role==='batch_admin'?'Batch Admin':'Super Admin'}</td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">Belum ada batch dalam skop ini.</div>';
+    }catch(e){area.innerHTML=`<div class="note">Gagal load batch: ${esc(e.message||e)}</div>`;}
+  };
+
   initSMKASASBranding();
   renderMenu();
 })();
