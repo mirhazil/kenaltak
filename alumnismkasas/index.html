@@ -1553,6 +1553,287 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
     });
   }
 
+
+
+  /* ==========================================================
+     KENAL Alumni SMKASAS - Public/Admin Restructure v3A
+     Public: Utama, Daftar Alumni, Reunion & Hebahan
+     Admin: gated by PIN, hidden from public menu
+     Batch logic: BATCH 1 = Form 1 1984, SPM 1988
+     ========================================================== */
+  sections.splice(0, sections.length,
+    ['dashboard','Utama','Info kempen, progress pendaftaran dan status verified alumni.'],
+    ['member','Daftar Alumni','Isi profil alumni. Sistem auto susun batch ikut Tahun SPM.'],
+    ['publicReunion','Reunion & Hebahan','Hebahan reunion, kempen data dan makluman alumni.']
+  );
+
+  function smkasasBatchNoFromSPM(year){
+    const y = parseInt(String(year||'').trim(),10);
+    if(!Number.isFinite(y) || y < 1988) return null;
+    return y - 1987;
+  }
+  function smkasasForm1FromSPM(year){
+    const y = parseInt(String(year||'').trim(),10);
+    return Number.isFinite(y) ? y - 4 : null;
+  }
+  function smkasasBatchLabelFromSPM(year){
+    const no = smkasasBatchNoFromSPM(year);
+    const f1 = smkasasForm1FromSPM(year);
+    return no ? `BATCH ${no} · SPM ${year} · Form 1 ${f1}` : '';
+  }
+
+  renderMenu = function(){
+    const grid = document.getElementById('menuGrid');
+    if(!grid) return;
+    grid.classList.add('public-menu-grid');
+    grid.innerHTML = sections.map((s,i)=>`<button class="menu-card" data-open="${i}"><div class="menu-num">${i+1}</div><h3>${esc(s[1])}</h3><p>${esc(s[2])}</p></button>`).join('');
+    grid.querySelectorAll('[data-open]').forEach(btn=>btn.addEventListener('click',()=>openSection(Number(btn.dataset.open))));
+    const footer = document.querySelector('.footer-note');
+    if(footer){
+      footer.innerHTML = `KENAL Alumni SMKASAS · Public alumni preview · Data masuk Supabase sebagai pending dan hanya disahkan oleh admin.<br><button class="mini gold" id="btnOpenAdminGate" style="margin-top:10px">Admin</button>`;
+      document.getElementById('btnOpenAdminGate')?.addEventListener('click', openAdminModal);
+    }
+  };
+
+  renderSection = function(){
+    const s=sections[currentSection];
+    document.getElementById('modalKicker').textContent = `MENU ${currentSection+1}`;
+    document.getElementById('modalTitle').textContent = s[1];
+    document.getElementById('btnPrev').style.display='';
+    document.getElementById('btnNext').style.display='';
+    document.getElementById('btnPrev').disabled = currentSection===0;
+    document.getElementById('btnNext').disabled = currentSection===sections.length-1;
+    const map = {dashboard:renderDashboard, member:renderMember, publicReunion:renderPublicReunion};
+    document.getElementById('modalBody').innerHTML = map[s[0]]();
+    bindSection(s[0]);
+  };
+
+  bindSection = function(id){
+    if(id==='dashboard') bindDashboard();
+    if(id==='member') bindMember();
+    if(id==='publicReunion') bindPublicReunion();
+  };
+
+  renderDashboard = function(){
+    return `<section class="panel smkasas-intro-panel"><h3>Utama Alumni SMKASAS</h3><p>Ruang info awam untuk kempen data alumni SMKA Sultan Azlan Shah. Paparan ini hanya menunjukkan statistik dan hebahan umum — bukan direktori peribadi alumni.</p><div class="safe-note"><strong>Batch rasmi:</strong> BATCH 1 = Form 1 tahun 1984 dan SPM tahun 1988. Alumni hanya perlu isi Tahun SPM; sistem akan susun batch secara automatik.</div></section>
+      <section class="impact-band"><h3>Progress Kempen Data Alumni</h3><p>Statistik ini akan dikemas kini dari Supabase selepas data diverifikasi oleh admin.</p><div class="impact-grid" id="publicStatsGrid"><div class="impact-stat"><strong>...</strong><span>Memuatkan data</span></div></div><div class="impact-badge">SMKASAS · ASASIANS · KENAL Alumni</div></section>
+      <section class="grid3"><div class="form-card"><h4>1. Daftar</h4><p>Alumni isi profil asas dan Tahun SPM. Data masuk sebagai pending.</p><button class="btn gold" data-jump-public="1">Daftar Alumni</button></div><div class="form-card"><h4>2. Admin Verify</h4><p>Admin menyemak pendaftaran sebelum data dikira verified.</p><button class="btn ghost" id="btnOpenAdminFromHome">Admin</button></div><div class="form-card"><h4>3. Hebahan</h4><p>Reunion, kempen data dan makluman rasmi alumni akan dipaparkan di sini.</p><button class="btn blue" data-jump-public="2">Reunion & Hebahan</button></div></section>`;
+  };
+
+  bindDashboard = function(){
+    document.querySelectorAll('[data-jump-public]').forEach(b=>b.addEventListener('click',()=>{currentSection=Number(b.dataset.jumpPublic);renderSection();}));
+    document.getElementById('btnOpenAdminFromHome')?.addEventListener('click', openAdminModal);
+    loadPublicStats();
+  };
+
+  async function loadPublicStats(){
+    const grid=document.getElementById('publicStatsGrid'); if(!grid) return;
+    try{
+      const data = await supabaseRpc('smkasas_public_stats', {});
+      const d = Array.isArray(data) ? data[0] : data;
+      grid.innerHTML = `<div class="impact-stat"><strong>${esc(d.total_registered??0)}</strong><span>Jumlah daftar</span></div><div class="impact-stat"><strong>${esc(d.total_verified??0)}</strong><span>Verified</span></div><div class="impact-stat"><strong>${esc(d.total_pending??0)}</strong><span>Pending</span></div><div class="impact-stat"><strong>${esc(d.total_batches??0)}</strong><span>Batch tersedia</span></div><div class="impact-stat"><strong>${esc(d.latest_batch||'-')}</strong><span>Batch terkini</span></div>`;
+    }catch(e){
+      try{
+        const [verified,batches] = await Promise.all([fetchVerifiedAlumniFromSupabase(), fetchSupabaseBatches()]);
+        grid.innerHTML = `<div class="impact-stat"><strong>${verified.length}</strong><span>Verified public</span></div><div class="impact-stat"><strong>${batches.length}</strong><span>Batch tersedia</span></div><div class="impact-stat"><strong>-</strong><span>Total pending admin-only</span></div>`;
+      }catch(err){ grid.innerHTML='<div class="impact-stat"><strong>-</strong><span>Statistik belum tersedia</span></div>'; }
+    }
+  }
+
+  renderMember = function(){
+    const currentYear = new Date().getFullYear();
+    let years='';
+    for(let y=currentYear; y>=1988; y--) years += option(y, `SPM ${y} · ${smkasasBatchLabelFromSPM(y)}`);
+    return `<section class="panel"><h3>Daftar Alumni SMKASAS</h3><p>Alumni tidak perlu cipta atau pilih nama batch secara manual. Pilih <strong>Tahun SPM</strong> sahaja; sistem akan auto susun ke batch rasmi.</p><div class="supabase-sync-note">Supabase aktif: pendaftaran masuk database online sebagai pending untuk semakan admin.</div></section>
+      <section class="form-card"><form id="memberForm">
+        <div class="form-card"><h4>A. Tahun SPM / STPM</h4><div class="form-grid">
+          <input type="hidden" name="institutionId" id="memberInstitution" value="${esc(defaultInstitutionId())}">
+          <input type="hidden" name="role" value="Alumni">
+          <input type="hidden" name="groupId" id="memberGroup" value="">
+          <label class="field">Tahun SPM <span class="required">*</span><select name="yearEnd" id="spmYear" required><option value="">Pilih tahun SPM...</option>${years}</select><small>BATCH 1 = Form 1 1984, SPM 1988.</small></label>
+          <label class="field">Tahun STPM, jika ada<input name="stpmYear" id="stpmYear" inputmode="numeric" placeholder="Contoh: 1990"><small>STPM optional. Mapping STPM akan disusun selepas data rasmi diperoleh.</small></label>
+          <label class="field wide">Auto Batch<div class="safe-note" id="batchAutoPreview">Pilih Tahun SPM untuk lihat batch rasmi.</div></label>
+          <label class="field">Kelas / Aliran / Program<input name="className" placeholder="5 Sains 1 / Aliran Agama / Asrama"></label>
+          <label class="field">No Pelajar / Rujukan<input name="memberNo" placeholder="Optional"></label>
+        </div></div>
+        <div class="form-card"><h4>B. Ambil Contact</h4><div class="contact-strip"><button type="button" class="mini" id="btnPickPhone">Ambil No Tel dari Contact</button><button type="button" class="mini" id="btnPickNamePhone">Ambil Nama + No Tel</button><span class="muted" style="font-weight:850">Jika browser tidak support Contact Picker, sistem buka fallback manual.</span></div></div>
+        <div class="form-card"><h4>C. Profil Individu</h4><div class="form-grid">
+          <label class="field">Nama Penuh <span class="required">*</span><input name="name" id="personName" required></label>
+          <label class="field">Nama Panggilan<input name="nickname"></label>
+          <label class="field">Jantina<select name="gender"><option value="">Pilih...</option><option>Lelaki</option><option>Perempuan</option><option>Tidak mahu nyatakan</option></select></label>
+          <label class="field">Tarikh Lahir<input type="date" name="dob"></label>
+          <label class="field">Status Hidup<select name="aliveStatus" id="aliveStatus"><option>Hidup</option><option>Meninggal</option><option>Tidak pasti</option></select></label>
+          <label class="field">Tarikh Meninggal<input type="date" name="deathDate"></label>
+          <label class="field">No WhatsApp / Telefon <span class="required">*</span><input name="phone" id="personPhone" required placeholder="6012xxxxxxx"></label>
+          <label class="field">Email<input type="email" name="email"></label>
+          <label class="field">Lokasi<input name="location" placeholder="Bandar/daerah"></label>
+          <label class="field">Negeri<input name="state"></label>
+          <label class="field">Negara<input name="country" value="Malaysia"></label>
+          <label class="field">Profesi<input name="profession" placeholder="Guru, doktor, usahawan..."></label>
+          <label class="field">Industri<input name="industry" placeholder="Pendidikan, kesihatan, teknologi..."></label>
+          <label class="field">Syarikat / Organisasi<input name="company"></label>
+        </div></div>
+        <div class="form-card"><h4>D. Maklumat Tambahan</h4><div class="form-grid">
+          <label class="field">Status Perkahwinan<select name="maritalStatus" id="maritalStatus"><option>Bujang</option><option>Berkahwin</option><option>Duda</option><option>Janda</option><option>Balu</option><option>Tidak mahu nyatakan</option></select></label>
+          <label class="field">Nama Pasangan / Waris Kecemasan<input name="spouseName" placeholder="Optional"></label>
+          <label class="field">Telefon Pasangan / Waris<input name="spousePhone" placeholder="Optional"></label>
+          <label class="field">Kerjaya Pasangan<input name="spouseProfession" placeholder="Optional"></label>
+          <label class="field wide">Nota Ringkas<textarea name="spouseNote" placeholder="Optional. Untuk admin sahaja jika berkaitan kecemasan/kebajikan."></textarea></label>
+        </div></div>
+        <div class="form-card"><h4>E. Persetujuan & Hantar</h4><div class="note">Data ini akan digunakan untuk tujuan rekod alumni, pengesahan ahli, komunikasi reunion, kebajikan alumni dan jaringan komuniti SMKASAS mengikut tetapan privasi.</div><label class="field wide"><span><input type="checkbox" id="consentBox" required style="width:auto;margin-right:8px"> Saya bersetuju menghantar maklumat ini untuk semakan admin alumni SMKASAS.</span></label><div class="save-row"><button class="btn gold" type="submit">Hantar Pendaftaran</button></div></div>
+      </form></section>`;
+  };
+
+  bindMember = function(){
+    const spm=document.getElementById('spmYear');
+    const prev=document.getElementById('batchAutoPreview');
+    if(spm){
+      spm.addEventListener('change', async()=>{
+        const y=spm.value;
+        const label=smkasasBatchLabelFromSPM(y);
+        if(!y){ prev.innerHTML='Pilih Tahun SPM untuk lihat batch rasmi.'; return; }
+        prev.innerHTML = `<strong>${esc(label)}</strong><br>Jika batch belum wujud di Supabase, admin akan semak dan assign kemudian.`;
+        const b = await findSupabaseBatchBySPM(y);
+        document.getElementById('memberGroup').value = b?.id || '';
+        if(b) prev.innerHTML = `<strong>${esc(b.batch_name)}</strong><br>${esc(b.short_name||'')} · sudah tersedia dalam Supabase.`;
+      });
+    }
+    document.getElementById('btnPickPhone')?.addEventListener('click',()=>pickContact(false));
+    document.getElementById('btnPickNamePhone')?.addEventListener('click',()=>pickContact(true));
+    document.getElementById('memberForm')?.addEventListener('submit', submitPublicAlumniForm);
+  };
+
+  async function findSupabaseBatchBySPM(year){
+    const batches = await fetchSupabaseBatches();
+    return (batches||[]).find(b=>String(b.year_end||'')===String(year||'')) || null;
+  }
+
+  async function submitPublicAlumniForm(e){
+    e.preventDefault();
+    const form=e.currentTarget;
+    const d=Object.fromEntries(new FormData(form).entries());
+    if(!d.yearEnd){ toast('Pilih Tahun SPM dahulu'); return; }
+    if(!document.getElementById('consentBox')?.checked){ toast('Sila tick persetujuan dahulu'); return; }
+    let batch=null;
+    try{ batch = await findSupabaseBatchBySPM(d.yearEnd); }catch(err){}
+    const payload={
+      batch_id: batch?.id || null,
+      full_name: nullIfBlank(d.name),
+      nickname: nullIfBlank(d.nickname),
+      gender: nullIfBlank(d.gender),
+      dob: nullIfBlank(d.dob),
+      phone: nullIfBlank(d.phone),
+      email: nullIfBlank(d.email),
+      location: nullIfBlank(d.location),
+      state: nullIfBlank(d.state),
+      country: nullIfBlank(d.country)||'Malaysia',
+      profession: nullIfBlank(d.profession),
+      industry: nullIfBlank(d.industry),
+      company: nullIfBlank(d.company),
+      marital_status: nullIfBlank(d.maritalStatus),
+      spouse_name: nullIfBlank(d.spouseName),
+      spouse_phone: nullIfBlank(d.spousePhone),
+      spouse_profession: nullIfBlank(d.spouseProfession),
+      spouse_note: nullIfBlank(d.spouseNote),
+      class_name: nullIfBlank(d.className),
+      member_no: nullIfBlank(d.memberNo),
+      year_end: toIntOrNull(d.yearEnd),
+      role:'Alumni',
+      status:'pending',
+      privacy:'group',
+      admin_note: nullIfBlank(d.stpmYear) ? `Tahun STPM: ${d.stpmYear}` : null
+    };
+    try{
+      await supabaseFetch('smkasas_alumni', {method:'POST', body: JSON.stringify(payload)});
+      toast('Alumni berjaya masuk Supabase sebagai pending');
+      form.reset();
+      const prev=document.getElementById('batchAutoPreview'); if(prev) prev.innerHTML='Pilih Tahun SPM untuk lihat batch rasmi.';
+    }catch(err){
+      toast('Gagal Supabase: '+(err.message||err));
+    }
+  }
+
+  function renderPublicReunion(){
+    return `<section class="panel"><h3>Reunion & Hebahan</h3><p>Ruang awam untuk makluman alumni SMKASAS. Modul RSVP penuh akan dikawal oleh admin/batch admin.</p></section>
+      <section class="grid2"><div class="form-card"><h4>Kempen Data Alumni</h4><p>Mohon semua ASASIANS mengemas kini data melalui menu Daftar Alumni. Admin akan semak dan verify sebelum data dikira rasmi.</p><button class="btn gold" data-jump-public="1">Daftar Sekarang</button></div><div class="form-card"><h4>Reunion</h4><p>Hebahan reunion rasmi, RSVP dan senarai hadir akan diaktifkan selepas setup event oleh admin.</p><div class="empty">Belum ada hebahan reunion aktif.</div></div></section>
+      <section class="panel"><h3>Prinsip Privasi</h3><p>Direktori penuh tidak dibuka kepada umum. Paparan alumni akan dikawal mengikut status verified, consent dan role akses.</p></section>`;
+  }
+  function bindPublicReunion(){ document.querySelectorAll('[data-jump-public]').forEach(b=>b.addEventListener('click',()=>{currentSection=Number(b.dataset.jumpPublic);renderSection();})); }
+
+  function openAdminModal(){
+    document.getElementById('sectionModal').classList.add('open');
+    document.getElementById('sectionModal').setAttribute('aria-hidden','false');
+    document.getElementById('modalKicker').textContent='ADMIN';
+    document.getElementById('modalTitle').textContent='Pusat Admin SMKASAS';
+    document.getElementById('btnPrev').style.display='none';
+    document.getElementById('btnNext').style.display='none';
+    document.getElementById('modalBody').innerHTML = renderAdminGate();
+    bindAdminGate();
+  }
+
+  function renderAdminGate(){
+    return `<section class="panel admin-hero"><h3>Pusat Admin</h3><p>Dapur admin disembunyikan daripada public. Masukkan PIN untuk verify alumni, lihat direktori dalaman dan statistik.</p></section>
+      <section class="form-card"><h4>Admin PIN</h4><div class="form-grid"><label class="field wide">PIN Admin<input id="adminMasterPin" type="password" placeholder="Masukkan PIN"></label></div><div class="save-row"><button class="btn gold" id="btnEnterAdmin">Masuk Admin</button></div></section><section id="adminWorkspace"></section>`;
+  }
+  function bindAdminGate(){ document.getElementById('btnEnterAdmin')?.addEventListener('click',()=>renderAdminWorkspace()); }
+  function renderAdminWorkspace(){
+    const pin=document.getElementById('adminMasterPin')?.value||'';
+    if(!pin){toast('Masukkan PIN admin');return;}
+    const w=document.getElementById('adminWorkspace'); if(!w)return;
+    w.innerHTML = `<div class="tabs admin-tabs"><button class="tab active" data-admin-public-tab="verify">Verify Alumni</button><button class="tab" data-admin-public-tab="directory">Direktori Dalaman</button><button class="tab" data-admin-public-tab="stats">Analisa Ringkas</button><button class="tab" data-admin-public-tab="batch">Batch Setup</button><button class="tab" data-admin-public-tab="future">Import / Reunion Tools</button></div>
+      <section id="adminTabVerify" class="admin-subpanel"><div class="form-card"><h4>Pending Alumni</h4><p class="muted">Senarai pendaftaran baru yang menunggu semakan.</p><div class="save-row"><button class="btn gold" id="btnAdminLoadPending2">Load Pending</button></div><div id="adminPendingList2" class="empty">Klik Load Pending.</div></div></section>
+      <section id="adminTabDirectory" class="admin-subpanel hidden"><div class="form-card"><h4>Direktori Dalaman Verified</h4><div class="form-grid"><label class="field wide">Carian<input id="adminDirQuery" placeholder="Nama, phone, batch, kerja, lokasi..."></label></div><div class="save-row"><button class="btn gold" id="btnAdminLoadDirectory">Load Direktori</button></div><div id="adminDirectoryList" class="empty">Klik Load Direktori.</div></div></section>
+      <section id="adminTabStats" class="admin-subpanel hidden"><div class="form-card"><h4>Analisa Ringkas</h4><div id="adminStatsArea" class="empty">Klik tab ini untuk memuatkan statistik.</div></div></section>
+      <section id="adminTabBatch" class="admin-subpanel hidden"><div class="form-card"><h4>Batch Setup</h4><p>Batch rasmi perlu disediakan oleh sistem/admin. Public tidak boleh cipta batch sendiri.</p><div class="save-row"><button class="btn gold" id="btnAdminLoadBatches">Load Batch</button></div><div id="adminBatchList" class="empty">Klik Load Batch.</div></div></section>
+      <section id="adminTabFuture" class="admin-subpanel hidden"><div class="grid2"><div class="form-card"><h4>Import CSV</h4><p>Modul CSV akan dimasukkan semula selepas struktur batch auto-map stabil.</p><div class="empty">Coming next</div></div><div class="form-card"><h4>Reunion Tools</h4><p>Modul reunion penuh untuk batch admin akan disambung selepas admin role dimatangkan.</p><div class="empty">Coming next</div></div></div></section>`;
+    bindAdminWorkspace(pin);
+  }
+  function bindAdminWorkspace(pin){
+    document.querySelectorAll('[data-admin-public-tab]').forEach(tab=>tab.addEventListener('click',()=>{
+      document.querySelectorAll('[data-admin-public-tab]').forEach(t=>t.classList.remove('active')); tab.classList.add('active');
+      ['Verify','Directory','Stats','Batch','Future'].forEach(k=>document.getElementById('adminTab'+k)?.classList.add('hidden'));
+      const k=cap(tab.dataset.adminPublicTab); document.getElementById('adminTab'+k)?.classList.remove('hidden');
+      if(tab.dataset.adminPublicTab==='stats') loadAdminStats();
+    }));
+    document.getElementById('btnAdminLoadPending2')?.addEventListener('click',()=>loadPendingAdminList2(pin));
+    document.getElementById('btnAdminLoadDirectory')?.addEventListener('click',()=>loadAdminDirectory());
+    document.getElementById('btnAdminLoadBatches')?.addEventListener('click',()=>loadAdminBatches());
+  }
+  async function loadPendingAdminList2(pin){
+    const area=document.getElementById('adminPendingList2'); if(!area)return;
+    area.innerHTML='<div class="empty">Memuatkan pending...</div>';
+    try{
+      const rows=await fetchPendingAlumniFromSupabase(pin);
+      area.innerHTML = rows.length ? `<div class="safe-note"><strong>${rows.length}</strong> pending.</div><div class="list">${rows.map(pendingRowCard).join('')}</div>` : '<div class="empty">Tiada pending.</div>';
+      area.querySelectorAll('[data-verify-supa]').forEach(b=>b.addEventListener('click',async()=>{await updateAlumniStatusSupabase(pin,b.dataset.verifySupa,'verified'); toast('Alumni disahkan'); loadPendingAdminList2(pin); }));
+      area.querySelectorAll('[data-reject-supa]').forEach(b=>b.addEventListener('click',async()=>{ if(confirm('Reject alumni ini?')){ await updateAlumniStatusSupabase(pin,b.dataset.rejectSupa,'rejected'); toast('Alumni ditolak'); loadPendingAdminList2(pin); }}));
+    }catch(e){area.innerHTML=`<div class="note">Gagal load pending: ${esc(e.message||e)}</div>`;}
+  }
+  async function loadAdminDirectory(){
+    const area=document.getElementById('adminDirectoryList'); if(!area)return;
+    area.innerHTML='<div class="empty">Memuatkan direktori...</div>';
+    try{
+      const [rows,batches]=await Promise.all([fetchVerifiedAlumniFromSupabase(), fetchSupabaseBatches()]);
+      const bm=batchMapFromSupabase(batches); const q=normalize(document.getElementById('adminDirQuery')?.value||'');
+      const filtered=rows.filter(r=>!q || normalize([r.full_name,r.phone,r.email,r.profession,r.state,bm[r.batch_id]?.batch_name].join(' ')).includes(q));
+      area.innerHTML = filtered.length ? `<div class="safe-note"><strong>${filtered.length}</strong> verified.</div><div class="results">${filtered.map(r=>alumniRowCard(r,bm,'admin')).join('')}</div>` : '<div class="empty">Tiada verified.</div>';
+    }catch(e){area.innerHTML=`<div class="note">Gagal load direktori: ${esc(e.message||e)}</div>`;}
+  }
+  async function loadAdminStats(){
+    const area=document.getElementById('adminStatsArea'); if(!area)return;
+    try{
+      const data=await supabaseRpc('smkasas_public_stats',{}); const d=Array.isArray(data)?data[0]:data;
+      area.innerHTML=`<div class="stats"><div class="stat"><strong>${esc(d.total_registered??0)}</strong><span>Total daftar</span></div><div class="stat"><strong>${esc(d.total_verified??0)}</strong><span>Verified</span></div><div class="stat"><strong>${esc(d.total_pending??0)}</strong><span>Pending</span></div><div class="stat"><strong>${esc(d.total_rejected??0)}</strong><span>Rejected</span></div><div class="stat"><strong>${esc(d.total_batches??0)}</strong><span>Batch</span></div></div>`;
+    }catch(e){area.innerHTML=`<div class="note">Gagal load statistik: ${esc(e.message||e)}</div>`;}
+  }
+  async function loadAdminBatches(){
+    const area=document.getElementById('adminBatchList'); if(!area)return;
+    try{
+      const batches=await fetchSupabaseBatches();
+      area.innerHTML = batches.length ? `<div class="table-wrap"><table class="table"><thead><tr><th>Batch</th><th>Short</th><th>SPM</th></tr></thead><tbody>${batches.map(b=>`<tr><td data-label="Batch">${esc(b.batch_name)}</td><td data-label="Short">${esc(b.short_name||'-')}</td><td data-label="SPM">${esc(b.year_end||'-')}</td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">Belum ada batch.</div>';
+    }catch(e){area.innerHTML=`<div class="note">Gagal load batch: ${esc(e.message||e)}</div>`;}
+  }
+
   initSMKASASBranding();
   renderMenu();
 })();
