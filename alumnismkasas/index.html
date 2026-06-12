@@ -897,7 +897,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
 .sop-board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.sop-card{background:#fff;border:1px solid var(--line);border-left:6px solid var(--gold);border-radius:20px;padding:14px}.sop-card h4{margin:0 0 8px;color:var(--navy)}.sop-card ul{margin:0;padding-left:20px;color:var(--muted);font-weight:850;line-height:1.55}.task-check{display:grid;gap:8px;margin-top:10px}.task-check label{background:#fffdf8;border:1px solid var(--line);border-radius:14px;padding:10px;font-weight:850;color:var(--navy);display:flex;gap:8px;align-items:flex-start}.task-check input{width:auto;margin-top:3px}
 @media(max-width:900px){.sop-board{grid-template-columns:1fr}.success-foot{display:grid}.success-foot .btn,.success-foot .mini{width:100%}}
 
-</style></head><body class="smkasas-page"><header class="hero"><div class="wrap"><small style="color:#F3D88B;font-weight:950;letter-spacing:.1em">KENAL ALUMNI · BORANG AHLI</small><h1>Borang Alumni / Kohort</h1><p>Isi dan hantar balik fail jawapan <b>.json</b> kepada admin.</p></div></header><main class="wrap"><section class="card"><h2>Kepala Borang</h2><div class="grid"><div><b>Institusi</b><br>${esc(form.institution)}</div><div><b>Group / Batch / Kohort</b><br>${esc(form.group)}</div><div><b>Role</b><br>${esc(form.role)}</div><div><b>Tahun Tamat</b><br>${esc(form.yearEnd||'-')}</div></div></section><section class="card note"><b>Nota iPhone / WhatsApp</b><br>Jika butang tidak berfungsi dalam preview WhatsApp, buka fail ini melalui Safari/Chrome. Tidak perlu sempurna; isi setakat yang anda tahu dahulu.</section><form id="alumniForm" class="card"><h2>Maklumat Diri</h2><div class="grid"><label class="field wide">Nama Penuh *<input name="name" required></label><label class="field">Nama Panggilan<input name="nickname"></label><label class="field">Jantina<select name="gender"><option></option><option>Lelaki</option><option>Perempuan</option><option>Tidak mahu nyatakan</option></select></label><label class="field">Tarikh Lahir<input type="date" name="dob"></label><label class="field">Status Hidup<select name="aliveStatus"><option>Hidup</option><option>Meninggal</option><option>Tidak pasti</option></select></label><label class="field">No Telefon / WhatsApp<input name="phone" placeholder="6012xxxxxxx"></label><label class="field">Email<input type="email" name="email"></label><label class="field">Lokasi<input name="location"></label><label class="field">Negeri<input name="state"></label><label class="field">Negara<input name="country" value="Malaysia"></label><label class="field">Kerjaya / Profesi<input name="profession"></label><label class="field">Industri<input name="industry"></label><label class="field">Syarikat / Organisasi<input name="company"></label><label class="field">Status Kahwin<select name="maritalStatus" id="marital"><option>Bujang</option><option>Berkahwin</option><option>Duda</option><option>Janda</option><option>Balu</option><option>Tidak mahu nyatakan</option></select></label></div><div id="spouseBox" style="display:none" class="card"><h2>Maklumat Pasangan / Kecemasan</h2><p style="color:var(--muted);font-weight:800">Optional. Untuk tujuan kecemasan, kebajikan, tahlil, ziarah atau bantuan jika berlaku kematian/musibah.</p><div class="grid"><label class="field">Nama Pasangan<input name="spouseName"></label><label class="field">Telefon Pasangan<input name="spousePhone"></label><label class="field">Kerjaya Pasangan<input name="spouseProfession"></label><label class="field wide">Nota Pasangan<textarea name="spouseNote"></textarea></label></div></div><label class="field wide">Nota tambahan<textarea name="note"></textarea></label><div class="actions"><button class="btn gold" type="submit">Jana Jawapan JSON</button><button class="btn" type="button" id="btnCopy">Copy JSON</button><button class="btn" type="button" id="btnShare">Share / WhatsApp</button></div></form><section class="card"><h2>Jawapan</h2><div id="result" class="result">Belum dijana.</div></section></main><script>const locked=${formJson};let latest='';function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}function collect(){const fd=new FormData(document.getElementById('alumniForm'));const d=Object.fromEntries(fd.entries());return {...locked,submittedAt:new Date().toISOString(),person:{name:d.name,nickname:d.nickname,gender:d.gender,dob:d.dob,aliveStatus:d.aliveStatus,phone:d.phone,email:d.email,location:d.location,state:d.state,country:d.country,profession:d.profession,industry:d.industry,company:d.company,maritalStatus:d.maritalStatus,note:d.note},spouse:{name:d.spouseName,phone:d.spousePhone,profession:d.spouseProfession,note:d.spouseNote},privacy:'group',consent:'Saya membenarkan data ini digunakan untuk tujuan direktori alumni mengikut tetapan privasi.'};}function download(name,content){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}document.getElementById('marital').addEventListener('change',e=>{document.getElementById('spouseBox').style.display=e.target.value==='Berkahwin'||e.target.value==='Balu'?'block':'none'});document.getElementById('alumniForm').addEventListener('submit',e=>{e.preventDefault();latest=JSON.stringify(collect(),null,2);document.getElementById('result').textContent=latest;download('KENAL_ALUMNI_jawapan_'+Date.now()+'.json',latest);});document.getElementById('btnCopy').addEventListener('click',()=>{if(!latest)latest=JSON.stringify(collect(),null,2);navigator.clipboard&&navigator.clipboard.writeText(latest);alert('JSON dicopy. Hantar kepada admin jika download gagal.');});document.getElementById('btnShare').addEventListener('click',()=>{if(!latest)latest=JSON.stringify(collect(),null,2);const msg='Assalamualaikum admin. Ini jawapan borang KENAL Alumni saya. Jika fail JSON tidak boleh attach, saya akan paste JSON selepas mesej ini.'; if(navigator.share){navigator.share({title:'Jawapan KENAL Alumni',text:msg+'\\n\\n'+latest}).catch(()=>{});}else{location.href='https://wa.me/?text='+encodeURIComponent(msg+'\\n\\n'+latest);}});<\/script><!-- KENAL Alumni SMKASAS v3K: admin detail view / borang penuh -->
+</style></head><body class="smkasas-page"><header class="hero"><div class="wrap"><small style="color:#F3D88B;font-weight:950;letter-spacing:.1em">KENAL ALUMNI · BORANG AHLI</small><h1>Borang Alumni / Kohort</h1><p>Isi dan hantar balik fail jawapan <b>.json</b> kepada admin.</p></div></header><main class="wrap"><section class="card"><h2>Kepala Borang</h2><div class="grid"><div><b>Institusi</b><br>${esc(form.institution)}</div><div><b>Group / Batch / Kohort</b><br>${esc(form.group)}</div><div><b>Role</b><br>${esc(form.role)}</div><div><b>Tahun Tamat</b><br>${esc(form.yearEnd||'-')}</div></div></section><section class="card note"><b>Nota iPhone / WhatsApp</b><br>Jika butang tidak berfungsi dalam preview WhatsApp, buka fail ini melalui Safari/Chrome. Tidak perlu sempurna; isi setakat yang anda tahu dahulu.</section><form id="alumniForm" class="card"><h2>Maklumat Diri</h2><div class="grid"><label class="field wide">Nama Penuh *<input name="name" required></label><label class="field">Nama Panggilan<input name="nickname"></label><label class="field">Jantina<select name="gender"><option></option><option>Lelaki</option><option>Perempuan</option><option>Tidak mahu nyatakan</option></select></label><label class="field">Tarikh Lahir<input type="date" name="dob"></label><label class="field">Status Hidup<select name="aliveStatus"><option>Hidup</option><option>Meninggal</option><option>Tidak pasti</option></select></label><label class="field">No Telefon / WhatsApp<input name="phone" placeholder="6012xxxxxxx"></label><label class="field">Email<input type="email" name="email"></label><label class="field">Lokasi<input name="location"></label><label class="field">Negeri<input name="state"></label><label class="field">Negara<input name="country" value="Malaysia"></label><label class="field">Kerjaya / Profesi<input name="profession"></label><label class="field">Industri<input name="industry"></label><label class="field">Syarikat / Organisasi<input name="company"></label><label class="field">Status Kahwin<select name="maritalStatus" id="marital"><option>Bujang</option><option>Berkahwin</option><option>Duda</option><option>Janda</option><option>Balu</option><option>Tidak mahu nyatakan</option></select></label></div><div id="spouseBox" style="display:none" class="card"><h2>Maklumat Pasangan / Kecemasan</h2><p style="color:var(--muted);font-weight:800">Optional. Untuk tujuan kecemasan, kebajikan, tahlil, ziarah atau bantuan jika berlaku kematian/musibah.</p><div class="grid"><label class="field">Nama Pasangan<input name="spouseName"></label><label class="field">Telefon Pasangan<input name="spousePhone"></label><label class="field">Kerjaya Pasangan<input name="spouseProfession"></label><label class="field wide">Nota Pasangan<textarea name="spouseNote"></textarea></label></div></div><label class="field wide">Nota tambahan<textarea name="note"></textarea></label><div class="actions"><button class="btn gold" type="submit">Jana Jawapan JSON</button><button class="btn" type="button" id="btnCopy">Copy JSON</button><button class="btn" type="button" id="btnShare">Share / WhatsApp</button></div></form><section class="card"><h2>Jawapan</h2><div id="result" class="result">Belum dijana.</div></section></main><script>const locked=${formJson};let latest='';function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}function collect(){const fd=new FormData(document.getElementById('alumniForm'));const d=Object.fromEntries(fd.entries());return {...locked,submittedAt:new Date().toISOString(),person:{name:d.name,nickname:d.nickname,gender:d.gender,dob:d.dob,aliveStatus:d.aliveStatus,phone:d.phone,email:d.email,location:d.location,state:d.state,country:d.country,profession:d.profession,industry:d.industry,company:d.company,maritalStatus:d.maritalStatus,note:d.note},spouse:{name:d.spouseName,phone:d.spousePhone,profession:d.spouseProfession,note:d.spouseNote},privacy:'group',consent:'Saya membenarkan data ini digunakan untuk tujuan direktori alumni mengikut tetapan privasi.'};}function download(name,content){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}document.getElementById('marital').addEventListener('change',e=>{document.getElementById('spouseBox').style.display=e.target.value==='Berkahwin'||e.target.value==='Balu'?'block':'none'});document.getElementById('alumniForm').addEventListener('submit',e=>{e.preventDefault();latest=JSON.stringify(collect(),null,2);document.getElementById('result').textContent=latest;download('KENAL_ALUMNI_jawapan_'+Date.now()+'.json',latest);});document.getElementById('btnCopy').addEventListener('click',()=>{if(!latest)latest=JSON.stringify(collect(),null,2);navigator.clipboard&&navigator.clipboard.writeText(latest);alert('JSON dicopy. Hantar kepada admin jika download gagal.');});document.getElementById('btnShare').addEventListener('click',()=>{if(!latest)latest=JSON.stringify(collect(),null,2);const msg='Assalamualaikum admin. Ini jawapan borang KENAL Alumni saya. Jika fail JSON tidak boleh attach, saya akan paste JSON selepas mesej ini.'; if(navigator.share){navigator.share({title:'Jawapan KENAL Alumni',text:msg+'\\n\\n'+latest}).catch(()=>{});}else{location.href='https://wa.me/?text='+encodeURIComponent(msg+'\\n\\n'+latest);}});<\/script><!-- KENAL Alumni SMKASAS v3L: data format standard uppercase/email lowercase -->
 </body></html>`;
   }
 
@@ -3097,10 +3097,240 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
   };
 
 
+
+  /* ==========================================================
+     KENAL Alumni SMKASAS v3L - Data Format Standard
+     - Public form auto UPPERCASE untuk medan teks
+     - Email auto lowercase
+     - Telefon dibersihkan kepada nombor standard
+     - CSV import dinormalize format yang sama sebelum preview/import
+     ========================================================== */
+  function upperV3L(v){
+    const s = String(v ?? '').replace(/\s+/g,' ').trim();
+    return s ? s.toLocaleUpperCase('ms-MY') : '';
+  }
+  function upperLooseV3L(v){
+    const s = String(v ?? '').replace(/\s+/g,' ');
+    return s ? s.toLocaleUpperCase('ms-MY') : '';
+  }
+  function lowerEmailV3L(v){
+    const s = String(v ?? '').replace(/\s+/g,'').trim();
+    return s ? s.toLowerCase() : '';
+  }
+  function phoneV3L(v){
+    let s = String(v ?? '').replace(/[^0-9+]/g,'').trim();
+    if(s.startsWith('+')) s = s.slice(1);
+    if(s.startsWith('0')) s = '6' + s;
+    return s || '';
+  }
+  function nullUpperV3L(v){ const s=upperV3L(v); return s ? s : null; }
+  function nullEmailV3L(v){ const s=lowerEmailV3L(v); return s ? s : null; }
+  function nullPhoneV3L(v){ const s=phoneV3L(v); return s ? s : null; }
+  const upperFieldsV3L = new Set(['name','nickname','className','memberNo','location','state','country','profession','industry','company','spouseName','spouseProfession','spouseNote']);
+  const emailFieldsV3L = new Set(['email']);
+  const phoneFieldsV3L = new Set(['phone','spousePhone']);
+  const digitFieldsV3L = new Set(['stpmYear']);
+  function transformInputValueV3L(el, mode, loose=false){
+    if(!el) return;
+    const old = el.value || '';
+    let val = old;
+    if(mode==='upper') val = loose ? upperLooseV3L(old) : upperV3L(old);
+    if(mode==='email') val = lowerEmailV3L(old);
+    if(mode==='phone') val = old.replace(/[^0-9+]/g,'');
+    if(mode==='digits') val = old.replace(/\D/g,'').slice(0,4);
+    if(val !== old){
+      const atEnd = (el.selectionStart === old.length && el.selectionEnd === old.length);
+      el.value = val;
+      try{
+        if(atEnd) el.setSelectionRange(val.length, val.length);
+      }catch(e){}
+    }
+  }
+  function applyFormNormalizationV3L(form){
+    if(!form) return;
+    form.querySelectorAll('input[name], textarea[name]').forEach(el=>{
+      const n = el.name;
+      const type = (el.type||'').toLowerCase();
+      if(['hidden','date','checkbox','radio','file','password'].includes(type)) return;
+      if(upperFieldsV3L.has(n)) transformInputValueV3L(el,'upper', el.tagName==='TEXTAREA');
+      if(emailFieldsV3L.has(n)) transformInputValueV3L(el,'email');
+      if(phoneFieldsV3L.has(n)){ el.value = phoneV3L(el.value); }
+      if(digitFieldsV3L.has(n)) transformInputValueV3L(el,'digits');
+    });
+  }
+  function bindDataFormatInputsV3L(){
+    const form = document.getElementById('memberForm');
+    if(!form) return;
+    if(!document.getElementById('dataFormatNoteV3L')){
+      form.insertAdjacentHTML('afterbegin', `<div id="dataFormatNoteV3L" class="safe-note"><strong>Format data standard:</strong> nama, lokasi, kerjaya, kelas dan medan teks akan distandardkan kepada <strong>CAPITAL LETTER</strong>. Email kekal lowercase. Telefon dibersihkan kepada nombor sahaja.</div>`);
+    }
+    form.querySelectorAll('input[name], textarea[name]').forEach(el=>{
+      if(el.dataset.v3lFormatBound) return;
+      el.dataset.v3lFormatBound='1';
+      const n=el.name;
+      if(upperFieldsV3L.has(n)){
+        el.addEventListener('input',()=>transformInputValueV3L(el,'upper', true));
+        el.addEventListener('blur',()=>transformInputValueV3L(el,'upper', false));
+        el.setAttribute('autocomplete', el.getAttribute('autocomplete') || 'off');
+      }
+      if(emailFieldsV3L.has(n)){
+        el.addEventListener('input',()=>transformInputValueV3L(el,'email'));
+        el.addEventListener('blur',()=>transformInputValueV3L(el,'email'));
+      }
+      if(phoneFieldsV3L.has(n)){
+        el.addEventListener('input',()=>transformInputValueV3L(el,'phone'));
+        el.addEventListener('blur',()=>{ el.value = phoneV3L(el.value); });
+      }
+      if(digitFieldsV3L.has(n)){
+        el.addEventListener('input',()=>transformInputValueV3L(el,'digits'));
+        el.addEventListener('blur',()=>transformInputValueV3L(el,'digits'));
+      }
+    });
+  }
+  const bindMemberV3LPrev = bindMember;
+  bindMember = function(){
+    bindMemberV3LPrev();
+    bindDataFormatInputsV3L();
+  };
+  const pickContactV3LPrev = pickContact;
+  pickContact = async function(withName){
+    await pickContactV3LPrev(withName);
+    const nameEl=document.getElementById('personName');
+    const phoneEl=document.getElementById('personPhone');
+    if(nameEl) nameEl.value=upperV3L(nameEl.value);
+    if(phoneEl) phoneEl.value=phoneV3L(phoneEl.value);
+  };
+  submitPublicAlumniForm = async function(e){
+    e.preventDefault();
+    const form=e.currentTarget;
+    applyFormNormalizationV3L(form);
+    const d=Object.fromEntries(new FormData(form).entries());
+    if(!d.yearEnd){ toast('Pilih Tahun SPM dahulu'); return; }
+    const phoneDigits = phoneV3L(d.phone);
+    if(!phoneDigits || phoneDigits.length < 8){ toast('No WhatsApp / Telefon wajib diisi dengan betul'); document.getElementById('personPhone')?.focus(); return; }
+    if(!document.getElementById('consentBox')?.checked){ toast('Sila tick persetujuan dahulu'); document.getElementById('consentBox')?.focus(); return; }
+    let batch=null;
+    try{ batch = await findSupabaseBatchBySPM(d.yearEnd); }catch(err){}
+    const stpm = String(d.stpmYear||'').replace(/\D/g,'').slice(0,4);
+    const payload={
+      batch_id: batch?.id || null,
+      full_name: nullUpperV3L(d.name),
+      nickname: nullUpperV3L(d.nickname),
+      gender: nullIfBlank(d.gender),
+      dob: nullIfBlank(d.dob),
+      phone: nullIfBlank(phoneDigits),
+      email: nullEmailV3L(d.email),
+      location: nullUpperV3L(d.location),
+      state: nullUpperV3L(d.state),
+      country: nullUpperV3L(d.country)||'MALAYSIA',
+      profession: nullUpperV3L(d.profession),
+      industry: nullUpperV3L(d.industry),
+      company: nullUpperV3L(d.company),
+      marital_status: nullIfBlank(d.maritalStatus),
+      spouse_name: nullUpperV3L(d.spouseName),
+      spouse_phone: nullPhoneV3L(d.spousePhone),
+      spouse_profession: nullUpperV3L(d.spouseProfession),
+      spouse_note: nullUpperV3L(d.spouseNote),
+      class_name: nullUpperV3L(d.className),
+      member_no: nullUpperV3L(d.memberNo),
+      year_end: toIntOrNull(d.yearEnd),
+      role:'Alumni',
+      status:'pending',
+      privacy:'group',
+      admin_note: stpm ? `TAHUN STPM: ${stpm}` : null
+    };
+    try{
+      await supabaseFetch('smkasas_alumni', {method:'POST', body: JSON.stringify(payload)});
+      showSuccessDialogV3D({
+        title:'Borang berjaya dihantar',
+        kicker:'TERIMA KASIH',
+        body:`<p><strong>Borang anda berjaya dihantar.</strong></p><p>Terima kasih atas kerjasama mengemas kini data alumni SMKASAS.</p><p>Data anda akan disemak oleh admin alumni sebelum disahkan.</p><div class="safe-note">Format data telah distandardkan: CAPITAL LETTER kecuali email.</div>`,
+        autoCloseMs:10000
+      });
+      form.reset();
+      const prev=document.getElementById('batchAutoPreview'); if(prev) prev.innerHTML='Pilih Tahun SPM untuk lihat batch rasmi.';
+      updateAdminBadgeV3D();
+      loadPublicStats();
+    }catch(err){
+      toast('Gagal Supabase: '+(err.message||err));
+    }
+  };
+  function csvValV3L(r, keys){
+    for(const k of keys){ const v = r[k]; if(v !== undefined && String(v).trim() !== '') return v; }
+    return '';
+  }
+  normalizeCsvRowsV3I = function(rows, batchByYear, duplicateIndex){
+    const seen={phone:{},email:{},nameYear:{}};
+    const scope=adminScopeV3E||{};
+    return (rows||[]).map((r,idx)=>{
+      const full_name = nullUpperV3L(csvValV3L(r,['full_name','name','nama','nama_penuh']));
+      const phone = nullPhoneV3L(csvValV3L(r,['phone','telefon','whatsapp','no_tel','no_whatsapp']));
+      const email = nullEmailV3L(csvValV3L(r,['email','emel']));
+      let year = String(csvValV3L(r,['year_spm','spm_year','tahun_spm','year_end','tahun'])).trim();
+      if(scope.role==='batch_admin' && !year) year = String(scope.year_end||'');
+      const issues=[];
+      const warnings=[];
+      let category='ok';
+      if(!full_name) issues.push('Nama wajib');
+      if(!phone) issues.push('Telefon wajib');
+      if(!year) issues.push('Tahun SPM wajib');
+      const y=parseInt(year,10);
+      if(year && (!Number.isFinite(y) || y<1988 || y>new Date().getFullYear()+1)) issues.push('Tahun SPM tidak munasabah');
+      if(scope.role==='batch_admin' && String(y)!==String(scope.year_end)){ issues.push(`Luar skop Batch Admin SPM ${scope.year_end}`); category='scope'; }
+      const batch = batchByYear[String(y)];
+      if(y && !batch) issues.push('Batch belum wujud dalam Supabase');
+      const ny=dupNameYearKeyV3I(full_name,y);
+      const csvDup=[];
+      if(phone && seen.phone[phone]) csvDup.push(`Telefon sama dengan row ${seen.phone[phone]}`);
+      if(email && seen.email[email]) csvDup.push(`Email sama dengan row ${seen.email[email]}`);
+      if(ny && seen.nameYear[ny]) csvDup.push(`Nama + SPM sama dengan row ${seen.nameYear[ny]}`);
+      if(phone) seen.phone[phone]=idx+1;
+      if(email) seen.email[email]=idx+1;
+      if(ny) seen.nameYear[ny]=idx+1;
+      const existingMatches=[];
+      if(phone && duplicateIndex.phone[phone]) existingMatches.push({type:'Telefon sama',record:duplicateIndex.phone[phone]});
+      if(email && duplicateIndex.email[email]) existingMatches.push({type:'Email sama',record:duplicateIndex.email[email]});
+      if(ny && duplicateIndex.nameYear[ny]) existingMatches.push({type:'Nama + SPM sama',record:duplicateIndex.nameYear[ny]});
+      if(csvDup.length || existingMatches.length){ category = category==='scope' ? 'scope' : 'duplicate'; }
+      if(csvDup.length) warnings.push(...csvDup);
+      if(existingMatches.length) warnings.push(...existingMatches.map(x=>`${x.type} dengan rekod ${x.record.status||'sedia ada'}`));
+      if(issues.length && category!=='scope') category='review';
+      const stpm = String(csvValV3L(r,['stpm_year','tahun_stpm'])).replace(/\D/g,'').slice(0,4);
+      const adminNote = ['CSV import v3L', stpm?`STPM: ${stpm}`:'', scope.role==='batch_admin'?`Batch Admin SPM ${scope.year_end}`:'Super Admin', `Row CSV: ${idx+1}`].filter(Boolean).join(' | ');
+      const payload={
+        batch_id: batch?.id || null,
+        full_name,
+        nickname: nullUpperV3L(csvValV3L(r,['nickname','nama_panggilan'])),
+        gender: nullIfBlank(csvValV3L(r,['gender','jantina'])),
+        phone,
+        email,
+        location: nullUpperV3L(csvValV3L(r,['location','lokasi'])),
+        state: nullUpperV3L(csvValV3L(r,['state','negeri'])),
+        country: 'MALAYSIA',
+        profession: nullUpperV3L(csvValV3L(r,['profession','kerjaya','profesi'])),
+        industry: nullUpperV3L(csvValV3L(r,['industry','industri'])),
+        company: nullUpperV3L(csvValV3L(r,['company','syarikat','organisasi'])),
+        class_name: nullUpperV3L(csvValV3L(r,['class_name','kelas','aliran'])),
+        member_no: nullUpperV3L(csvValV3L(r,['member_no','no_pelajar'])),
+        year_end: Number.isFinite(y)?y:null,
+        role: 'Alumni',
+        privacy: 'group',
+        status: 'pending',
+        admin_note: adminNote
+      };
+      const canImport = issues.length===0 && category!=='scope';
+      let action = canImport && category==='ok' ? 'import' : (category==='duplicate' ? 'skip' : 'review');
+      return {index:idx+1, canImport, action, category, issues, warnings, existingMatches, csvDup, full_name, phone, email, year_spm:year, batch_name:batch?.batch_name||'', payload};
+    }).filter(x=>x.full_name || x.phone || x.year_spm);
+  };
+  normalizeCsvRowsV3F = function(rows, batchByYear){
+    return normalizeCsvRowsV3I(rows, batchByYear, {phone:{},email:{},nameYear:{}}).map(x=>Object.assign(x,{ok:x.canImport}));
+  };
+
   initSMKASASBranding();
   renderMenu();
 })();
 </script>
-<!-- KENAL Alumni SMKASAS v3K: admin detail view / borang penuh -->
+<!-- KENAL Alumni SMKASAS v3L: data format standard uppercase/email lowercase -->
 </body>
 </html>
