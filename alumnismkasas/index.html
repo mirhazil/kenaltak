@@ -2403,7 +2403,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
     area.innerHTML='<div class="empty">Membaca CSV...</div>';
     const text=await file.text();
     let raw=[];
-    try{ raw=parseCsv(text); }catch(e){ area.innerHTML=`<div class="note">CSV tidak dapat dibaca: ${esc(e.message||e)}</div>`; return; }
+    try{ raw=parseCsvV3H(text); }catch(e){ area.innerHTML=`<div class="note">CSV tidak dapat dibaca: ${esc(e.message||e)}</div>`; return; }
     const batches=await fetchSupabaseBatches();
     const byYear={}; batches.forEach(b=>{ if(b.year_end) byYear[String(b.year_end)] = b; });
     csvImportPreviewV3F = normalizeCsvRowsV3F(raw, byYear);
@@ -2413,6 +2413,56 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
     const btn=document.getElementById('btnImportCsvToSupabaseV3F'); if(btn) btn.disabled = ok===0;
     area.innerHTML = csvImportPreviewV3F.length ? `<div class="safe-note"><strong>${ok}</strong> row sedia import. ${bad?`<strong>${bad}</strong> row perlu semak.`:'Tiada isu besar dikesan.'}</div><div class="table-wrap"><table class="table"><thead><tr><th>Status</th><th>Nama</th><th>Telefon</th><th>SPM</th><th>Batch</th><th>Isu</th></tr></thead><tbody>${csvImportPreviewV3F.slice(0,80).map(r=>`<tr><td data-label="Status">${r.ok?'<span class="chip ok">OK</span>':'<span class="chip red">Semak</span>'}</td><td data-label="Nama">${esc(r.full_name||'-')}</td><td data-label="Telefon">${esc(r.phone||'-')}</td><td data-label="SPM">${esc(r.year_spm||'-')}</td><td data-label="Batch">${esc(r.batch_name||'-')}</td><td data-label="Isu">${esc(r.issues.join(' · ')||'-')}</td></tr>`).join('')}</tbody></table></div>${csvImportPreviewV3F.length>80?'<div class="note">Preview 80 row pertama sahaja.</div>':''}` : '<div class="empty">CSV kosong atau header tidak dikenali.</div>';
   }
+
+
+  function parseCsvV3H(text){
+    text = String(text || '').replace(/^\uFEFF/, '');
+    const firstLine = (text.split(/\r?\n/).find(l=>l.trim()) || '').replace(/^\uFEFF/, '');
+    if(!firstLine.trim()) return [];
+    const commaCount = (firstLine.match(/,/g)||[]).length;
+    const semiCount = (firstLine.match(/;/g)||[]).length;
+    const tabCount = (firstLine.match(/\t/g)||[]).length;
+    const delim = tabCount > commaCount && tabCount >= semiCount ? '\t' : (semiCount > commaCount ? ';' : ',');
+    const lines = text.split(/\r?\n/).filter(l=>l.replace(/^\uFEFF/,'').trim());
+    if(!lines.length) return [];
+    const headers = splitCsvLineV3H(lines[0].replace(/^\uFEFF/,''), delim).map(h => normalizeCsvHeaderV3H(h));
+    const hasKnown = headers.some(h => ['full_name','name','nama','nama_penuh'].includes(h)) || headers.some(h => ['phone','telefon','whatsapp','no_tel','no_whatsapp'].includes(h)) || headers.some(h => ['year_spm','spm_year','tahun_spm','year_end','tahun'].includes(h));
+    if(!hasKnown) return [];
+    return lines.slice(1).map(line=>{
+      const vals = splitCsvLineV3H(line, delim);
+      const o = {};
+      headers.forEach((h,i)=>{ if(h) o[h] = (vals[i] ?? '').trim(); });
+      return o;
+    }).filter(o => Object.values(o).some(v => String(v||'').trim()));
+  }
+
+  function normalizeCsvHeaderV3H(h){
+    return String(h || '')
+      .replace(/^\uFEFF/, '')
+      .trim()
+      .toLowerCase()
+      .replace(/[()]/g,'')
+      .replace(/[^a-z0-9]+/g,'_')
+      .replace(/^_+|_+$/g,'');
+  }
+
+  function splitCsvLineV3H(line, delim){
+    const out=[]; let cur='', q=false;
+    for(let i=0;i<line.length;i++){
+      const ch=line[i];
+      if(ch==='"'){
+        if(q && line[i+1]==='"'){ cur+='"'; i++; }
+        else q=!q;
+      }else if(ch===delim && !q){
+        out.push(cur); cur='';
+      }else{
+        cur+=ch;
+      }
+    }
+    out.push(cur);
+    return out;
+  }
+
 
   function normalizeCsvRowsV3F(rows, batchByYear){
     const seen={};
