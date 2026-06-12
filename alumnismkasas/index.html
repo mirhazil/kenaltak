@@ -1470,7 +1470,6 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
 
   /* =========================
      PHASE 2A - SUPABASE ADMIN VERIFY + VERIFIED DIRECTORY
-     PIN sementara: ASASIANS1984 (disemak di fungsi SQL Supabase, bukan dalam HTML)
      ========================= */
   async function supabaseRpc(functionName, payload){
     return await supabaseFetch('rpc/'+functionName, {
@@ -2174,8 +2173,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
 
   /* ==========================================================
      KENAL Alumni SMKASAS v3E - Batch Admin Lite
-     - Super Admin PIN: ASASIANS1984 (semua batch)
-     - Batch Admin PIN: ASASIANS + Tahun SPM, contoh ASASIANS1995
+     - PIN admin tidak dipaparkan dalam UI. Skop akses disahkan melalui Supabase.
      - Pending / Direktori / Analisa scoped ikut batch admin
      ========================================================== */
   let adminScopeV3E = null;
@@ -2216,7 +2214,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
   }
 
   renderAdminGate = function(){
-    return `<section class="admin-gate-grid"><div class="admin-gate-card"><h4>Pusat Admin SMKASAS</h4><p>Masukkan PIN Super Admin atau PIN Batch Admin. Batch Admin hanya nampak data batch sendiri.</p><div class="admin-quick-grid"><div class="admin-quick"><strong>Super</strong><span>ASASIANS1984</span></div><div class="admin-quick"><strong>Batch</strong><span>ASASIANS + Tahun SPM</span></div><div class="admin-quick"><strong>Scope</strong><span>ikut role</span></div></div><div class="safe-note" style="margin-top:12px"><strong>Contoh:</strong> Batch Admin SPM 1995 guna PIN <b>ASASIANS1995</b>.</div></div><div class="form-card"><h4>Admin PIN</h4><div class="form-grid"><label class="field wide">PIN Admin<input id="adminMasterPin" type="password" placeholder="ASASIANS1984 / ASASIANS1995"></label></div><div class="save-row"><button class="btn gold" id="btnEnterAdmin">Masuk Admin</button></div><div class="admin-small-note">PIN pilot. Versi production nanti guna login sebenar dan audit log.</div></div></section><section id="adminWorkspace" style="margin-top:14px"></section>`;
+    return `<section class="admin-gate-grid"><div class="admin-gate-card"><h4>Pusat Admin SMKASAS</h4><p>Masukkan PIN admin yang diberi oleh Super Admin. Batch Admin hanya nampak data batch sendiri; Super Admin boleh semak semua batch.</p><div class="admin-quick-grid"><div class="admin-quick"><strong>Verify</strong><span>semak pending</span></div><div class="admin-quick"><strong>Skop</strong><span>ikut lantikan</span></div><div class="admin-quick"><strong>Amanah</strong><span>data tertutup</span></div></div><div class="safe-note" style="margin-top:12px"><strong>Nota P&C:</strong> PIN tidak dipaparkan di skrin. Sila rujuk Super Admin jika terlupa akses.</div></div><div class="form-card"><h4>Admin PIN</h4><div class="form-grid"><label class="field wide">PIN Admin<input id="adminMasterPin" type="password" placeholder="Masukkan PIN admin"></label></div><div class="save-row"><button class="btn gold" id="btnEnterAdmin">Masuk Admin</button></div><div class="admin-small-note">PIN pilot. Versi production nanti guna login sebenar dan audit log.</div></div></section><section id="adminWorkspace" style="margin-top:14px"></section>`;
   };
 
   bindAdminGate = function(){
@@ -2362,11 +2360,12 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
 
   function renderCsvImportV3F(scope){
     const locked = scope?.role === 'batch_admin';
-    const yearInfo = locked ? `CSV untuk PIN ini dikunci kepada <strong>SPM ${esc(scope.year_end||'')}</strong>. Row tahun lain akan ditolak.` : 'Super Admin boleh import banyak tahun SPM dalam satu CSV.';
-    return `<section class="panel"><h3>Import CSV Alumni</h3><p>Untuk admin batch yang sudah ada senarai Excel/CSV. Data import akan masuk sebagai <strong>pending</strong>, bukan auto verified.</p><div class="safe-note">${yearInfo}</div></section>
-      <section class="grid2"><div class="form-card"><h4>1. Pilih CSV</h4><p class="muted">Header disokong: <code>full_name, phone, email, year_spm, class_name, nickname, gender, location, state, profession, industry, company, stpm_year</code></p><input class="file-input" type="file" id="csvImportFileV3F" accept=".csv,text/csv"><div class="save-row"><button class="btn ghost" id="btnDownloadCsvTemplateV3F">Download Template CSV</button><button class="btn gold" id="btnPreviewCsvV3F">Preview CSV</button></div></div>
-      <div class="form-card"><h4>2. Skop Import</h4><div id="csvImportScopeNoteV3F" class="note">${adminScopeLabelV3E(scope)}</div><p class="muted">Sistem auto padankan Tahun SPM kepada batch rasmi. BATCH 1 = SPM 1988.</p><div class="save-row"><button class="btn gold" id="btnImportCsvToSupabaseV3F" disabled>Import ke Supabase Pending</button></div></div></section>
-      <section class="panel"><h3>Preview CSV</h3><div id="csvPreviewAreaV3F" class="empty">Pilih file CSV dan klik Preview CSV.</div></section>`;
+    const yearInfo = locked ? `Template dan import untuk sesi ini dikunci kepada <strong>SPM ${esc(scope.year_end||'')}</strong>. Row tahun lain akan ditolak.` : 'Super Admin boleh import banyak tahun SPM dalam satu CSV.';
+    return `<section class="panel"><h3>Import CSV Alumni</h3><p>Gunakan template kosong rasmi supaya susunan data tidak bercampur. Data import akan masuk sebagai <strong>pending</strong>, bukan auto verified.</p><div class="safe-note">${yearInfo}</div></section>
+      <section class="grid2"><div class="form-card"><h4>1. Download Template CSV Kosong</h4><p class="muted">Format wajib: <code>full_name, phone, email, year_spm, class_name, nickname, gender, location, state, profession, industry, company, stpm_year</code></p><div class="note">Isi template ini di Excel / Google Sheets. Jangan ubah nama header. Medan paling penting: <strong>full_name</strong>, <strong>phone</strong>, dan <strong>year_spm</strong>.</div><div class="save-row"><button class="btn gold" id="btnDownloadCsvTemplateV3F">Download Template CSV Kosong</button><button class="btn ghost" id="btnOpenCsvUploadV3F">Saya sudah isi template — buka upload</button></div></div>
+      <div class="form-card"><h4>2. Upload CSV Yang Sudah Diisi</h4><div id="csvUploadBoxV3F" class="hidden"><input class="file-input" type="file" id="csvImportFileV3F" accept=".csv,text/csv"><p class="muted">Pilih fail CSV yang sudah diisi mengikut template kosong tadi.</p><div class="save-row"><button class="btn gold" id="btnPreviewCsvV3F">Preview CSV</button></div></div><div id="csvUploadLockedV3F" class="empty">Download template dahulu atau klik “Saya sudah isi template — buka upload”.</div></div></section>
+      <section class="grid2"><div class="form-card"><h4>3. Skop Import</h4><div id="csvImportScopeNoteV3F" class="note">${adminScopeLabelV3E(scope)}</div><p class="muted">Sistem auto padankan Tahun SPM kepada batch rasmi. BATCH 1 = SPM 1988.</p></div><div class="form-card"><h4>4. Hantar ke Supabase</h4><p class="muted">Selepas preview disemak, import data sebagai pending untuk diverifikasi admin.</p><div class="save-row"><button class="btn gold" id="btnImportCsvToSupabaseV3F" disabled>Import ke Supabase Pending</button></div></div></section>
+      <section class="panel"><h3>Preview CSV</h3><div id="csvPreviewAreaV3F" class="empty">Upload CSV dan klik Preview CSV.</div></section>`;
   }
 
   function refreshImportScopeNoteV3F(){
@@ -2376,17 +2375,24 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
   }
 
   function bindCsvImportV3F(){
-    document.getElementById('btnDownloadCsvTemplateV3F')?.addEventListener('click',downloadCsvTemplateV3F);
+    document.getElementById('btnDownloadCsvTemplateV3F')?.addEventListener('click',()=>{downloadCsvTemplateV3F(); showCsvUploadV3F();});
+    document.getElementById('btnOpenCsvUploadV3F')?.addEventListener('click',showCsvUploadV3F);
     document.getElementById('btnPreviewCsvV3F')?.addEventListener('click',previewCsvImportV3F);
     document.getElementById('csvImportFileV3F')?.addEventListener('change',()=>{csvImportRowsV3F=[];csvImportPreviewV3F=[]; const btn=document.getElementById('btnImportCsvToSupabaseV3F'); if(btn)btn.disabled=true;});
     document.getElementById('btnImportCsvToSupabaseV3F')?.addEventListener('click',importCsvToSupabaseV3F);
   }
 
+  function showCsvUploadV3F(){
+    document.getElementById('csvUploadBoxV3F')?.classList.remove('hidden');
+    document.getElementById('csvUploadLockedV3F')?.classList.add('hidden');
+    const area=document.getElementById('csvPreviewAreaV3F');
+    if(area && area.classList.contains('empty')) area.textContent='Pilih CSV yang sudah diisi, kemudian klik Preview CSV.';
+  }
+
   function downloadCsvTemplateV3F(){
-    const sampleYear = adminScopeV3E?.role==='batch_admin' ? adminScopeV3E.year_end : '1995';
-    const csv = 'full_name,phone,email,year_spm,class_name,nickname,gender,location,state,profession,industry,company,stpm_year\n' +
-      `Nama Contoh,60123456789,contoh@email.com,${sampleYear},5 Sains 1,Contoh,Lelaki,Ipoh,Perak,Guru,Pendidikan,SMK Contoh,\n`;
-    downloadFile(`SMKASAS_template_import_${sampleYear||'alumni'}.csv`, csv, 'text/csv');
+    const sampleYear = adminScopeV3E?.role==='batch_admin' ? adminScopeV3E.year_end : 'alumni';
+    const csv = 'full_name,phone,email,year_spm,class_name,nickname,gender,location,state,profession,industry,company,stpm_year\n';
+    downloadFile(`SMKASAS_template_import_kosong_${sampleYear||'alumni'}.csv`, csv, 'text/csv');
   }
 
   async function previewCsvImportV3F(){
