@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>KENAL Famili — v2.4p F15 Carta & Laporan Famili Polish</title>
+  <title>KENAL Famili — v2.5 Beta Preview</title>
   <style>
 :root{
   --green:#06483f;--green2:#0b6a5c;--gold:#bd8d3b;--navy:#172b3a;
@@ -2652,6 +2652,64 @@ body.section-modal-open #proContent{scroll-margin-top:150px;}
 .f15-hero{background:linear-gradient(135deg,rgba(4,86,74,.10),rgba(212,175,55,.14));border:1px solid rgba(212,175,55,.28)}
 .f15-menu-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}.f15-tool-card{border:1px solid rgba(17,24,39,.10);border-radius:18px;background:#fff;padding:14px;text-align:left;box-shadow:0 8px 24px rgba(15,23,42,.06);cursor:pointer;min-height:118px}.f15-tool-card:hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(15,23,42,.10)}.f15-tool-card strong{display:block;font-size:1rem;color:#04564a;margin-bottom:6px}.f15-tool-card span{display:block;color:#64748b;font-size:.88rem;line-height:1.35}.f15-tool-card em{display:inline-flex;margin-top:10px;border-radius:999px;background:#f8f5ee;color:#8a6a11;padding:4px 9px;font-style:normal;font-size:.78rem}.f15-overlay{position:fixed;inset:0;background:rgba(6,26,53,.58);z-index:82;display:flex;align-items:flex-start;justify-content:center;padding:18px;overflow:auto}.f15-modal{width:min(1120px,100%);background:#fff;border-radius:24px;box-shadow:0 28px 90px rgba(0,0,0,.34);overflow:hidden;margin:20px 0}.f15-modal-head,.f15-modal-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;background:#f8f5ee;border-bottom:1px solid rgba(17,24,39,.08)}.f15-modal-foot{border-top:1px solid rgba(17,24,39,.08);border-bottom:none}.f15-modal-head h3{margin:0}.f15-modal-body{padding:16px}.f15-kv-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0}.f15-kv{border:1px solid rgba(17,24,39,.08);border-radius:16px;padding:12px;background:#fff}.f15-kv strong{display:block;color:#061A35;font-size:1.3rem}.f15-kv span{display:block;color:#64748b;font-size:.86rem;margin-top:4px}.f15-doc{line-height:1.65}.f15-doc h4{margin:16px 0 6px;color:#04564a}.f15-doc ul{margin:4px 0 12px 18px;padding:0}.f15-mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.f15-copybox{width:100%;min-height:260px;border:1px solid rgba(17,24,39,.14);border-radius:16px;padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9rem;background:#fff}.f15-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.f15-report-area{background:#fff;border:1px solid rgba(17,24,39,.08);border-radius:18px;padding:16px}.f15-warning{background:#fff7ed;border-color:#fed7aa}.f15-print-brand{text-align:center;margin:0 0 16px}.f15-print-brand h1{margin:0;color:#04564a}.f15-print-brand p{margin:4px 0;color:#64748b;font-weight:750}.f15-chart-wrap{overflow:auto;padding:8px;background:#fff;border-radius:18px;border:1px solid rgba(17,24,39,.08)}@media(max-width:900px){.f15-menu-grid,.f15-kv-grid,.f15-mini-grid{grid-template-columns:1fr}.f15-modal{border-radius:18px;margin:0}.f15-overlay{padding:8px}.f15-modal-head,.f15-modal-foot{align-items:flex-start;flex-direction:column}}@media print{.f15-overlay{position:static;background:none;padding:0}.f15-modal{box-shadow:none;margin:0;width:100%;border-radius:0}.f15-modal-head .btn,.f15-modal-foot,.f15-actions,.f15-menu-grid,.f15-tool-card{display:none!important}.f15-modal-body{padding:0}.f15-report-area{border:0}}
 
+
+
+/* v2.4q F16 - Backup & Restore Local */
+.backup-hero{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;align-items:stretch}
+.backup-safe-card{background:linear-gradient(135deg,#f8fff8,#fff8e9);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
+.backup-safe-card h3{margin:0 0 8px;color:var(--green)}
+.backup-safe-card p{margin:0;color:var(--muted);line-height:1.55}
+.backup-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.backup-actions .btn{width:100%;justify-content:center}
+.backup-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.backup-mini{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;text-align:center}
+.backup-mini strong{display:block;font-size:1.45rem;color:var(--green)}
+.backup-mini span{display:block;font-size:.82rem;color:var(--muted);margin-top:3px}
+.backup-drop{margin-top:14px;border:1.5px dashed #b9c8bf;border-radius:22px;background:#fbfff9;padding:18px;text-align:center}
+.backup-drop input{width:100%;margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
+.backup-checklist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.backup-check{border:1px solid var(--line);background:#fff;border-radius:16px;padding:12px;display:flex;gap:10px;align-items:flex-start;color:var(--ink)}
+.backup-check b{display:inline-flex;width:24px;height:24px;border-radius:50%;align-items:center;justify-content:center;background:#eef8f1;color:var(--green);flex:0 0 24px}
+.backup-check small{display:block;color:var(--muted);margin-top:3px;line-height:1.35}
+.backup-warning{border-left:5px solid #bd8d3b;background:#fff8ea;border-radius:16px;padding:14px;margin-top:12px;color:#5d4720;line-height:1.55}
+.backup-status{margin-top:12px;border:1px solid var(--line);border-radius:16px;background:#fff;padding:12px;color:var(--muted);white-space:pre-wrap;line-height:1.45}
+.backup-status.good{border-color:#9bc7a6;background:#f3fff5;color:#145c2b}
+.backup-status.bad{border-color:#d9a6a6;background:#fff5f5;color:#7b1e1e}
+@media(max-width:900px){.backup-hero,.backup-actions,.backup-checklist{grid-template-columns:1fr}.backup-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+
+/* v2.5 F17 - MVP Lock & Cloud Clean */
+.beta-guide-card{
+  width:min(92vw,980px);
+  margin:12px auto 0;
+  background:rgba(255,253,248,.94);
+  border:1px solid var(--line);
+  border-radius:24px;
+  box-shadow:var(--shadow);
+  padding:14px 16px;
+}
+.beta-guide-card h3{margin:0 0 8px;color:var(--green);font-size:16px}
+.beta-guide-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0;padding:0;list-style:none}
+.beta-guide-steps li{background:#fbf7ef;border:1px solid var(--line);border-radius:18px;padding:10px;font-weight:850;color:var(--ink);font-size:13px;line-height:1.35}
+.beta-guide-steps span{display:block;color:var(--gold);font-size:12px;font-weight:950;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em}
+.top-test-tools{width:min(92vw,980px);margin:8px auto 0;background:#fffdf8;border:1px dashed #dec99b;border-radius:18px;padding:8px 12px;color:var(--muted);font-size:12px;font-weight:850}
+.top-test-tools summary{cursor:pointer;color:var(--green);font-weight:950}
+.top-test-tools .action-buttons{box-shadow:none;border:0;background:transparent;padding:8px 0 2px;justify-content:flex-start}
+.top-test-tools .btn{min-width:auto;font-size:12px;padding:8px 10px}
+.cloud-panel{display:none!important}
+.cloud-beta-note{background:#fbf7ef;border:1px solid var(--line);border-radius:18px;padding:12px;margin-top:12px;color:var(--muted);font-size:13px;font-weight:850;line-height:1.45}
+.nav-admin-details{background:rgba(255,253,248,.92);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+.nav-admin-details summary{display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;padding:14px;cursor:pointer;list-style:none}
+.nav-admin-details summary::-webkit-details-marker{display:none}
+.nav-admin-details summary strong{color:var(--green)}
+.nav-admin-details summary small{display:block;color:var(--muted);font-weight:850;margin-top:2px}
+.nav-admin-details summary em{font-style:normal;font-size:12px;background:#fbf7ef;border:1px solid var(--line);border-radius:999px;padding:5px 9px;color:var(--muted);font-weight:950}
+.nav-admin-details .nav-mini-grid{padding:0 12px 12px}
+.f17-lock-card{background:#fff8e8;border:1px solid #ead4a1;border-radius:20px;padding:14px;margin:12px 0;color:var(--ink)}
+.f17-lock-card strong{color:var(--green)}
+@media(max-width:900px){.beta-guide-steps{grid-template-columns:1fr}.top-test-tools .action-buttons{justify-content:center}}
+
 </style>
 <!-- Mobile single-file build: HTML + CSS + JS + seed data bundled in one file. -->
 
@@ -2675,26 +2733,32 @@ window.addEventListener("error", function(ev){
     <div class="cover-tags" aria-label="Fungsi utama">
       <span>Salasilah</span>
       <span>Semak Hubungan</span>
-      <span>Reunion Mode</span>
+      <span>Reunion Tools</span>
       <span>Famili PRO</span>
     </div>
   </div>
 </section>
 
-<div class="version-pill no-print">KENAL Famili v2.4l F11 · Engine Hardening + Dummy 7 Borang</div>
-<section class="site-actions no-print" aria-label="Tindakan dan simpanan cloud">
+<div class="version-pill no-print">KENAL Famili v2.5 Beta · MVP Lock & Backup Ready</div>
+<section class="beta-guide-card no-print" aria-label="Panduan mula ringkas">
+  <h3>Cara mula ringkas</h3>
+  <ol class="beta-guide-steps">
+    <li><span>Langkah 1</span>Isi 7 borang Family Tree mengikut apa yang diketahui dahulu.</li>
+    <li><span>Langkah 2</span>Gunakan Direktori, Reunion Tools dan Carta & Laporan untuk lihat hasil keluarga.</li>
+    <li><span>Langkah 3</span>Download Backup Data sebelum reset, tukar device atau kongsi fail ujian.</li>
+  </ol>
+</section>
+<section class="site-actions no-print" aria-label="Tindakan utama">
   <div class="action-buttons">
+    <button id="btnBackupQuick" class="btn gold">Backup Data</button>
     <button id="btnPrint" class="btn secondary">Print / Save PDF</button>
-    <button id="btnFillDummy" class="btn gold">Isi Dummy</button>
-    <button id="btnFillDummy7" class="btn secondary">Dummy Tree 7</button>
-    <button id="btnFillDummy7Families" class="btn secondary">Dummy 7 Borang</button>
     <button id="btnExport" class="btn">Export JSON</button>
     <button id="btnReset" class="btn ghost danger-soft">Reset Data</button>
   </div>
   <div class="cloud-panel" id="cloudPanel">
     <div class="cloud-copy">
-      <strong>Cloud Sync</strong>
-      <span id="cloudStatus">Guest Mode · data disimpan dalam browser ini sahaja.</span>
+      <strong>Cloud Backup</strong>
+      <span id="cloudStatus">Beta / akan datang · buat masa ini gunakan Backup Data ke phone/PC.</span>
     </div>
     <div class="cloud-controls">
       <input id="cloudEmail" type="email" inputmode="email" autocomplete="email" placeholder="Email untuk login / sync" />
@@ -2704,6 +2768,14 @@ window.addEventListener("error", function(ev){
     </div>
   </div>
 </section>
+<details class="top-test-tools no-print">
+  <summary>Admin/Test Data — buka hanya untuk ujian beta</summary>
+  <div class="action-buttons">
+    <button id="btnFillDummy" class="btn gold">Isi Dummy</button>
+    <button id="btnFillDummy7" class="btn secondary">Dummy Tree 7</button>
+    <button id="btnFillDummy7Families" class="btn secondary">Dummy 7 Borang</button>
+  </div>
+</details>
 
 <main class="shell">
   <aside class="side no-print">
@@ -2715,7 +2787,7 @@ window.addEventListener("error", function(ev){
     <nav id="sectionNav" class="section-nav"></nav>
     <section class="note-card">
       <h3>Menu Utama</h3>
-      <p>Versi kosong tanpa data peribadi. Pilih Family Tree untuk mula isi data, Tools Data untuk semakan/import, dan Report & Insight untuk Matrix Mahram, reunion, kerjaya serta carta.</p>
+      <p><strong>Mula dengan 7 borang Family Tree.</strong> Selepas itu gunakan Direktori, Reunion Tools, Semak Hubungan serta Carta & Laporan Famili. Cloud disorok sementara; untuk keselamatan data, gunakan Backup & Restore.</p>
     </section>
   </aside>
 
@@ -2807,7 +2879,7 @@ window.KENAL_CAREER = {"activity_status": ["", "Pelajar", "Mahasiswa", "Bekerja 
 </script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const STORAGE_KEY="kenal_famili_v24p_f15_carta_laporan_famili";;
+const STORAGE_KEY="kenal_famili_v25_beta_mvp_lock";;
 let MEMORY_STORE={};
 let STORAGE_OK=true;
 function cloneData(obj){try{return structuredClone(obj)}catch(e){return JSON.parse(JSON.stringify(obj))}}
@@ -2866,6 +2938,7 @@ const sections=[
   {id:"semak", title:"Carta & Laporan Famili", desc:"Lihat carta keluarga, ringkasan data dan pilihan print/export laporan."},
   {id:"accuracy", title:"Ketepatan Data", desc:"Semak kelengkapan, sumber, konflik dan data yang perlu disahkan."},
   {id:"exchange", title:"Kongsi / Import Cabang", desc:"Export cabang keluarga dan import fail jawapan sebagai draft."},
+  {id:"backup", title:"Backup & Restore", desc:"Simpan data ke phone/PC dan load balik jika browser reset atau tukar device."},
   {id:"pro", title:"Famili PRO", desc:"Shell organisasi: daftar ahli, rumah/cabang, link existing person dan relationship registry."},
   {id:"admin", title:"Dapur Sistem / Admin Mode", desc:"Ruang developer/admin untuk ujian kes, stress test, performance meter dan debug sistem."}
 ];
@@ -3358,6 +3431,187 @@ function ensureDialogCloseButtons(){
   });
 }
 
+
+/* v2.4q F16 - Backup & Restore Local */
+function f16Slug(v){return String(v||"kenal-famili").toLowerCase().replace(/[^a-z0-9]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,60)||"kenal-famili";}
+function f16DateStamp(){
+  const d=new Date();
+  const pad=n=>String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}`;
+}
+function f16AppStats(data=state){
+  const ui=data.ui||{};
+  const done=["self","father","spouse_father","paternal_grandfather","maternal_grandfather","spouse_paternal_grandfather","spouse_maternal_grandfather"].reduce((a,k)=>a+(ui[k]?1:0),0);
+  const persons=(data.persons||[]).length, unions=(data.unions||[]).length, links=(data.parent_child_links||[]).length;
+  const bytes=new Blob([JSON.stringify(data||{})]).size;
+  return {persons,unions,links,done,bytes,kb:Math.max(1,Math.round(bytes/1024))};
+}
+function f16BackupPackage(){
+  const data=cloneData(state);
+  return {
+    kenal_backup:true,
+    app:"KENAL Famili",
+    backup_type:"full_local_backup",
+    backup_version:"2.5-F17",
+    exported_at:now(),
+    storage_key:STORAGE_KEY,
+    url:location.href,
+    stats:f16AppStats(data),
+    data
+  };
+}
+function f16BackupFileName(){
+  const self=person(state.ui?.self)?.full_name || state.report?.project_name || "KENALfamili";
+  return `KENALfamili-backup-${f16Slug(self)}-${f16DateStamp()}.json`;
+}
+function f16DownloadBackup(){
+  const pkg=f16BackupPackage();
+  if(!state.backup)state.backup={};
+  state.backup.last_exported_at=pkg.exported_at;
+  state.backup.last_export_stats=pkg.stats;
+  safeSet(STORAGE_KEY,JSON.stringify(state));
+  downloadText(f16BackupFileName(),JSON.stringify(pkg,null,2),"application/json");
+  return pkg;
+}
+function f16ExtractDataFromBackup(obj){
+  if(!obj||typeof obj!=="object")throw new Error("Fail backup tidak dapat dibaca.");
+  const data=obj.kenal_backup&&obj.data?obj.data:obj;
+  if(!data||typeof data!=="object")throw new Error("Struktur backup kosong.");
+  if(!data.ui||typeof data.ui!=="object")throw new Error("Backup tiada data UI 7 borang.");
+  if(!Array.isArray(data.persons))throw new Error("Backup tiada senarai persons.");
+  if(!Array.isArray(data.unions))data.unions=[];
+  if(!Array.isArray(data.parent_child_links))data.parent_child_links=[];
+  if(!Array.isArray(data.update_logs))data.update_logs=[];
+  if(!Array.isArray(data.import_drafts))data.import_drafts=[];
+  return data;
+}
+function f16ValidateBackupObject(obj){
+  const data=f16ExtractDataFromBackup(obj);
+  const st=f16AppStats(data);
+  const warnings=[];
+  if(!data.ui.self)warnings.push("Profil Saya belum diisi dalam backup.");
+  if(st.persons===0)warnings.push("Backup ini tiada ahli keluarga.");
+  if(st.done<7)warnings.push(`Progress backup ${st.done}/7, belum penuh 7 borang.`);
+  return {data,stats:st,warnings};
+}
+function f16SetStatus(msg,type=""){
+  const el=$("#backupStatus");
+  if(!el)return;
+  el.className=`backup-status ${type||""}`.trim();
+  el.textContent=msg;
+}
+function f16RestoreBackupObject(obj){
+  const checked=f16ValidateBackupObject(obj);
+  const s=checked.stats;
+  const warn=checked.warnings.length?"\n\nNota:\n- "+checked.warnings.join("\n- "):"";
+  const ok=confirm(`Restore backup ini akan menggantikan data semasa dalam browser.\n\nBackup dikesan:\n${s.persons} ahli · ${s.unions} union · ${s.links} parent-child links · progress ${s.done}/7.${warn}\n\nTeruskan restore?`);
+  if(!ok)return false;
+  let restored=cloneData(checked.data);
+  restored=migrateF2Data(restored);
+  restored.backup=restored.backup||{};
+  restored.backup.last_restored_at=now();
+  restored.backup.restored_from="local_json";
+  restored.backup.restored_stats=s;
+  state=restored;
+  if(!state.directory) state.directory={q:"",anchor_id:state.mahram?.anchor_id||state.ui.self||"",branch:"all",gender:"all",status:"all",relation:"all",career:"all",missing:"all",sort:"name"};
+  if(!state.report) state.report={active_tool:"",scope:"all",last_exported_at:""};
+  if(!state.reunion) state.reunion={statuses:{},notes:{},last_updated_at:""};
+  if(!state.mahram) state.mahram={anchor_id:state.ui.self||"",filter:"all"};
+  safeSet(STORAGE_KEY,JSON.stringify(state));
+  current=0;sectionModalOpen=false;render();
+  alert("Backup berjaya di-restore. Data 7 borang sudah dimuatkan semula.");
+  return true;
+}
+function f16ReadBackupFile(file){
+  if(!file){f16SetStatus("Pilih fail backup .json dahulu.","bad");return;}
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const obj=JSON.parse(String(reader.result||"{}"));
+      const checked=f16ValidateBackupObject(obj);
+      f16SetStatus(`Fail backup sah.\n${checked.stats.persons} ahli · ${checked.stats.unions} union · ${checked.stats.links} links · progress ${checked.stats.done}/7 · ${checked.stats.kb} KB${checked.warnings.length?"\n\nNota:\n- "+checked.warnings.join("\n- "):""}`, checked.warnings.length?"":"good");
+      window.__KENAL_F16_PENDING_BACKUP=obj;
+    }catch(err){
+      window.__KENAL_F16_PENDING_BACKUP=null;
+      f16SetStatus("Fail tidak sah: "+(err&&err.message?err.message:err),"bad");
+    }
+  };
+  reader.onerror=()=>f16SetStatus("Gagal baca fail backup.","bad");
+  reader.readAsText(file);
+}
+function renderBackupRestore(){
+  const st=f16AppStats();
+  const last=state.backup?.last_exported_at||"Belum pernah backup dalam versi ini";
+  const restored=state.backup?.last_restored_at||"Belum pernah restore";
+  app.innerHTML=`<section class="panel backup-panel">
+    <h3>Backup & Restore Local</h3>
+    <p class="panel-intro">Simpan data KENAL Famili sebagai fail JSON di phone/PC. Jika browser reset atau tukar device, fail ini boleh di-load balik untuk pulihkan 7 borang dan semua dapur hubungan.</p>
+    <div class="backup-hero">
+      <div class="backup-safe-card">
+        <h3>Backup Penuh Data Famili</h3>
+        <p>Backup ini menyimpan profil ahli, 7 borang, union/perkahwinan, parent-child links, Direktori, Reunion Tools, Semak Hubungan, Carta & Laporan dan tetapan anchor.</p>
+        <div class="backup-actions no-print">
+          <button type="button" class="btn gold" id="btnF16Download">Download Backup Data</button>
+          <button type="button" class="btn secondary" id="btnF16BackupReset">Backup & Reset Data</button>
+        </div>
+        <div class="backup-warning"><strong>Penting:</strong> Simpan fail backup di tempat selamat. Fail ini boleh mengandungi data keluarga dan nombor telefon jika diisi.</div>
+      </div>
+      <div class="backup-stats">
+        <div class="backup-mini"><strong>${st.persons}</strong><span>Ahli</span></div>
+        <div class="backup-mini"><strong>${st.unions}</strong><span>Union</span></div>
+        <div class="backup-mini"><strong>${st.links}</strong><span>Parent-child links</span></div>
+        <div class="backup-mini"><strong>${st.done}/7</strong><span>Progress borang</span></div>
+      </div>
+    </div>
+  </section>
+  <section class="panel backup-panel">
+    <div class="subhead"><h4>Restore / Load Backup</h4><span class="hint">Fail .json daripada KENAL Famili</span></div>
+    <div class="backup-drop no-print">
+      <strong>Pilih fail backup dari phone/PC</strong>
+      <input type="file" id="f16RestoreFile" accept="application/json,.json">
+      <div class="backup-actions">
+        <button type="button" class="btn" id="btnF16Check">Semak Fail</button>
+        <button type="button" class="btn gold" id="btnF16Restore">Restore Backup</button>
+      </div>
+      <div id="backupStatus" class="backup-status">Belum ada fail dipilih. Pilih fail .json kemudian tekan Semak Fail.</div>
+    </div>
+    <div class="backup-checklist">
+      <div class="backup-check"><b>1</b><div><strong>Download backup</strong><small>Buat sebelum reset, sebelum tukar device, atau sebelum test data besar.</small></div></div>
+      <div class="backup-check"><b>2</b><div><strong>Simpan di tempat selamat</strong><small>Contoh: folder phone/PC, Google Drive peribadi, atau external drive.</small></div></div>
+      <div class="backup-check"><b>3</b><div><strong>Restore bila perlu</strong><small>Pilih fail JSON dan sistem akan pulihkan data ke browser semasa.</small></div></div>
+      <div class="backup-check"><b>4</b><div><strong>Cloud kemudian</strong><small>Supabase nanti untuk multi-user. Backup JSON ini perlindungan manual dahulu.</small></div></div>
+    </div>
+  </section>
+  <section class="panel"><h3>Log Backup</h3><p class="panel-intro">Backup terakhir: <strong>${esc(last)}</strong><br>Restore terakhir: <strong>${esc(restored)}</strong><br>Saiz data semasa anggaran: <strong>${st.kb} KB</strong>.</p></section>`;
+  attachF16Handlers();
+}
+function attachF16Handlers(){
+  const file=$("#f16RestoreFile");
+  const down=$("#btnF16Download");
+  const check=$("#btnF16Check");
+  const restore=$("#btnF16Restore");
+  const backupReset=$("#btnF16BackupReset");
+  if(down)down.onclick=()=>{const pkg=f16DownloadBackup();f16SetStatus(`Backup dimuat turun.\n${pkg.stats.persons} ahli · ${pkg.stats.unions} union · ${pkg.stats.links} links · ${pkg.stats.kb} KB`,"good");};
+  if(file)file.onchange=()=>{window.__KENAL_F16_PENDING_BACKUP=null;f16SetStatus(file.files&&file.files[0]?`Fail dipilih: ${file.files[0].name}\nTekan Semak Fail untuk validasi.`:"Belum ada fail dipilih.");};
+  if(check)check.onclick=()=>f16ReadBackupFile(file?.files?.[0]);
+  if(restore)restore.onclick=()=>{
+    if(window.__KENAL_F16_PENDING_BACKUP)return f16RestoreBackupObject(window.__KENAL_F16_PENDING_BACKUP);
+    if(file?.files?.[0]){
+      const reader=new FileReader();
+      reader.onload=()=>{try{f16RestoreBackupObject(JSON.parse(String(reader.result||"{}")));}catch(err){f16SetStatus("Fail tidak sah: "+(err.message||err),"bad")}};
+      reader.readAsText(file.files[0]);
+    }else f16SetStatus("Pilih fail backup dahulu.","bad");
+  };
+  if(backupReset)backupReset.onclick=()=>{
+    const pkg=f16DownloadBackup();
+    setTimeout(()=>{
+      if(confirm(`Backup sudah dimuat turun (${pkg.stats.persons} ahli, ${pkg.stats.kb} KB).\n\nKosongkan data semasa sekarang?`)){
+        state=cloneData(SEED);safeSet(STORAGE_KEY,JSON.stringify(state));queueCloudSave();current=0;sectionModalOpen=false;render();
+      }
+    },500);
+  };
+}
+
 function render(){
   ensureDialogCloseButtons();
   renderNav();
@@ -3378,6 +3632,7 @@ function render(){
   if(s.id==="reunion") renderReunionMode();
   if(s.id==="career") renderCareerDashboard();
   if(s.id==="exchange") renderExchange();
+  if(s.id==="backup") renderBackupRestore();
   if(s.id==="semak") renderReview();
   if(s.id==="mahram") renderMahramLite();
   if(s.id==="admin") renderAdminDapur();
@@ -3410,7 +3665,7 @@ function renderNav(){
   const idxs=(ids)=>sections.map((x,i)=>ids.includes(x.id)?i:null).filter(x=>x!==null);
   const gunaan=idxs(["career","reunion"]);
   const insights=idxs(["mahram","semak"]);
-  const tools=idxs(["accuracy","exchange"]);
+  const tools=idxs(["accuracy","exchange","backup"]);
   const admin=idxs(["pro","admin"]);
   $("#sectionNav").innerHTML=`
     <details class="nav-group nav-family" ${inTree?"open":"open"}>
@@ -3441,18 +3696,19 @@ function renderNav(){
     <div class="nav-group-card">
       <div class="nav-group-head">
         <span class="nav-icon">${navIcon("tools")}</span>
-        <span><strong>Tools Data</strong><small>Ketepatan data, kongsi dan import</small></span>
+        <span><strong>Tools Data</strong><small>Ketepatan data, kongsi/import dan backup</small></span>
       </div>
       <div class="nav-mini-grid">${tools.map(i=>navButtonHTML(i,true)).join("")}</div>
     </div>
 
-    <div class="nav-group-card">
-      <div class="nav-group-head">
+    <details class="nav-admin-details">
+      <summary>
         <span class="nav-icon">${navIcon("future")}</span>
         <span><strong>Pro / Admin</strong><small>Organisasi, peranan dan dapur sistem</small></span>
-      </div>
+        <em>Lanjutan</em>
+      </summary>
       <div class="nav-mini-grid">${admin.map(i=>navButtonHTML(i,true)).join("")}</div>
-    </div>`;
+    </details>`;
   document.querySelectorAll(".nav-section-btn").forEach(b=>b.onclick=()=>{current=+b.dataset.i;sectionModalOpen=true;render()});
 }
 function sectionDone(i){
@@ -3469,6 +3725,7 @@ function sectionDone(i){
     case "accuracy": return true;
     case "career": return true;
     case "exchange": return true;
+    case "backup": return true;
     case "reunion": return true;
     case "semak": return state.persons.length>0;
     case "mahram": return true;
@@ -6903,9 +7160,9 @@ function renderMahramLite(){
       <button type="button" class="semak-card" data-semak-view="repair"><strong>Baiki Data</strong><span>Correction queue untuk status, pautan anak, union dan isu data yang boleh dibaiki.</span><em>Admin keluarga</em></button>
     </div>
     <details class="semak-admin-details no-print"><summary>Dapur / Ujian Sistem</summary><div class="semak-admin-grid">
-      <button type="button" class="semak-card" data-semak-view="admin-f7"><strong>F7 Test Case</strong><span>Ujian kes mahram dan reason engine.</span></button>
-      <button type="button" class="semak-card" data-semak-view="admin-f10"><strong>F10 Stress Test</strong><span>Dummy/stress scan untuk dapur relationship.</span></button>
-      <button type="button" class="semak-card" data-semak-view="admin-f11"><strong>F11 Performance</strong><span>Index, cache, beban data dan Safe Mode.</span></button>
+      <button type="button" class="semak-card" data-semak-view="admin-f7"><strong>Ujian Kes</strong><span>Uji logik hubungan/mahram untuk data contoh dan kes perlu semak.</span></button>
+      <button type="button" class="semak-card" data-semak-view="admin-f10"><strong>Stress Test</strong><span>Scan beban data dan semak ketahanan relationship engine.</span></button>
+      <button type="button" class="semak-card" data-semak-view="admin-f11"><strong>Performance Meter</strong><span>Index, cache, beban data dan cadangan Safe Mode.</span></button>
     </div></details>
   </section>
   <dialog id="semakHubunganDialog" class="semak-dialog"><div class="semak-modal-shell"><div class="semak-modal-top"><h3 id="semakDialogTitle">Semak Hubungan</h3><div class="semak-modal-actions"><button type="button" class="btn ghost semak-close">← Kembali / Tutup</button></div></div><div id="semakHubunganContent"></div><div class="semak-modal-actions no-print" style="margin-top:14px"><button type="button" class="btn secondary semak-close">Tutup</button></div></div></dialog>`;
@@ -7588,10 +7845,10 @@ function renderAdminDapur(){
   mahramEnsure();
   const people=mahramPeopleAZ();
   const anchorId=state.mahram?.anchor_id || state.settings.anchor_person_id || state.ui.self || people[0]?.id || "";
-  app.innerHTML=`<section class="panel"><h3>Dapur Sistem / Admin Mode</h3><p class="panel-intro">Ruang ini bukan untuk user biasa. Ia menyimpan test case, stress scan dan performance meter supaya menu Semak Hubungan kekal kemas.</p><div class="admin-dapur-grid"><div class="auto-box"><strong>F7</strong><br>Ujian kes mahram & reason engine.</div><div class="auto-box"><strong>F10</strong><br>Stress test dummy dan beban relationship.</div><div class="auto-box"><strong>F11</strong><br>Performance meter, index, cache dan Safe Mode.</div><div class="auto-box"><strong>Nota</strong><br>Jika app dibuka kepada user awam, menu ini boleh disembunyikan.</div></div></section>
-  ${safeMatrixBlock("F7 · Ujian Kes Mahram & Reason Engine",()=>renderF7MahramTestCases(anchorId))}
-  ${safeMatrixBlock("F10 · Dummy Tree 7 Stress Test",()=>renderF10StressPanel(anchorId))}
-  ${safeMatrixBlock("F11 · Engine Hardening & Performance Meter",()=>renderF11PerformancePanel(anchorId))}`;
+  app.innerHTML=`<section class="panel"><h3>Dapur Sistem / Admin Mode</h3><p class="panel-intro">Ruang lanjutan untuk admin/builder sahaja. User biasa cukup guna Direktori, Reunion Tools, Semak Hubungan, Carta & Laporan serta Backup & Restore.</p><div class="f17-lock-card"><strong>Cloud Backup:</strong> disorok sementara dalam versi beta ini supaya tidak mengelirukan. Simpanan rasmi buat masa ini ialah <strong>Backup Data</strong> ke phone/PC. Supabase akan disusun semula selepas MVP lock.</div><div class="admin-dapur-grid"><div class="auto-box"><strong>Ujian Kes</strong><br>Semak logik mahram & reason engine.</div><div class="auto-box"><strong>Stress Test</strong><br>Uji dummy dan beban relationship.</div><div class="auto-box"><strong>Performance Meter</strong><br>Index, cache, beban data dan Safe Mode.</div><div class="auto-box"><strong>Nota</strong><br>Menu ini dikekalkan untuk beta/dev, bukan pintu utama user.</div></div></section>
+  ${safeMatrixBlock("Ujian Kes Mahram & Reason Engine",()=>renderF7MahramTestCases(anchorId))}
+  ${safeMatrixBlock("Stress Test Dapur Hubungan",()=>renderF10StressPanel(anchorId))}
+  ${safeMatrixBlock("Performance Meter",()=>renderF11PerformancePanel(anchorId))}`;
   attachF7Handlers();attachF10Handlers();attachF11Handlers();
 }
 
@@ -9014,7 +9271,23 @@ function attachProHandlers(){
 $("#btnPrev").onclick=()=>{current=Math.max(0,current-1);render()};
 $("#btnNext").onclick=()=>{current=Math.min(sections.length-1,current+1);render()};
 $("#btnExport").onclick=()=>downloadText("KENALfamili-data.json",JSON.stringify(state,null,2),"application/json");
-$("#btnReset").onclick=()=>{if(confirm("Kosongkan semua data dalam browser ini? Jika sedang login, data cloud juga akan dikemaskini kosong.")){state=cloneData(SEED);safeSet(STORAGE_KEY,JSON.stringify(state));queueCloudSave();current=0;render()}};
+const quickBackupBtn=$("#btnBackupQuick"); if(quickBackupBtn) quickBackupBtn.onclick=()=>f16DownloadBackup();
+$("#btnReset").onclick=()=>{
+  const hasData=(state.persons||[]).length || (state.unions||[]).length || (state.parent_child_links||[]).length;
+  if(hasData && confirm("Sebelum reset, mahu Download Backup Data dahulu?\n\nTekan OK untuk download backup. Tekan Cancel jika sudah ada backup.")){
+    try{f16DownloadBackup();}catch(e){console.warn(e);}
+  }
+  if(confirm("Reset akan kosongkan data dalam browser ini. Teruskan?")){
+    if(confirm("Pengesahan akhir: data semasa akan diganti kosong. Pastikan backup sudah dibuat.")){
+      state=cloneData(SEED);
+      safeSet(STORAGE_KEY,JSON.stringify(state));
+      queueCloudSave();
+      current=0;
+      sectionModalOpen=false;
+      render();
+    }
+  }
+};
 const dummyBtn=$("#btnFillDummy"); if(dummyBtn) dummyBtn.onclick=()=>fillF2DummyData();
 const dummy7Btn=$("#btnFillDummy7"); if(dummy7Btn) dummy7Btn.onclick=()=>fillF10Level7DummyData();
 const dummy7FamBtn=$("#btnFillDummy7Families"); if(dummy7FamBtn) dummy7FamBtn.onclick=()=>fillF10cSevenMainFormsDummyData();
@@ -9047,7 +9320,8 @@ $("#profileEdit").onclick=()=>{ if(profileTargetId){ $("#profileDialog").close()
 
 ensureDialogCloseButtons();
 render();
-initCloud();
+/* F17: Cloud Sync disorok sementara untuk beta; guna Backup Data sebagai simpanan utama. */
+setCloudStatus("Cloud Backup beta disorok · gunakan Backup Data ke phone/PC.","guest");
 
 </script>
 </body>
