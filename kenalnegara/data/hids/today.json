@@ -1,0 +1,32 @@
+{
+  "sourceName": "HIDS · Arkib Negara Malaysia",
+  "sourceUrl": "https://hids.arkib.gov.my/",
+  "status": "cache-ready",
+  "note": "Fail cache contoh untuk struktur GitHub Pages. Data final perlu dikemas kini secara beradab daripada sumber rasmi HIDS.",
+  "dayMonth": "13 Jun",
+  "days": {
+    "13 Jun": [
+      {
+        "year": "HIDS",
+        "title": "Semak peristiwa rasmi hari ini",
+        "summary": "Cache harian ini ialah struktur awal. Apabila automasi disambung, ruang ini memaparkan ringkasan peristiwa rasmi mengikut tarikh semasa dengan pautan ke HIDS Arkib Negara Malaysia.",
+        "state": "Malaysia",
+        "tags": [
+          "sejarah",
+          "arkib",
+          "sumber rasmi"
+        ],
+        "sourceUrl": "https://hids.arkib.gov.my/"
+      }
+    ]
+  },
+  "reflection": {
+    "title": "Sejarah sebagai cermin hidup bersama.",
+    "body": "Hari ini kita mula dari nilai. Malaysia tidak cukup dikenal melalui peta dan makanan; ia juga perlu dikenal melalui adab hidup bersama, kesetiaan, perlembagaan, undang-undang dan kesusilaan.",
+    "tags": [
+      "nilai",
+      "warga",
+      "kuiz tema"
+    ]
+  }
+}
