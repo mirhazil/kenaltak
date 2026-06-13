@@ -2710,6 +2710,52 @@ body.section-modal-open #proContent{scroll-margin-top:150px;}
 .f17-lock-card strong{color:var(--green)}
 @media(max-width:900px){.beta-guide-steps{grid-template-columns:1fr}.top-test-tools .action-buttons{justify-content:center}}
 
+
+/* v2.5.1 F17 fix - Mobile guide/actions no-overlap */
+.beta-guide-card + .site-actions{
+  margin:12px auto 20px!important;
+}
+@media(max-width:760px){
+  .beta-guide-card{
+    width:min(92vw,980px);
+    margin:10px auto 0!important;
+    padding:12px 12px;
+    border-radius:20px;
+  }
+  .beta-guide-card h3{
+    font-size:15px;
+    margin-bottom:7px;
+  }
+  .beta-guide-steps{
+    grid-template-columns:1fr!important;
+    gap:8px;
+  }
+  .beta-guide-steps li{
+    padding:9px 10px;
+    border-radius:16px;
+    font-size:12.5px;
+    line-height:1.28;
+  }
+  .beta-guide-steps span{
+    font-size:11px;
+    margin-bottom:2px;
+  }
+  .beta-guide-card + .site-actions,
+  .site-actions{
+    margin:10px auto 16px!important;
+    padding:0 14px;
+  }
+  .site-actions .action-buttons{
+    border-radius:20px;
+    padding:11px;
+    gap:9px;
+  }
+  .site-actions .action-buttons .btn{
+    padding:12px 10px;
+    font-size:13px;
+  }
+}
+
 </style>
 <!-- Mobile single-file build: HTML + CSS + JS + seed data bundled in one file. -->
 
@@ -2739,7 +2785,7 @@ window.addEventListener("error", function(ev){
   </div>
 </section>
 
-<div class="version-pill no-print">KENAL Famili v2.5 Beta · MVP Lock & Backup Ready</div>
+<div class="version-pill no-print">KENAL Famili v2.5.1 Beta · Mobile Guide Fix</div>
 <section class="beta-guide-card no-print" aria-label="Panduan mula ringkas">
   <h3>Cara mula ringkas</h3>
   <ol class="beta-guide-steps">
