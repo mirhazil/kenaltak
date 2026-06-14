@@ -259,6 +259,34 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
   .detail-actions-v3k .btn.pencil-v3m{background:#f8fbff;border-color:#bcd5ff;color:#0B3D91}
 </style>
 
+
+<style id="v3m3-mobile-safe-gap">
+/* KENAL Alumni SMKASAS v3M3 - Mobile Bottom Safe Gap
+   Fix ruang bawah popup Admin Detail / Edit Teknikal supaya butang tidak tenggelam di HP. */
+@media (max-width: 760px) {
+  .section-modal.open .modal-card,
+  .modal-card {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+  }
+
+  .modal-body {
+    padding-bottom: calc(150px + env(safe-area-inset-bottom, 0px)) !important;
+    scroll-padding-bottom: calc(150px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .detail-actions-v3k,
+  .save-row {
+    margin-bottom: calc(90px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: 18px !important;
+  }
+
+  .detail-actions-v3k .btn,
+  .save-row .btn {
+    min-height: 52px;
+  }
+}
+</style>
 </head>
 <body class="smkasas-page">
   <section class="hero smkasas-hero smkasas-image-only-hero" aria-label="KENAL Alumni SMKASAS hero cover">
