@@ -250,6 +250,15 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
     @media(max-width:860px){.public-dashboard-hero{grid-template-columns:1fr}.batch-progress-card{grid-template-columns:1fr}.progress-counts{justify-content:flex-start}.campaign-steps{grid-template-columns:1fr}.public-dashboard-hero .big-message h3{font-size:24px}}
   </style>
 
+
+<style id="kenal-v3m-admin-correction-css">
+  .admin-correction-note-v3m{background:#eef6ff;border:1px solid #bfdcff;color:#123a63;border-radius:16px;padding:11px;font-weight:850;line-height:1.45;margin:10px 0}
+  .admin-correction-form-v3m .field input[readonly]{background:#f3f6fb;color:#59677a;border-style:dashed}
+  .correction-mini-v3m{font-size:12px;color:#64748b;font-weight:850;line-height:1.4;margin-top:4px}
+  .correction-warning-v3m{background:#fff8e5;border:1px solid #edd49a;color:#70480d;border-radius:14px;padding:10px;font-weight:850;line-height:1.45;margin-top:8px}
+  .detail-actions-v3k .btn.pencil-v3m{background:#f8fbff;border-color:#bcd5ff;color:#0B3D91}
+</style>
+
 </head>
 <body class="smkasas-page">
   <section class="hero smkasas-hero smkasas-image-only-hero" aria-label="KENAL Alumni SMKASAS hero cover">
@@ -897,7 +906,16 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
 .sop-board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.sop-card{background:#fff;border:1px solid var(--line);border-left:6px solid var(--gold);border-radius:20px;padding:14px}.sop-card h4{margin:0 0 8px;color:var(--navy)}.sop-card ul{margin:0;padding-left:20px;color:var(--muted);font-weight:850;line-height:1.55}.task-check{display:grid;gap:8px;margin-top:10px}.task-check label{background:#fffdf8;border:1px solid var(--line);border-radius:14px;padding:10px;font-weight:850;color:var(--navy);display:flex;gap:8px;align-items:flex-start}.task-check input{width:auto;margin-top:3px}
 @media(max-width:900px){.sop-board{grid-template-columns:1fr}.success-foot{display:grid}.success-foot .btn,.success-foot .mini{width:100%}}
 
-</style></head><body class="smkasas-page"><header class="hero"><div class="wrap"><small style="color:#F3D88B;font-weight:950;letter-spacing:.1em">KENAL ALUMNI · BORANG AHLI</small><h1>Borang Alumni / Kohort</h1><p>Isi dan hantar balik fail jawapan <b>.json</b> kepada admin.</p></div></header><main class="wrap"><section class="card"><h2>Kepala Borang</h2><div class="grid"><div><b>Institusi</b><br>${esc(form.institution)}</div><div><b>Group / Batch / Kohort</b><br>${esc(form.group)}</div><div><b>Role</b><br>${esc(form.role)}</div><div><b>Tahun Tamat</b><br>${esc(form.yearEnd||'-')}</div></div></section><section class="card note"><b>Nota iPhone / WhatsApp</b><br>Jika butang tidak berfungsi dalam preview WhatsApp, buka fail ini melalui Safari/Chrome. Tidak perlu sempurna; isi setakat yang anda tahu dahulu.</section><form id="alumniForm" class="card"><h2>Maklumat Diri</h2><div class="grid"><label class="field wide">Nama Penuh *<input name="name" required></label><label class="field">Nama Panggilan<input name="nickname"></label><label class="field">Jantina<select name="gender"><option></option><option>Lelaki</option><option>Perempuan</option><option>Tidak mahu nyatakan</option></select></label><label class="field">Tarikh Lahir<input type="date" name="dob"></label><label class="field">Status Hidup<select name="aliveStatus"><option>Hidup</option><option>Meninggal</option><option>Tidak pasti</option></select></label><label class="field">No Telefon / WhatsApp<input name="phone" placeholder="6012xxxxxxx"></label><label class="field">Email<input type="email" name="email"></label><label class="field">Lokasi<input name="location"></label><label class="field">Negeri<input name="state"></label><label class="field">Negara<input name="country" value="Malaysia"></label><label class="field">Kerjaya / Profesi<input name="profession"></label><label class="field">Industri<input name="industry"></label><label class="field">Syarikat / Organisasi<input name="company"></label><label class="field">Status Kahwin<select name="maritalStatus" id="marital"><option>Bujang</option><option>Berkahwin</option><option>Duda</option><option>Janda</option><option>Balu</option><option>Tidak mahu nyatakan</option></select></label></div><div id="spouseBox" style="display:none" class="card"><h2>Maklumat Pasangan / Kecemasan</h2><p style="color:var(--muted);font-weight:800">Optional. Untuk tujuan kecemasan, kebajikan, tahlil, ziarah atau bantuan jika berlaku kematian/musibah.</p><div class="grid"><label class="field">Nama Pasangan<input name="spouseName"></label><label class="field">Telefon Pasangan<input name="spousePhone"></label><label class="field">Kerjaya Pasangan<input name="spouseProfession"></label><label class="field wide">Nota Pasangan<textarea name="spouseNote"></textarea></label></div></div><label class="field wide">Nota tambahan<textarea name="note"></textarea></label><div class="actions"><button class="btn gold" type="submit">Jana Jawapan JSON</button><button class="btn" type="button" id="btnCopy">Copy JSON</button><button class="btn" type="button" id="btnShare">Share / WhatsApp</button></div></form><section class="card"><h2>Jawapan</h2><div id="result" class="result">Belum dijana.</div></section></main><script>const locked=${formJson};let latest='';function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}function collect(){const fd=new FormData(document.getElementById('alumniForm'));const d=Object.fromEntries(fd.entries());return {...locked,submittedAt:new Date().toISOString(),person:{name:d.name,nickname:d.nickname,gender:d.gender,dob:d.dob,aliveStatus:d.aliveStatus,phone:d.phone,email:d.email,location:d.location,state:d.state,country:d.country,profession:d.profession,industry:d.industry,company:d.company,maritalStatus:d.maritalStatus,note:d.note},spouse:{name:d.spouseName,phone:d.spousePhone,profession:d.spouseProfession,note:d.spouseNote},privacy:'group',consent:'Saya membenarkan data ini digunakan untuk tujuan direktori alumni mengikut tetapan privasi.'};}function download(name,content){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}document.getElementById('marital').addEventListener('change',e=>{document.getElementById('spouseBox').style.display=e.target.value==='Berkahwin'||e.target.value==='Balu'?'block':'none'});document.getElementById('alumniForm').addEventListener('submit',e=>{e.preventDefault();latest=JSON.stringify(collect(),null,2);document.getElementById('result').textContent=latest;download('KENAL_ALUMNI_jawapan_'+Date.now()+'.json',latest);});document.getElementById('btnCopy').addEventListener('click',()=>{if(!latest)latest=JSON.stringify(collect(),null,2);navigator.clipboard&&navigator.clipboard.writeText(latest);alert('JSON dicopy. Hantar kepada admin jika download gagal.');});document.getElementById('btnShare').addEventListener('click',()=>{if(!latest)latest=JSON.stringify(collect(),null,2);const msg='Assalamualaikum admin. Ini jawapan borang KENAL Alumni saya. Jika fail JSON tidak boleh attach, saya akan paste JSON selepas mesej ini.'; if(navigator.share){navigator.share({title:'Jawapan KENAL Alumni',text:msg+'\\n\\n'+latest}).catch(()=>{});}else{location.href='https://wa.me/?text='+encodeURIComponent(msg+'\\n\\n'+latest);}});<\/script><!-- KENAL Alumni SMKASAS v3L: data format standard uppercase/email lowercase -->
+</style>
+<style id="kenal-v3m-admin-correction-css">
+  .admin-correction-note-v3m{background:#eef6ff;border:1px solid #bfdcff;color:#123a63;border-radius:16px;padding:11px;font-weight:850;line-height:1.45;margin:10px 0}
+  .admin-correction-form-v3m .field input[readonly]{background:#f3f6fb;color:#59677a;border-style:dashed}
+  .correction-mini-v3m{font-size:12px;color:#64748b;font-weight:850;line-height:1.4;margin-top:4px}
+  .correction-warning-v3m{background:#fff8e5;border:1px solid #edd49a;color:#70480d;border-radius:14px;padding:10px;font-weight:850;line-height:1.45;margin-top:8px}
+  .detail-actions-v3k .btn.pencil-v3m{background:#f8fbff;border-color:#bcd5ff;color:#0B3D91}
+</style>
+
+</head><body class="smkasas-page"><header class="hero"><div class="wrap"><small style="color:#F3D88B;font-weight:950;letter-spacing:.1em">KENAL ALUMNI · BORANG AHLI</small><h1>Borang Alumni / Kohort</h1><p>Isi dan hantar balik fail jawapan <b>.json</b> kepada admin.</p></div></header><main class="wrap"><section class="card"><h2>Kepala Borang</h2><div class="grid"><div><b>Institusi</b><br>${esc(form.institution)}</div><div><b>Group / Batch / Kohort</b><br>${esc(form.group)}</div><div><b>Role</b><br>${esc(form.role)}</div><div><b>Tahun Tamat</b><br>${esc(form.yearEnd||'-')}</div></div></section><section class="card note"><b>Nota iPhone / WhatsApp</b><br>Jika butang tidak berfungsi dalam preview WhatsApp, buka fail ini melalui Safari/Chrome. Tidak perlu sempurna; isi setakat yang anda tahu dahulu.</section><form id="alumniForm" class="card"><h2>Maklumat Diri</h2><div class="grid"><label class="field wide">Nama Penuh *<input name="name" required></label><label class="field">Nama Panggilan<input name="nickname"></label><label class="field">Jantina<select name="gender"><option></option><option>Lelaki</option><option>Perempuan</option><option>Tidak mahu nyatakan</option></select></label><label class="field">Tarikh Lahir<input type="date" name="dob"></label><label class="field">Status Hidup<select name="aliveStatus"><option>Hidup</option><option>Meninggal</option><option>Tidak pasti</option></select></label><label class="field">No Telefon / WhatsApp<input name="phone" placeholder="6012xxxxxxx"></label><label class="field">Email<input type="email" name="email"></label><label class="field">Lokasi<input name="location"></label><label class="field">Negeri<input name="state"></label><label class="field">Negara<input name="country" value="Malaysia"></label><label class="field">Kerjaya / Profesi<input name="profession"></label><label class="field">Industri<input name="industry"></label><label class="field">Syarikat / Organisasi<input name="company"></label><label class="field">Status Kahwin<select name="maritalStatus" id="marital"><option>Bujang</option><option>Berkahwin</option><option>Duda</option><option>Janda</option><option>Balu</option><option>Tidak mahu nyatakan</option></select></label></div><div id="spouseBox" style="display:none" class="card"><h2>Maklumat Pasangan / Kecemasan</h2><p style="color:var(--muted);font-weight:800">Optional. Untuk tujuan kecemasan, kebajikan, tahlil, ziarah atau bantuan jika berlaku kematian/musibah.</p><div class="grid"><label class="field">Nama Pasangan<input name="spouseName"></label><label class="field">Telefon Pasangan<input name="spousePhone"></label><label class="field">Kerjaya Pasangan<input name="spouseProfession"></label><label class="field wide">Nota Pasangan<textarea name="spouseNote"></textarea></label></div></div><label class="field wide">Nota tambahan<textarea name="note"></textarea></label><div class="actions"><button class="btn gold" type="submit">Jana Jawapan JSON</button><button class="btn" type="button" id="btnCopy">Copy JSON</button><button class="btn" type="button" id="btnShare">Share / WhatsApp</button></div></form><section class="card"><h2>Jawapan</h2><div id="result" class="result">Belum dijana.</div></section></main><script>const locked=${formJson};let latest='';function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}function collect(){const fd=new FormData(document.getElementById('alumniForm'));const d=Object.fromEntries(fd.entries());return {...locked,submittedAt:new Date().toISOString(),person:{name:d.name,nickname:d.nickname,gender:d.gender,dob:d.dob,aliveStatus:d.aliveStatus,phone:d.phone,email:d.email,location:d.location,state:d.state,country:d.country,profession:d.profession,industry:d.industry,company:d.company,maritalStatus:d.maritalStatus,note:d.note},spouse:{name:d.spouseName,phone:d.spousePhone,profession:d.spouseProfession,note:d.spouseNote},privacy:'group',consent:'Saya membenarkan data ini digunakan untuk tujuan direktori alumni mengikut tetapan privasi.'};}function download(name,content){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}document.getElementById('marital').addEventListener('change',e=>{document.getElementById('spouseBox').style.display=e.target.value==='Berkahwin'||e.target.value==='Balu'?'block':'none'});document.getElementById('alumniForm').addEventListener('submit',e=>{e.preventDefault();latest=JSON.stringify(collect(),null,2);document.getElementById('result').textContent=latest;download('KENAL_ALUMNI_jawapan_'+Date.now()+'.json',latest);});document.getElementById('btnCopy').addEventListener('click',()=>{if(!latest)latest=JSON.stringify(collect(),null,2);navigator.clipboard&&navigator.clipboard.writeText(latest);alert('JSON dicopy. Hantar kepada admin jika download gagal.');});document.getElementById('btnShare').addEventListener('click',()=>{if(!latest)latest=JSON.stringify(collect(),null,2);const msg='Assalamualaikum admin. Ini jawapan borang KENAL Alumni saya. Jika fail JSON tidak boleh attach, saya akan paste JSON selepas mesej ini.'; if(navigator.share){navigator.share({title:'Jawapan KENAL Alumni',text:msg+'\\n\\n'+latest}).catch(()=>{});}else{location.href='https://wa.me/?text='+encodeURIComponent(msg+'\\n\\n'+latest);}});<\/script><!-- KENAL Alumni SMKASAS v3M2: edit button visible + admin correction tool -->
 </body></html>`;
   }
 
@@ -3033,6 +3051,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
         ])}
       </div>
       <div class="detail-actions-v3k">
+        <button class="btn pencil-v3m" id="btnEditCorrectionV3M">Edit Teknikal</button>
         <button class="btn ghost" id="btnCopyDetailV3K">Copy Ringkasan</button>
         ${phone?`<a class="btn blue" target="_blank" rel="noopener" href="${esc(waLinkV3D(phone,waMsg))}">WhatsApp</a>`:''}
         ${status==='pending'?`<button class="btn gold" id="btnDetailVerifyV3K">Verify</button><button class="btn danger" id="btnDetailRejectV3K">Reject</button>`:''}
@@ -3327,10 +3346,167 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
     return normalizeCsvRowsV3I(rows, batchByYear, {phone:{},email:{},nameYear:{}}).map(x=>Object.assign(x,{ok:x.canImport}));
   };
 
+
+
+  /* ==========================================================
+     KENAL Alumni SMKASAS v3M - Admin Correction Tool
+     - Admin boleh betulkan ralat teknikal: nombor, ejaan, email, kelas, lokasi, kerjaya.
+     - Super Admin: semua batch. Batch Admin: batch sendiri sahaja.
+     - Status/consent/tarikh daftar tidak diedit dari form ini.
+     ========================================================== */
+  async function saveAdminCorrectionV3M(pin, alumniId, patch, reason){
+    return await supabaseRpc('smkasas_admin_correct_alumni', {
+      p_pin: pin,
+      p_alumni_id: alumniId,
+      p_patch: patch || {},
+      p_reason: reason || null
+    });
+  }
+  function inputValV3M(row, key){
+    const v = row && row[key] !== undefined && row[key] !== null ? row[key] : '';
+    return esc(String(v));
+  }
+  function selectValV3M(current, list){
+    return list.map(v=>`<option value="${esc(v)}" ${String(current||'')===String(v)?'selected':''}>${esc(v||'-')}</option>`).join('');
+  }
+  function renderAdminCorrectionFormV3M(row){
+    const scope = adminScopeV3E || {};
+    const yearReadonly = scope.role === 'batch_admin' ? 'readonly' : '';
+    const batchNote = scope.role === 'batch_admin'
+      ? `Batch Admin hanya boleh membetulkan rekod SPM ${esc(scope.year_end||row.year_end||'-')}. Tahun SPM dikunci untuk elak rekod tersalah pindah batch.`
+      : 'Super Admin boleh membetulkan Tahun SPM. Sistem akan padankan semula Batch ID berdasarkan tahun SPM.';
+    return `<form id="adminCorrectionFormV3M" class="form-grid admin-correction-form-v3m">
+      <div class="wide admin-correction-note-v3m"><strong>Pembetulan Teknikal.</strong> Gunakan ruang ini untuk betulkan nombor WhatsApp, email typo, ejaan nama, kelas, lokasi atau kerjaya. Jangan guna untuk ubah status pengesahan atau consent.</div>
+      <label class="field wide">Nama penuh<input name="full_name" value="${inputValV3M(row,'full_name')}"></label>
+      <label class="field">Nama panggilan<input name="nickname" value="${inputValV3M(row,'nickname')}"></label>
+      <label class="field">Jantina<select name="gender">${selectValV3M(row.gender||'', ['', 'Lelaki', 'Perempuan'])}</select></label>
+      <label class="field">Telefon / WhatsApp<input name="phone" value="${inputValV3M(row,'phone')}" inputmode="tel"><div class="correction-mini-v3m">Contoh: 60123456789. Sistem bersihkan spacing/dash.</div></label>
+      <label class="field">Email<input name="email" type="email" value="${inputValV3M(row,'email')}"><div class="correction-mini-v3m">Email kekal lowercase.</div></label>
+      <label class="field">Tahun SPM<input name="year_end" value="${inputValV3M(row,'year_end')}" inputmode="numeric" ${yearReadonly}></label>
+      <label class="field">Kelas / Aliran<input name="class_name" value="${inputValV3M(row,'class_name')}"></label>
+      <label class="field">No Pelajar<input name="member_no" value="${inputValV3M(row,'member_no')}"></label>
+      <label class="field">Tarikh lahir<input name="dob" type="date" value="${inputValV3M(row,'dob')}"></label>
+      <label class="field">Status kahwin<input name="marital_status" value="${inputValV3M(row,'marital_status')}"></label>
+      <label class="field">Lokasi<input name="location" value="${inputValV3M(row,'location')}"></label>
+      <label class="field">Negeri<input name="state" value="${inputValV3M(row,'state')}"></label>
+      <label class="field">Negara<input name="country" value="${inputValV3M(row,'country')}"></label>
+      <label class="field">Profesion<input name="profession" value="${inputValV3M(row,'profession')}"></label>
+      <label class="field">Industri<input name="industry" value="${inputValV3M(row,'industry')}"></label>
+      <label class="field">Syarikat / Organisasi<input name="company" value="${inputValV3M(row,'company')}"></label>
+      <label class="field">Nama pasangan / waris<input name="spouse_name" value="${inputValV3M(row,'spouse_name')}"></label>
+      <label class="field">Telefon pasangan / waris<input name="spouse_phone" value="${inputValV3M(row,'spouse_phone')}" inputmode="tel"></label>
+      <label class="field">Kerjaya pasangan / waris<input name="spouse_profession" value="${inputValV3M(row,'spouse_profession')}"></label>
+      <label class="field wide">Nota pasangan / waris<textarea name="spouse_note">${inputValV3M(row,'spouse_note')}</textarea></label>
+      <label class="field wide">Admin note<textarea name="admin_note">${inputValV3M(row,'admin_note')}</textarea></label>
+      <label class="field wide">Sebab pembetulan <textarea name="correction_reason" required placeholder="Contoh: Nombor WhatsApp salah digit / email typo / ejaan nama dibetulkan."></textarea></label>
+      <div class="wide correction-warning-v3m">${batchNote}</div>
+      <div class="wide save-row"><button class="btn gold" type="submit">Save Correction</button><button class="btn ghost" type="button" id="btnCancelCorrectionV3M">Kembali Borang Penuh</button><button class="btn" type="button" onclick="closeEditDialog()">Tutup</button></div>
+    </form>`;
+  }
+  function normalizeCorrectionPatchV3M(formData){
+    const d = Object.fromEntries(formData.entries());
+    const patch = {
+      full_name: nullUpperV3L(d.full_name),
+      nickname: nullUpperV3L(d.nickname),
+      gender: nullIfBlank(d.gender),
+      phone: nullPhoneV3L(d.phone),
+      email: nullEmailV3L(d.email),
+      year_end: toIntOrNull(d.year_end),
+      class_name: nullUpperV3L(d.class_name),
+      member_no: nullUpperV3L(d.member_no),
+      dob: nullIfBlank(d.dob),
+      marital_status: nullUpperV3L(d.marital_status),
+      location: nullUpperV3L(d.location),
+      state: nullUpperV3L(d.state),
+      country: nullUpperV3L(d.country),
+      profession: nullUpperV3L(d.profession),
+      industry: nullUpperV3L(d.industry),
+      company: nullUpperV3L(d.company),
+      spouse_name: nullUpperV3L(d.spouse_name),
+      spouse_phone: nullPhoneV3L(d.spouse_phone),
+      spouse_profession: nullUpperV3L(d.spouse_profession),
+      spouse_note: nullUpperV3L(d.spouse_note),
+      admin_note: nullIfBlank(d.admin_note)
+    };
+    return {patch, reason: String(d.correction_reason||'').trim()};
+  }
+  function bindCorrectionInputFormatV3M(){
+    const form=document.getElementById('adminCorrectionFormV3M');
+    if(!form) return;
+    const upperNames = new Set(['full_name','nickname','class_name','member_no','location','state','country','profession','industry','company','marital_status','spouse_name','spouse_profession','spouse_note']);
+    form.querySelectorAll('input[name], textarea[name]').forEach(el=>{
+      const n=el.name;
+      if(upperNames.has(n)){
+        el.addEventListener('input',()=>transformInputValueV3L(el,'upper', true));
+        el.addEventListener('blur',()=>transformInputValueV3L(el,'upper', false));
+      }
+      if(n==='email'){
+        el.addEventListener('input',()=>transformInputValueV3L(el,'email'));
+        el.addEventListener('blur',()=>transformInputValueV3L(el,'email'));
+      }
+      if(n==='phone' || n==='spouse_phone'){
+        el.addEventListener('input',()=>transformInputValueV3L(el,'phone'));
+        el.addEventListener('blur',()=>{ el.value = phoneV3L(el.value); });
+      }
+      if(n==='year_end'){
+        el.addEventListener('input',()=>{ el.value = String(el.value||'').replace(/\D/g,'').slice(0,4); });
+      }
+    });
+  }
+  async function openAdminCorrectionV3M(alumniId){
+    if(!adminPinV3C){ toast('Masukkan PIN admin dahulu'); return; }
+    openEditDialog('Memuatkan pembetulan','ADMIN CORRECTION',`<div class="empty">Memuatkan borang pembetulan...</div>`);
+    try{
+      let row = await fetchAdminAlumniDetailV3K(adminPinV3C, alumniId);
+      if(Array.isArray(row)) row = row[0] || {};
+      if(row && row.data && typeof row.data === 'object') row = row.data;
+      if(!row || !row.id){ throw new Error('Rekod tidak ditemui atau akses ditolak.'); }
+      openEditDialog(row.full_name || 'Pembetulan Teknikal','ADMIN CORRECTION',renderAdminCorrectionFormV3M(row));
+      bindCorrectionInputFormatV3M();
+      document.getElementById('btnCancelCorrectionV3M')?.addEventListener('click',()=>openAdminAlumniDetailV3K(row.id));
+      document.getElementById('adminCorrectionFormV3M')?.addEventListener('submit',async(e)=>{
+        e.preventDefault();
+        const {patch, reason} = normalizeCorrectionPatchV3M(new FormData(e.currentTarget));
+        if(!patch.full_name){ toast('Nama penuh wajib ada'); return; }
+        if(!patch.phone || String(patch.phone).length < 8){ toast('Telefon / WhatsApp perlu betul'); return; }
+        if(!reason){ toast('Tulis sebab pembetulan dahulu'); return; }
+        try{
+          await saveAdminCorrectionV3M(adminPinV3C, row.id, patch, reason);
+          showSuccessDialogV3D({
+            title:'Correction disimpan',
+            kicker:'ADMIN CORRECTION',
+            body:`<p><strong>Pembetulan teknikal berjaya disimpan.</strong></p><p>Rekod alumni telah dikemas kini. Buka semula borang penuh untuk semak WhatsApp / email terbaru.</p>`,
+            autoCloseMs:6000
+          });
+          await loadPendingAdminList2(adminPinV3C); await loadAdminStats(); await updateAdminBadgeV3D();
+          openAdminAlumniDetailV3K(row.id);
+        }catch(err){
+          openEditDialog('Correction gagal','ADMIN CORRECTION',`<div class="note"><strong>Gagal simpan pembetulan.</strong><br>${esc(err.message||err)}<br><br>Pastikan SQL v3M sudah dijalankan di Supabase.</div><div class="save-row"><button class="btn" onclick="openAdminAlumniDetailV3K('${esc(row.id)}')">Kembali</button></div>`);
+        }
+      });
+    }catch(e){
+      openEditDialog('Correction tidak dapat dibuka','ADMIN CORRECTION',`<div class="note"><strong>Gagal buka pembetulan.</strong><br>${esc(e.message||e)}</div>`);
+    }
+  }
+  const renderAdminDetailHtmlV3MBase = renderAdminDetailHtmlV3K;
+  renderAdminDetailHtmlV3K = function(row){
+    let html = renderAdminDetailHtmlV3MBase(row);
+    const btn = `<button class="btn pencil-v3m" id="btnEditCorrectionV3M">Edit Teknikal</button>`;
+    if(html.includes('id="btnEditCorrectionV3M"')) return html;
+    html = html.replace('<button class="btn ghost" id="btnCopyDetailV3K">Copy Ringkasan</button>', btn + '<button class="btn ghost" id="btnCopyDetailV3K">Copy Ringkasan</button>');
+    return html;
+  };
+  const openAdminAlumniDetailV3MBase = openAdminAlumniDetailV3K;
+  openAdminAlumniDetailV3K = async function(id){
+    await openAdminAlumniDetailV3MBase(id);
+    document.getElementById('btnEditCorrectionV3M')?.addEventListener('click',()=>openAdminCorrectionV3M(id));
+  };
+
+
   initSMKASASBranding();
   renderMenu();
 })();
 </script>
-<!-- KENAL Alumni SMKASAS v3L: data format standard uppercase/email lowercase -->
+<!-- KENAL Alumni SMKASAS v3M: admin correction tool + data format standard -->
 </body>
 </html>
