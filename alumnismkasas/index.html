@@ -3562,6 +3562,245 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
   };
 
 
+  /* ==========================================================
+     v3O - Duplicate Register Guard + Admin Archive/Delete
+     - Friendly duplicate message bila email/phone sudah pending/verified
+     - Admin boleh Padam/Arkib atau Tandakan Duplicate dari Borang Penuh
+     - Aksi guna RPC status sedia ada; fallback REST jika policy membenarkan
+     ========================================================== */
+  function injectV3OStyles(){
+    if(document.getElementById('styleV3O')) return;
+    const st=document.createElement('style');
+    st.id='styleV3O';
+    st.textContent=`
+      .admin-risk-zone-v3o{margin:14px 0;padding:14px;border:1px solid #f0c7bf;background:#fff6f4;border-radius:18px;color:var(--navy)}
+      .admin-risk-zone-v3o strong{display:block;margin-bottom:5px;color:var(--danger)}
+      .admin-risk-zone-v3o p{margin:0;color:#7a4b45;font-weight:800;line-height:1.45;font-size:13px}
+      .duplicate-notice-v3o{padding:14px;border:1px solid #edd49a;background:#fff8e5;border-radius:18px;margin-top:10px;color:#70480d;font-weight:850;line-height:1.5}
+      .row-actions .mini.danger.soft-v3o{background:#fff6f4;color:var(--danger);border-color:#f0c7bf}
+      .detail-actions-v3k .btn.danger{background:var(--danger);color:#fff}
+    `;
+    document.head.appendChild(st);
+  }
+  injectV3OStyles();
+
+  function isDuplicateRegistrationErrorV3O(err){
+    const msg=String(err?.message||err||'').toLowerCase();
+    return msg.includes('duplicate key') || msg.includes('uq_smkasas_alumni_phone_active') || msg.includes('uq_smkasas_alumni_email_active') || msg.includes('already exists');
+  }
+  function duplicateRegistrationMessageV3O(){
+    return 'Rekod pendaftaran menggunakan email/no telefon ini sudah wujud. Jika anda sudah daftar, sila tunggu pengesahan admin batch. Jika perlu kemas kini maklumat, hubungi wakil batch atau Super Admin.';
+  }
+  function showDuplicateRegistrationDialogV3O(){
+    if(typeof showSuccessDialogV3D === 'function'){
+      showSuccessDialogV3D({
+        title:'Rekod pendaftaran sudah wujud',
+        kicker:'SEMAKAN DUPLICATE',
+        body:`<p><strong>Pendaftaran tidak dihantar semula.</strong></p><p>${esc(duplicateRegistrationMessageV3O())}</p><div class="duplicate-notice-v3o">Sistem sudah mengunci email/no telefon yang berstatus <b>pending</b> atau <b>verified</b> supaya tidak berlaku daftar dua kali.</div>`,
+        autoCloseMs:0
+      });
+    }else{
+      alert(duplicateRegistrationMessageV3O());
+    }
+  }
+
+  submitPublicAlumniForm = async function(e){
+    e.preventDefault();
+    const form=e.currentTarget;
+    const submitBtn=form.querySelector('button[type="submit"]');
+    const oldText=submitBtn?submitBtn.textContent:'';
+    if(submitBtn){ submitBtn.disabled=true; submitBtn.textContent='Menghantar...'; }
+    try{
+      applyFormNormalizationV3L(form);
+      const d=Object.fromEntries(new FormData(form).entries());
+      if(!d.yearEnd){ toast('Pilih Tahun SPM dahulu'); document.getElementById('yearEnd')?.focus(); return; }
+      const phoneDigits = phoneV3L(d.phone);
+      if(!phoneDigits || phoneDigits.length < 8){ toast('No WhatsApp / Telefon wajib diisi dengan betul'); document.getElementById('personPhone')?.focus(); return; }
+      if(!document.getElementById('consentBox')?.checked){ toast('Sila tick persetujuan dahulu'); document.getElementById('consentBox')?.focus(); return; }
+      let batch=null;
+      try{ batch = await findSupabaseBatchBySPM(d.yearEnd); }catch(err){}
+      const stpm = String(d.stpmYear||'').replace(/\D/g,'').slice(0,4);
+      const payload={
+        batch_id: batch?.id || null,
+        full_name: nullUpperV3L(d.name),
+        nickname: nullUpperV3L(d.nickname),
+        gender: nullIfBlank(d.gender),
+        dob: nullIfBlank(d.dob),
+        phone: nullIfBlank(phoneDigits),
+        email: nullEmailV3L(d.email),
+        location: nullUpperV3L(d.location),
+        state: nullUpperV3L(d.state),
+        country: nullUpperV3L(d.country)||'MALAYSIA',
+        profession: nullUpperV3L(d.profession),
+        industry: nullUpperV3L(d.industry),
+        company: nullUpperV3L(d.company),
+        marital_status: nullIfBlank(d.maritalStatus),
+        spouse_name: nullUpperV3L(d.spouseName),
+        spouse_phone: nullPhoneV3L(d.spousePhone),
+        spouse_profession: nullUpperV3L(d.spouseProfession),
+        spouse_note: nullUpperV3L(d.spouseNote),
+        class_name: nullUpperV3L(d.className),
+        member_no: nullUpperV3L(d.memberNo),
+        year_end: toIntOrNull(d.yearEnd),
+        role:'Alumni',
+        status:'pending',
+        privacy:'group',
+        admin_note: stpm ? `TAHUN STPM: ${stpm}` : null
+      };
+      await supabaseFetch('smkasas_alumni', {method:'POST', body: JSON.stringify(payload)});
+      showSuccessDialogV3D({
+        title:'Borang berjaya dihantar',
+        kicker:'TERIMA KASIH',
+        body:`<p><strong>Borang anda berjaya dihantar.</strong></p><p>Terima kasih atas kerjasama mengemas kini data alumni SMKASAS.</p><p>Data anda akan disemak oleh admin alumni sebelum disahkan.</p><div class="safe-note">Format data telah distandardkan: CAPITAL LETTER kecuali email.</div>`,
+        autoCloseMs:10000
+      });
+      form.reset();
+      const prev=document.getElementById('batchAutoPreview'); if(prev) prev.innerHTML='Pilih Tahun SPM untuk lihat batch rasmi.';
+      updateAdminBadgeV3D();
+      loadPublicStats();
+    }catch(err){
+      if(isDuplicateRegistrationErrorV3O(err)){
+        showDuplicateRegistrationDialogV3O();
+      }else{
+        toast('Gagal Supabase: '+(err.message||err));
+      }
+    }finally{
+      if(submitBtn){ submitBtn.disabled=false; submitBtn.textContent=oldText; }
+    }
+  };
+
+  async function adminActionUpdateStatusV3O(alumniId, status, reason){
+    const note = reason ? `${status.toUpperCase()}: ${reason}` : status.toUpperCase();
+    try{
+      // RPC rasmi admin scope. Jika SQL function sudah menerima status duplicate/deleted, ini pilihan paling selamat.
+      return await updateAlumniStatusSupabase(adminPinV3C, alumniId, status);
+    }catch(rpcErr){
+      // Fallback untuk environment yang membenarkan PATCH table melalui RLS.
+      const patch = {status, admin_note: note};
+      if(status==='deleted'){
+        patch.deleted_at = new Date().toISOString();
+        patch.delete_reason = reason || 'Arkib oleh admin';
+      }
+      if(status==='duplicate'){
+        patch.deleted_at = new Date().toISOString();
+        patch.duplicate_reason = reason || 'Tandakan duplicate oleh admin';
+        patch.delete_reason = reason || 'Duplicate';
+      }
+      try{
+        return await supabaseFetch(`smkasas_alumni?id=eq.${encodeURIComponent(alumniId)}`, {method:'PATCH', body: JSON.stringify(patch)});
+      }catch(patchErr){
+        throw rpcErr;
+      }
+    }
+  }
+  async function adminArchiveAlumniV3O(alumniId){
+    if(!adminPinV3C){ toast('Masukkan PIN admin dahulu'); return; }
+    const reason=prompt('Sebab Padam / Arkib akaun ini?', 'Daftar berganda / salah daftar');
+    if(reason===null) return;
+    if(!confirm('Akaun ini akan dikeluarkan daripada pending/verified dan tidak dipaparkan dalam direktori aktif. Teruskan?')) return;
+    try{
+      await adminActionUpdateStatusV3O(alumniId,'deleted',reason||'Arkib oleh admin');
+      toast('Akaun telah diarkibkan');
+      closeEditDialog();
+      await refreshAdminAfterActionV3O();
+    }catch(err){
+      alert('Gagal arkib akaun: '+(err.message||err));
+    }
+  }
+  async function adminMarkDuplicateV3O(alumniId){
+    if(!adminPinV3C){ toast('Masukkan PIN admin dahulu'); return; }
+    const reason=prompt('Sebab tandakan duplicate?', 'Daftar berganda');
+    if(reason===null) return;
+    if(!confirm('Rekod ini akan ditandakan sebagai duplicate dan dikeluarkan daripada paparan aktif. Teruskan?')) return;
+    try{
+      await adminActionUpdateStatusV3O(alumniId,'duplicate',reason||'Daftar berganda');
+      toast('Rekod telah ditandakan duplicate');
+      closeEditDialog();
+      await refreshAdminAfterActionV3O();
+    }catch(err){
+      alert('Gagal tandakan duplicate: '+(err.message||err));
+    }
+  }
+  async function refreshAdminAfterActionV3O(){
+    try{ await loadPendingAdminList2(adminPinV3C); }catch(e){}
+    try{ await loadAdminDirectory(); }catch(e){}
+    try{ await loadAdminStats(); }catch(e){}
+    try{ await updateAdminBadgeV3D(); }catch(e){}
+  }
+  function bindAdminActionsV3O(){
+    document.querySelectorAll('[data-archive-supa-v3o]').forEach(b=>{
+      if(b.dataset.boundArchiveV3o) return;
+      b.dataset.boundArchiveV3o='1';
+      b.addEventListener('click',()=>adminArchiveAlumniV3O(b.dataset.archiveSupaV3o));
+    });
+    document.querySelectorAll('[data-duplicate-supa-v3o]').forEach(b=>{
+      if(b.dataset.boundDuplicateV3o) return;
+      b.dataset.boundDuplicateV3o='1';
+      b.addEventListener('click',()=>adminMarkDuplicateV3O(b.dataset.duplicateSupaV3o));
+    });
+  }
+
+  const renderAdminDetailHtmlV3OBase = renderAdminDetailHtmlV3K;
+  renderAdminDetailHtmlV3K = function(row){
+    let html = renderAdminDetailHtmlV3OBase(row);
+    if(html.includes('data-archive-supa-v3o')) return html;
+    const status = String(row?.status||'').toLowerCase();
+    if(status==='deleted' || status==='duplicate') return html;
+    const actionHtml = `<div class="admin-risk-zone-v3o"><strong>Tindakan sensitif admin</strong><p>Gunakan untuk kes salah daftar, daftar dua kali atau rekod yang tidak patut kekal aktif. Rekod tidak hilang daripada database; statusnya dikeluarkan daripada paparan pending/verified.</p></div><button class="btn danger" data-duplicate-supa-v3o="${esc(row.id)}">Tandakan Duplicate</button><button class="btn danger" data-archive-supa-v3o="${esc(row.id)}">Padam / Arkib Akaun</button>`;
+    return html.replace('<button class="btn" onclick="closeEditDialog()">Tutup</button>', actionHtml + '<button class="btn" onclick="closeEditDialog()">Tutup</button>');
+  };
+
+  const openAdminAlumniDetailV3OBase = openAdminAlumniDetailV3K;
+  openAdminAlumniDetailV3K = async function(id){
+    await openAdminAlumniDetailV3OBase(id);
+    bindAdminActionsV3O();
+  };
+
+  const pendingRowCardV3OBase = pendingRowCardV3C;
+  pendingRowCardV3C = function(row){
+    let html = pendingRowCardV3OBase(row);
+    if(html.includes('data-archive-supa-v3o')) return html;
+    const extra = `<button class="mini danger soft-v3o" data-duplicate-supa-v3o="${esc(row.id)}">Duplicate</button><button class="mini danger soft-v3o" data-archive-supa-v3o="${esc(row.id)}">Arkib</button>`;
+    return html.replace('</div></div>', extra + '</div></div>');
+  };
+
+  const bindPendingListV3OPrev = bindPendingListV3C;
+  bindPendingListV3C = function(){
+    bindPendingListV3OPrev();
+    bindAdminActionsV3O();
+  };
+
+  const alumniRowCardScopedV3OBase = alumniRowCardScopedV3E;
+  alumniRowCardScopedV3E = function(row){
+    const html = alumniRowCardScopedV3OBase(row);
+    if(html.includes('data-archive-supa-v3o')) return html;
+    return html.replace('</div>', `<div class="row-actions"><button class="mini" data-admin-detail-row="${esc(row.id)}">Edit</button><button class="mini danger soft-v3o" data-duplicate-supa-v3o="${esc(row.id)}">Duplicate</button><button class="mini danger soft-v3o" data-archive-supa-v3o="${esc(row.id)}">Arkib</button></div></div>`);
+  };
+
+  const loadAdminDirectoryV3OPrev = loadAdminDirectory;
+  loadAdminDirectory = async function(){
+    await loadAdminDirectoryV3OPrev();
+    bindAdminDetailButtonsV3K();
+    bindAdminActionsV3O();
+  };
+
+
+  // Override explicit row rendering supaya butang action tidak mengganggu struktur HTML asal.
+  pendingRowCardV3C = function(row){
+    const batchLabel = row.batch_name || (row.year_end ? `SPM ${row.year_end}` : 'Batch belum dipilih');
+    const contact = [row.phone, row.email].filter(Boolean).join(' · ') || 'Contact belum diisi';
+    const date = row.created_at ? String(row.created_at).slice(0,10) : '-';
+    return `<div class="row-card"><div class="avatar">${esc(initials(row.full_name))}</div><div><strong><button class="name-link-v3k" data-admin-detail-row="${esc(row.id)}">${esc(row.full_name||'-')}</button></strong><span>${esc(batchLabel)} · ${esc(row.class_name||'-')}<br>${esc(contact)}<br>${esc(row.profession||'-')} · ${esc(row.state||'-')}</span><div class="chips"><span class="chip warn">Pending</span><span class="chip">${esc(date)}</span><span class="chip gold">Klik nama = borang penuh</span></div><div class="pending-detail hidden" id="pendingDetail_${esc(row.id)}"><div><strong>Profil ringkas</strong><span>Nama panggilan: ${esc(row.nickname||'-')}<br>Kelas: ${esc(row.class_name||'-')}<br>SPM: ${esc(row.year_end||'-')}</span></div><div><strong>Contact / Kerjaya</strong><span>${esc(contact)}<br>${esc(row.profession||'-')}<br>${esc(row.state||'-')}</span></div></div></div><div class="row-actions"><button class="mini" data-admin-detail-row="${esc(row.id)}">Borang Penuh</button><button class="mini" data-toggle-pending-detail="${esc(row.id)}">Ringkas</button><button class="mini gold" data-verify-supa="${esc(row.id)}">Verify</button><button class="mini danger" data-reject-supa="${esc(row.id)}">Reject</button><button class="mini danger soft-v3o" data-duplicate-supa-v3o="${esc(row.id)}">Duplicate</button><button class="mini danger soft-v3o" data-archive-supa-v3o="${esc(row.id)}">Arkib</button></div></div>`;
+  };
+  alumniRowCardScopedV3E = function(row){
+    const batchLabel = row.batch_name || (row.year_end ? `SPM ${row.year_end}` : 'Batch belum dipilih');
+    const meta = [batchLabel, row.class_name, row.profession, row.state].filter(Boolean).join(' · ');
+    const contact = [row.phone, row.email].filter(Boolean).join(' · ') || 'Contact belum dipaparkan';
+    return `<div class="result-card"><div><strong><button class="name-link-v3k" data-admin-detail-row="${esc(row.id)}">${esc(row.full_name||'-')}</button></strong><p>${esc(meta||'-')}<br>${esc(contact)}</p><div class="chips"><span class="chip ok">Verified</span>${row.industry?`<span class="chip">${esc(row.industry)}</span>`:''}<span class="chip gold">Borang penuh</span></div></div><div class="row-actions"><button class="mini" data-admin-detail-row="${esc(row.id)}">Lihat/Edit</button><button class="mini danger soft-v3o" data-duplicate-supa-v3o="${esc(row.id)}">Duplicate</button><button class="mini danger soft-v3o" data-archive-supa-v3o="${esc(row.id)}">Arkib</button></div></div>`;
+  };
+
+
+
 
 
   /* =========================
