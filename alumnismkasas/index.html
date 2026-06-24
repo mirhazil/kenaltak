@@ -318,6 +318,27 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
   @media(max-width:860px){.v3n-campaign-grid{grid-template-columns:1fr}.v3n-rep-mini-grid{grid-template-columns:repeat(3,1fr)}.v3n-batch-row{grid-template-columns:1fr}.v3n-alert h3{font-size:20px}}
 </style>
 
+
+<style id="kenal-v3q-batch-saya-share-css">
+  .share-actions-v3q{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+  .share-actions-v3q .btn,.share-actions-v3q .mini{white-space:normal}
+  .batch-saya-hero-v3q{background:linear-gradient(135deg,#071b35,#0a3b85);border:1px solid rgba(214,168,79,.42);border-radius:28px;padding:22px;color:#fff;box-shadow:0 16px 44px rgba(7,27,53,.16);position:relative;overflow:hidden}
+  .batch-saya-hero-v3q:after{content:"";position:absolute;right:-45px;top:-45px;width:160px;height:160px;border-radius:999px;background:rgba(214,168,79,.18)}
+  .batch-saya-hero-v3q h3{color:#fff;margin:0 0 8px;font-size:28px;position:relative;z-index:1}
+  .batch-saya-hero-v3q p{color:#eef5ff;font-weight:780;line-height:1.55;margin:0;position:relative;z-index:1}
+  .batch-login-v3q{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end}
+  .batch-login-v3q .field{margin:0}
+  .batch-result-head-v3q{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px}
+  .batch-result-head-v3q h4{margin:0;color:var(--navy);font-size:22px}
+  .batch-name-list-v3q{display:grid;gap:8px;margin-top:10px}
+  .batch-name-row-v3q{display:grid;grid-template-columns:46px 1fr auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:11px;box-shadow:0 8px 20px rgba(7,27,53,.04)}
+  .batch-name-row-v3q strong{display:block;color:var(--navy);font-size:15px}
+  .batch-name-row-v3q span{display:block;color:var(--muted);font-size:12px;font-weight:850;line-height:1.35}
+  .date-pill-v3q{display:inline-flex;border:1px solid #dce8fb;background:#eef6ff;color:#17365f;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:950;white-space:nowrap}
+  .privacy-mini-v3q{background:#eef6ff;border-left:5px solid var(--blue);border-radius:18px;padding:12px;color:#17365f;font-weight:850;line-height:1.45;margin-top:12px}
+  @media(max-width:760px){.batch-login-v3q{grid-template-columns:1fr}.batch-name-row-v3q{grid-template-columns:44px 1fr}.date-pill-v3q{grid-column:2/3;justify-self:start}.share-actions-v3q{display:grid;grid-template-columns:1fr}.share-actions-v3q .btn,.share-actions-v3q .mini{width:100%}}
+</style>
+
 </head>
 <body class="smkasas-page">
   <section class="hero smkasas-hero smkasas-image-only-hero" aria-label="KENAL Alumni SMKASAS hero cover">
@@ -1727,6 +1748,64 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
      Admin: gated by PIN, hidden from public menu
      Batch logic: BATCH 1 = Form 1 1984, SPM 1988
      ========================================================== */
+
+  /* =========================
+     v3R - Wakil Batch WhatsApp Urusetia
+     ========================= */
+  const URUSETIA_WHATSAPP_V3R = '60173332349';
+  function batchInfoFromYearV3R(year){
+    const y=parseInt(String(year||'').trim(),10);
+    return ADMIN_BATCH_PUBLIC_V3N.find(x=>Number(x.year)===y) || null;
+  }
+  function batchNoFromYearV3R(year){
+    const info=batchInfoFromYearV3R(year);
+    return info ? info.batch : '';
+  }
+  function batchRepYearOptionsV3R(selectedYear=''){
+    const sel=String(selectedYear||'');
+    return ADMIN_BATCH_PUBLIC_V3N.map(x=>option(String(x.year), `${x.batch} · SPM ${x.year}`, sel)).join('');
+  }
+  function buildRepRequestTextV3R(data){
+    const year=String(data.year_spm||'').trim();
+    const batch=data.batch_no || batchNoFromYearV3R(year) || '-';
+    const mode=data.mode || 'Menjadi Wakil Batch';
+    return cleanShareTextV3Q(`Assalamualaikum Urusetia Alumni SMKASAS.
+
+Saya ingin ${mode.toLowerCase()} untuk kempen daftar Alumni SMKASAS.
+
+Nama: ${data.rep_name || '-'}
+No Telefon: ${data.rep_phone || '-'}
+Batch: ${batch}
+Tahun SPM: ${year || '-'}
+Catatan: ${data.note || '-'}
+
+Saya bersedia membantu mengajak sahabat batch mendaftar dan membantu urusetia menyemak senarai nama batch saya.`);
+  }
+  function openUrusetiaWhatsAppV3R(text){
+    window.open(`https://wa.me/${URUSETIA_WHATSAPP_V3R}?text=${encodeURIComponent(text)}`,'_blank');
+  }
+  function openBatchRepRequestV3R(prefillYear=''){
+    const selected=String(prefillYear||'');
+    const currentBatch=batchNoFromYearV3R(selected);
+    openEditDialog('Mohon Jadi Wakil Batch','URUS WAKIL BATCH', `<section class="form-card"><h4>Batch Anda Belum Ada Wakil?</h4><p class="muted">Isi maklumat ringkas ini. Sistem akan sediakan mesej WhatsApp automatik kepada <strong>Urusetia Alumni SMKASAS</strong>. Tiada emel diperlukan dalam versi ini.</p><form id="batchRepRequestFormV3R" class="form-grid">
+      <label class="field wide">Nama Penuh<input name="rep_name" required placeholder="Nama seperti mahu dikenali urusetia"></label>
+      <label class="field">No Telefon / WhatsApp<input name="rep_phone" required placeholder="Contoh: 60123456789"></label>
+      <label class="field">Tahun SPM<select name="year_spm" id="repYearV3R" required><option value="">Pilih batch...</option>${batchRepYearOptionsV3R(selected)}</select></label>
+      <label class="field">No Batch<input name="batch_no" id="repBatchNoV3R" value="${esc(currentBatch)}" readonly placeholder="Auto ikut Tahun SPM"></label>
+      <label class="field wide">Saya ingin<select name="mode"><option>Menjadi Wakil Batch</option><option>Mencadangkan Nama Wakil Batch</option></select></label>
+      <label class="field wide">Catatan Ringkas<textarea name="note" placeholder="Contoh: Saya boleh bantu kumpul nama dalam group WhatsApp batch."></textarea></label>
+      <div class="wide save-row"><button class="btn gold" type="submit">Hantar WhatsApp ke Urusetia</button><button class="btn ghost" type="button" id="btnCopyRepRequestV3R">Copy Teks</button><button class="btn" type="button" onclick="closeEditDialog()">Tutup</button></div>
+    </form><div class="privacy-mini-v3q"><strong>Nota:</strong> Bila klik hantar, WhatsApp di telefon pengguna akan terbuka dengan teks siap isi. Pengguna masih perlu tekan Send sendiri.</div></section>`);
+    const form=document.getElementById('batchRepRequestFormV3R');
+    const yearEl=document.getElementById('repYearV3R');
+    const batchEl=document.getElementById('repBatchNoV3R');
+    function updateBatch(){ if(batchEl) batchEl.value=batchNoFromYearV3R(yearEl?.value||''); }
+    yearEl?.addEventListener('change', updateBatch); updateBatch();
+    function data(){ updateBatch(); return Object.fromEntries(new FormData(form).entries()); }
+    form?.addEventListener('submit',e=>{ e.preventDefault(); openUrusetiaWhatsAppV3R(buildRepRequestTextV3R(data())); toast('WhatsApp urusetia dibuka'); });
+    document.getElementById('btnCopyRepRequestV3R')?.addEventListener('click',()=>copyTextV3Q(buildRepRequestTextV3R(data()),'Teks permohonan wakil batch sudah disalin'));
+  }
+
   sections.splice(0, sections.length,
     ['dashboard','Utama','Info kempen, progress pendaftaran dan status verified alumni.'],
     ['member','Daftar Alumni','Isi profil alumni. Sistem auto susun batch ikut Tahun SPM.'],
@@ -3578,12 +3657,13 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
   }
   function renderBatchAdminListV3N(){
     const st = batchAdminStatsV3N();
-    return `<div class="v3n-public-list-note"><strong>Nota:</strong> Senarai ini dipaparkan tanpa nombor telefon untuk menjaga privasi wakil batch. Batch yang kosong masih memerlukan wakil admin.</div>
+    return `<div class="v3n-public-list-note"><strong>Nota:</strong> Senarai ini dipaparkan tanpa nombor telefon untuk menjaga privasi wakil batch. Batch kosong boleh klik <strong>Saya Batch Ini</strong> untuk hantar mesej WhatsApp kepada Urusetia Alumni SMKASAS.</div>
       <div class="v3n-rep-mini-grid"><div class="v3n-rep-mini"><strong>${st.total}</strong><span>Jumlah batch</span></div><div class="v3n-rep-mini"><strong>${st.filled}</strong><span>Sudah ada wakil</span></div><div class="v3n-rep-mini"><strong>${st.missing}</strong><span>Masih kosong</span></div></div>
-      <div class="v3n-batch-list">${ADMIN_BATCH_PUBLIC_V3N.map(x=>`<div class="v3n-batch-row ${x.name?'':'missing'}"><div class="b">${esc(x.batch)} · SPM ${esc(x.year)}</div><div class="name">${esc(x.name||'BELUM ADA WAKIL')}</div><div class="status">${x.name?'ADA WAKIL':'DIPERLUKAN'}</div></div>`).join('')}</div>`;
+      <div class="v3n-batch-list">${ADMIN_BATCH_PUBLIC_V3N.map(x=>`<div class="v3n-batch-row ${x.name?'':'missing'}"><div class="b">${esc(x.batch)} · SPM ${esc(x.year)}</div><div class="name">${esc(x.name||'BELUM ADA WAKIL')}</div><div class="status">${x.name?'ADA WAKIL':`<span>DIPERLUKAN</span><br><button class="mini gold" data-open-rep-request="${esc(x.year)}">Saya Batch Ini</button>`}</div></div>`).join('')}</div>`;
   }
   function openBatchAdminListV3N(){
     openEditDialog('Senarai Wakil Admin Batch','WAKIL BATCH', renderBatchAdminListV3N());
+    document.querySelectorAll('#editBody [data-open-rep-request]').forEach(btn=>btn.addEventListener('click',()=>openBatchRepRequestV3R(btn.dataset.openRepRequest||'')));
   }
   function openCampaignPosterV3N(){
     openEditDialog('Kempen Daftar Alumni','POSTER KEMPEN', `<div class="v3n-poster-frame"><img src="${CAMPAIGN_POSTER_DATA_V3N}" alt="Poster Kempen Daftar Alumni SMKASAS"></div><div class="save-row"><button class="btn gold" data-jump-public-from-poster="1">Daftar Alumni</button><button class="btn" onclick="closeEditDialog()">Tutup</button></div>`);
@@ -3596,10 +3676,10 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
         <div class="big-message"><span class="kicker">PUBLIC DASHBOARD</span><h3>Gerakan Data Alumni ASASIANS</h3><p>Ruang awam untuk melihat perkembangan kempen alumni SMKA Sultan Azlan Shah. Paparan ini hanya menunjukkan statistik umum dan hebahan — bukan direktori peribadi alumni.</p><div class="public-cta-row"><button class="btn gold" data-jump-public="1">Daftar sebagai Alumni</button><button class="btn blue" data-jump-public="2">Reunion & Hebahan</button><button class="btn ghost" id="btnOpenAdminFromHome">Admin</button></div></div>
         <div class="campaign-card"><span class="phase-badge">Fasa 1 · Kumpul & Sahkan Data</span><h4>Sasaran Semasa</h4><p>Setiap batch melantik wakil, mengumpul data asas, dan membantu admin mengesahkan rekod alumni secara berperingkat.</p><div class="safe-note" style="margin-top:12px"><strong>Batch rasmi:</strong> BATCH 1 = Form 1 tahun 1984 / SPM 1988. Alumni hanya perlu pilih Tahun SPM.</div></div>
       </section>
-      <section class="v3n-alert"><span class="kicker">Makluman</span><h3>Wakil batch diperlukan untuk posisi Admin Batch sendiri</h3><p>Mohon hubungi <strong>Profesor Madya Dr Alwi Mohd Yunus</strong> di <a href="mailto:alwiyunus@uitm.edu.my">alwiyunus@uitm.edu.my</a> untuk pelantikan dan koordinasi wakil batch.</p></section>
+      <section class="v3n-alert"><span class="kicker">Batch Belum Ada Wakil</span><h3>Jadi orang pertama yang hidupkan semula batch anda</h3><p>Urusetia Alumni SMKASAS sedang melengkapkan Wakil / Admin Batch bagi setiap tahun SPM. Jika batch anda masih kosong, tawarkan diri atau cadangkan sahabat batch yang sesuai. Klik butang di bawah — mesej WhatsApp akan disediakan automatik.</p><div class="public-cta-row"><button class="btn gold" id="btnOpenBecomeRepV3R">Saya Sedia Jadi Wakil Batch</button><button class="btn ghost" id="btnOpenBatchRepListAlertV3R">Lihat Batch Belum Ada Wakil</button></div></section>
       <section class="v3n-campaign-grid">
         <div class="v3n-poster-card"><div class="v3n-poster-frame"><img id="campaignPosterImgV3N" alt="Poster Kempen Daftar Alumni SMKASAS"></div><h3>Kempen Daftar Alumni</h3><p><strong>Sirih Pulang ke Gagang.</strong> Jom daftar dan kemas kini maklumat alumni SMKASAS.</p><div class="public-cta-row"><button class="btn gold" data-jump-public="1">Daftar Sekarang</button><button class="btn ghost" id="btnOpenPosterV3N">Lihat Poster</button></div></div>
-        <div class="v3n-rep-card"><h3>Status Wakil Admin Batch</h3><p>Senarai wakil batch dipaparkan tanpa nombor telefon. Batch kosong boleh mula mencadangkan wakil untuk bantu kempen daftar dan verify alumni.</p><div class="v3n-rep-mini-grid"><div class="v3n-rep-mini"><strong>${st.total}</strong><span>Batch 1988–2025</span></div><div class="v3n-rep-mini"><strong>${st.filled}</strong><span>Sudah ada wakil</span></div><div class="v3n-rep-mini"><strong>${st.missing}</strong><span>Masih kosong</span></div></div><button class="btn blue" id="btnOpenBatchRepListV3N">Lihat Senarai Wakil Batch</button></div>
+        <div class="v3n-rep-card"><h3>Status Wakil Admin Batch</h3><p>Senarai wakil batch dipaparkan tanpa nombor telefon. Batch kosong boleh mula mencadangkan wakil untuk bantu kempen daftar dan verify alumni.</p><div class="v3n-rep-mini-grid"><div class="v3n-rep-mini"><strong>${st.total}</strong><span>Batch 1988–2025</span></div><div class="v3n-rep-mini"><strong>${st.filled}</strong><span>Sudah ada wakil</span></div><div class="v3n-rep-mini"><strong>${st.missing}</strong><span>Masih kosong</span></div></div><div class="share-actions-v3q"><button class="btn blue" id="btnOpenBatchRepListV3N">Lihat Senarai Wakil Batch</button><button class="btn gold" id="btnOpenBecomeRepCardV3R">Jadi Wakil Batch</button></div></div>
       </section>
       <section class="impact-band"><h3>Statistik Kempen</h3><p>Angka dikira daripada rekod Supabase. Data penuh alumni tidak dipaparkan kepada umum.</p><div class="impact-grid" id="publicStatsGrid"><div class="impact-stat"><strong>...</strong><span>Memuatkan data</span></div></div><div class="impact-badge">SMKASAS · ASASIANS · KENAL Alumni</div></section>
       <section class="panel"><h3>Progress Batch</h3><p>Gambaran ringkas penyertaan setiap batch. Batch dengan rekod terbaru akan dipaparkan di atas.</p><div id="publicBatchProgressGrid" class="progress-wrap"><div class="empty">Memuatkan progress batch...</div></div></section>
@@ -3612,7 +3692,194 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
     document.getElementById('btnOpenAdminFromHome')?.addEventListener('click', openAdminModal);
     const img = document.getElementById('campaignPosterImgV3N'); if(img) img.src = CAMPAIGN_POSTER_DATA_V3N;
     document.getElementById('btnOpenBatchRepListV3N')?.addEventListener('click', openBatchAdminListV3N);
+    document.getElementById('btnOpenBatchRepListAlertV3R')?.addEventListener('click', openBatchAdminListV3N);
+    document.getElementById('btnOpenBecomeRepV3R')?.addEventListener('click', ()=>openBatchRepRequestV3R());
+    document.getElementById('btnOpenBecomeRepCardV3R')?.addEventListener('click', ()=>openBatchRepRequestV3R());
     document.getElementById('btnOpenPosterV3N')?.addEventListener('click', openCampaignPosterV3N);
+    loadPublicStats();
+    loadPublicBatchProgressV3J();
+  };
+
+
+
+  /* =========================
+     v3Q - Menu 4 BATCH SAYA + Share Kempen
+     ========================= */
+  function publicWebAddressV3Q(){
+    const fallback = 'https://kenaltak.com/alumnismkasas/';
+    try{
+      if(location && /^https?:$/i.test(location.protocol)){
+        return (location.origin + location.pathname).replace(/index\.html$/i,'');
+      }
+    }catch(e){}
+    return fallback;
+  }
+  function cleanShareTextV3Q(text){ return String(text||'').replace(/\n{3,}/g,'\n\n').trim(); }
+  async function copyTextV3Q(text, successMsg){
+    text = cleanShareTextV3Q(text);
+    try{
+      if(navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(text); }
+      else{
+        const ta=document.createElement('textarea'); ta.value=text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.left='-9999px'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+      }
+      toast(successMsg || 'Teks sudah disalin');
+      return true;
+    }catch(e){
+      openEditDialog('Copy Manual','KEMPEN ALUMNI',`<div class="note"><strong>Browser tidak benarkan auto-copy.</strong><br>Copy teks di bawah dan tampal di WhatsApp.</div><textarea style="min-height:220px">${esc(text)}</textarea><div class="save-row"><button class="btn" onclick="closeEditDialog()">Tutup</button></div>`);
+      return false;
+    }
+  }
+  async function shareOrCopyTextV3Q(title, text, successMsg){
+    text = cleanShareTextV3Q(text);
+    if(navigator.share){
+      try{ await navigator.share({title:title||'KENAL Alumni SMKASAS', text}); toast('Menu share dibuka'); return; }catch(e){}
+    }
+    await copyTextV3Q(text, successMsg || 'Teks jemputan sudah disalin');
+  }
+  function openWhatsappShareV3Q(text){ window.open('https://wa.me/?text='+encodeURIComponent(cleanShareTextV3Q(text)),'_blank'); }
+  function buildInviteTextV3Q(extra){
+    return cleanShareTextV3Q(`Assalamualaikum sahabat Alumni SMKASAS.\n\nJom sertai Kempen Daftar Alumni SMKASAS agar nama batch kita dapat dikumpulkan semula dan disahkan oleh Admin Batch.\n\nDaftar di sini:\n${publicWebAddressV3Q()}\n\nSelepas daftar, maklumkan kepada Admin Batch untuk semakan.${extra?'\n\n'+extra:''}`);
+  }
+  function buildStatsShareTextV3Q(){
+    const rows = Array.from(document.querySelectorAll('#publicStatsGrid .impact-stat')).map(el=>{
+      const n = el.querySelector('strong')?.textContent?.trim() || '-';
+      const l = el.querySelector('span')?.textContent?.trim() || 'Statistik';
+      return `• ${l}: ${n}`;
+    }).filter(Boolean);
+    return cleanShareTextV3Q(`Statistik Kempen Daftar Alumni SMKASAS\n\n${rows.length?rows.join('\n'):'Statistik sedang dikemas kini.'}\n\nJom lengkapkan data Alumni SMKASAS.\nDaftar di sini:\n${publicWebAddressV3Q()}`);
+  }
+  function formatDateV3Q(v){
+    if(!v) return 'Tarikh belum ada';
+    try{ const d=new Date(v); if(!isNaN(d.getTime())) return d.toLocaleDateString('ms-MY',{day:'2-digit',month:'short',year:'numeric'}); }catch(e){}
+    return String(v).slice(0,10);
+  }
+  function validBatchCodeV3Q(year, code){
+    const y=parseInt(String(year||'').trim(),10); const no=smkasasBatchNoFromSPM(y);
+    const c=String(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+    if(!y || !no || !c) return false;
+    const allowed=[`SMKASAS${y}`,`ASASIANS${y}`,`B${no}`,`BATCH${no}`,`SMKASASB${no}`];
+    return allowed.includes(c);
+  }
+  async function fetchBatchSayaRowsV3Q(year){
+    const y=parseInt(String(year||'').trim(),10); if(!y) return [];
+    try{
+      const path = `smkasas_alumni?select=id,full_name,nickname,class_name,year_end,status,created_at,state,profession&year_end=eq.${encodeURIComponent(y)}&status=eq.verified&order=created_at.asc`;
+      const rows = await supabaseFetch(path,{method:'GET',headers:{Prefer:'return=representation'}});
+      return Array.isArray(rows)?rows:[];
+    }catch(e){
+      try{ const rows = await fetchVerifiedAlumniFromSupabase(); return (rows||[]).filter(r=>String(r.year_end||'')===String(y)).sort((a,b)=>String(a.created_at||'').localeCompare(String(b.created_at||''))); }
+      catch(_){ throw e; }
+    }
+  }
+  function batchInviteTextV3Q(year){
+    const label=smkasasBatchLabelFromSPM(year)||`SPM ${year}`;
+    return buildInviteTextV3Q(`Batch: ${label}\n\nKlik menu BATCH SAYA selepas daftar untuk lihat senarai nama sahabat batch yang telah disahkan.`);
+  }
+  function renderBatchSayaRowsV3Q(rows, year){
+    const label=smkasasBatchLabelFromSPM(year)||`SPM ${year}`;
+    if(!rows.length){
+      return `<div class="note"><strong>Belum ada nama verified untuk ${esc(label)}.</strong><br>Jika baru daftar, tunggu Admin Batch semak dan verify dahulu. Sementara itu, jemput rakan batch lain untuk daftar.</div>`;
+    }
+    return `<div class="batch-result-head-v3q"><div><h4>${esc(label)}</h4><p class="muted"><strong>${rows.length}</strong> nama sudah disahkan dalam senarai batch ini. Paparan ini tidak menunjukkan nombor telefon atau email.</p></div><span class="chip ok">Verified list</span></div>
+      <div class="share-actions-v3q"><button class="btn gold" id="btnCopyBatchInviteV3Q">Copy link untuk jemput rakan anda</button><button class="btn blue" id="btnWhatsappBatchInviteV3Q">Share WhatsApp</button><button class="btn ghost" data-jump-public="1">Daftar / Kemas Kini Nama</button></div>
+      <div class="batch-name-list-v3q">${rows.map(r=>`<div class="batch-name-row-v3q"><div class="avatar">${esc(initials(r.full_name||'?'))}</div><div><strong>${esc(r.full_name||'-')}</strong><span>${esc([r.class_name,r.profession,r.state].filter(Boolean).join(' · ')||'Data minima sahaja')}<br>${esc(r.status||'verified')}</span></div><div class="date-pill-v3q">Daftar ${esc(formatDateV3Q(r.created_at))}</div></div>`).join('')}</div>`;
+  }
+  function renderBatchSaya(){
+    const currentYear = new Date().getFullYear();
+    let years='';
+    for(let y=currentYear; y>=1988; y--) years += option(y, `SPM ${y} · ${smkasasBatchLabelFromSPM(y)}`);
+    return `<section class="batch-saya-hero-v3q"><h3>Batch Saya</h3><p>Ruang ringan untuk alumni melihat senarai sahabat batch yang sudah disahkan. Ini bukan direktori terbuka — hanya nama, status minima dan tarikh daftar dipaparkan.</p></section>
+      <section class="panel"><h3>Masuk ruang batch</h3><p>Pilih Tahun SPM dan masukkan kod batch yang diberi oleh Admin Batch. Untuk fasa kempen awal, kod ringan boleh diselaraskan oleh admin seperti <strong>SMKASAS + Tahun SPM</strong> atau nombor batch.</p><form id="batchSayaFormV3Q" class="batch-login-v3q"><label class="field">Tahun SPM<select id="batchSayaYearV3Q" required><option value="">Pilih tahun SPM...</option>${years}</select></label><label class="field">Kod Batch<input id="batchSayaCodeV3Q" required placeholder="Contoh: SMKASAS1988 / B1"></label><button class="btn gold" type="submit">Lihat Batch Saya</button></form><div class="privacy-mini-v3q"><strong>Privasi:</strong> Paparan ini tidak menunjukkan nombor telefon, email, alamat, tarikh lahir atau data sensitif. Senarai penuh kekal di Pusat Admin.</div></section>
+      <section class="panel"><div id="batchSayaResultV3Q" class="empty">Pilih Tahun SPM dan masukkan kod batch untuk melihat senarai nama sahabat batch anda.</div></section>`;
+  }
+  function bindBatchSaya(){
+    const form=document.getElementById('batchSayaFormV3Q'); if(!form) return;
+    const out=document.getElementById('batchSayaResultV3Q');
+    form.addEventListener('submit',async(e)=>{
+      e.preventDefault();
+      const year=document.getElementById('batchSayaYearV3Q')?.value||'';
+      const code=document.getElementById('batchSayaCodeV3Q')?.value||'';
+      if(!validBatchCodeV3Q(year,code)){ out.innerHTML='<div class="note"><strong>Kod batch belum tepat.</strong><br>Semak semula kod yang diberi Admin Batch. Contoh fasa awal: SMKASAS1988 atau B1 untuk SPM 1988.</div>'; return; }
+      out.innerHTML='<div class="empty">Memuatkan senarai batch...</div>';
+      try{
+        const rows=await fetchBatchSayaRowsV3Q(year);
+        out.innerHTML=renderBatchSayaRowsV3Q(rows, year);
+        document.getElementById('btnCopyBatchInviteV3Q')?.addEventListener('click',()=>copyTextV3Q(batchInviteTextV3Q(year),'Teks jemputan batch sudah disalin. Tampal di WhatsApp group batch.'));
+        document.getElementById('btnWhatsappBatchInviteV3Q')?.addEventListener('click',()=>openWhatsappShareV3Q(batchInviteTextV3Q(year)));
+        out.querySelectorAll('[data-jump-public]').forEach(b=>b.addEventListener('click',()=>{currentSection=Number(b.dataset.jumpPublic);renderSection();}));
+      }catch(err){
+        out.innerHTML=`<div class="note"><strong>Senarai batch belum dapat dibuka.</strong><br>${esc(err.message||err)}<br><br>Jika SQL/RLS public belum aktif, menu ini masih boleh digunakan selepas endpoint verified batch dibuka.</div>`;
+      }
+    });
+  }
+  function openCampaignPosterV3Q(){
+    const text=buildInviteTextV3Q();
+    openEditDialog('Kempen Daftar Alumni','POSTER KEMPEN', `<div class="v3n-poster-frame"><img src="${CAMPAIGN_POSTER_DATA_V3N}" alt="Poster Kempen Daftar Alumni SMKASAS"></div><div class="share-actions-v3q"><button class="btn gold" id="btnPosterShareInviteV3Q">Share Jemput Daftar Alumni</button><button class="btn blue" id="btnPosterWhatsappInviteV3Q">WhatsApp</button><button class="btn ghost" id="btnPosterCopyInviteV3Q">Copy Link</button></div><div class="save-row"><button class="btn gold" data-jump-public-from-poster="1">Daftar Alumni</button><button class="btn" onclick="closeEditDialog()">Tutup</button></div>`);
+    document.getElementById('btnPosterShareInviteV3Q')?.addEventListener('click',()=>shareOrCopyTextV3Q('Kempen Daftar Alumni SMKASAS', text, 'Teks jemputan poster sudah disalin'));
+    document.getElementById('btnPosterWhatsappInviteV3Q')?.addEventListener('click',()=>openWhatsappShareV3Q(text));
+    document.getElementById('btnPosterCopyInviteV3Q')?.addEventListener('click',()=>copyTextV3Q(text,'Teks jemputan sudah disalin'));
+    document.querySelector('[data-jump-public-from-poster]')?.addEventListener('click',()=>{ closeEditDialog(); currentSection=1; renderSection(); });
+  }
+  openCampaignPosterV3N = openCampaignPosterV3Q;
+
+  sections.splice(0, sections.length,
+    ['dashboard','Utama','Info kempen, statistik pendaftaran dan poster jemput daftar alumni.'],
+    ['member','Daftar Alumni','Isi profil alumni. Sistem auto susun batch ikut Tahun SPM.'],
+    ['publicReunion','Reunion & Hebahan','Hebahan reunion, kempen data dan makluman alumni.'],
+    ['batchSaya','Batch Saya','Lihat senarai nama sahabat batch yang sudah daftar dan disahkan.']
+  );
+
+  renderSection = function(){
+    const s=sections[currentSection];
+    document.getElementById('modalKicker').textContent = `MENU ${currentSection+1}`;
+    document.getElementById('modalTitle').textContent = s[1];
+    document.getElementById('btnPrev').style.display='';
+    document.getElementById('btnNext').style.display='';
+    document.getElementById('btnPrev').disabled = currentSection===0;
+    document.getElementById('btnNext').disabled = currentSection===sections.length-1;
+    const map = {dashboard:renderDashboard, member:renderMember, publicReunion:renderPublicReunion, batchSaya:renderBatchSaya};
+    document.getElementById('modalBody').innerHTML = (map[s[0]]||renderDashboard)();
+    bindSection(s[0]);
+  };
+  bindSection = function(id){
+    if(id==='dashboard') bindDashboard();
+    if(id==='member') bindMember();
+    if(id==='publicReunion') bindPublicReunion();
+    if(id==='batchSaya') bindBatchSaya();
+  };
+
+  renderDashboard = function(){
+    const st = batchAdminStatsV3N();
+    return `<section class="public-dashboard-hero">
+        <div class="big-message"><span class="kicker">PUBLIC DASHBOARD</span><h3>Gerakan Data Alumni ASASIANS</h3><p>Ruang awam untuk melihat perkembangan kempen alumni SMKA Sultan Azlan Shah. Paparan ini hanya menunjukkan statistik umum dan hebahan — bukan direktori peribadi alumni.</p><div class="public-cta-row"><button class="btn gold" data-jump-public="1">Daftar sebagai Alumni</button><button class="btn blue" data-jump-public="3">Batch Saya</button><button class="btn ghost" id="btnOpenAdminFromHome">Admin</button></div></div>
+        <div class="campaign-card"><span class="phase-badge">Fasa 1 · Kumpul & Sahkan Data</span><h4>Sasaran Semasa</h4><p>Setiap batch melantik wakil, mengumpul data asas, dan membantu admin mengesahkan rekod alumni secara berperingkat.</p><div class="safe-note" style="margin-top:12px"><strong>Batch rasmi:</strong> BATCH 1 = Form 1 tahun 1984 / SPM 1988. Alumni hanya perlu pilih Tahun SPM.</div><div class="share-actions-v3q"><button class="mini gold" id="btnCopyHomeInviteV3Q">Copy link untuk jemput rakan anda</button><button class="mini" id="btnWhatsappHomeInviteV3Q">WhatsApp</button></div></div>
+      </section>
+      <section class="v3n-alert"><span class="kicker">Batch Belum Ada Wakil</span><h3>Jadi orang pertama yang hidupkan semula batch anda</h3><p>Urusetia Alumni SMKASAS sedang melengkapkan Wakil / Admin Batch bagi setiap tahun SPM. Jika batch anda masih kosong, tawarkan diri atau cadangkan sahabat batch yang sesuai. Klik butang di bawah — mesej WhatsApp akan disediakan automatik.</p><div class="public-cta-row"><button class="btn gold" id="btnOpenBecomeRepV3R">Saya Sedia Jadi Wakil Batch</button><button class="btn ghost" id="btnOpenBatchRepListAlertV3R">Lihat Batch Belum Ada Wakil</button></div></section>
+      <section class="v3n-campaign-grid">
+        <div class="v3n-poster-card"><div class="v3n-poster-frame"><img id="campaignPosterImgV3N" alt="Poster Kempen Daftar Alumni SMKASAS"></div><h3>Kempen Daftar Alumni</h3><p><strong>Sirih Pulang ke Gagang.</strong> Jom daftar dan kemas kini maklumat alumni SMKASAS.</p><div class="public-cta-row"><button class="btn gold" data-jump-public="1">Daftar Sekarang</button><button class="btn ghost" id="btnOpenPosterV3N">Lihat Poster</button></div><div class="share-actions-v3q"><button class="btn blue" id="btnSharePosterInviteV3Q">Share Jemput Daftar Alumni</button><button class="btn ghost" id="btnCopyPosterInviteV3Q">Copy Link</button></div></div>
+        <div class="v3n-rep-card"><h3>Status Wakil Admin Batch</h3><p>Senarai wakil batch dipaparkan tanpa nombor telefon. Batch kosong boleh mula mencadangkan wakil untuk bantu kempen daftar dan verify alumni.</p><div class="v3n-rep-mini-grid"><div class="v3n-rep-mini"><strong>${st.total}</strong><span>Batch 1988–2025</span></div><div class="v3n-rep-mini"><strong>${st.filled}</strong><span>Sudah ada wakil</span></div><div class="v3n-rep-mini"><strong>${st.missing}</strong><span>Masih kosong</span></div></div><div class="share-actions-v3q"><button class="btn blue" id="btnOpenBatchRepListV3N">Lihat Senarai Wakil Batch</button><button class="btn gold" id="btnOpenBecomeRepCardV3R">Jadi Wakil Batch</button></div></div>
+      </section>
+      <section class="impact-band"><h3>Statistik Kempen</h3><p>Angka dikira daripada rekod Supabase. Data penuh alumni tidak dipaparkan kepada umum.</p><div class="impact-grid" id="publicStatsGrid"><div class="impact-stat"><strong>...</strong><span>Memuatkan data</span></div></div><div class="impact-badge">SMKASAS · ASASIANS · KENAL Alumni</div><div class="share-actions-v3q"><button class="btn gold" id="btnShareStatsV3Q">Share Statistik Kempen</button><button class="btn ghost" id="btnCopyStatsV3Q">Copy Statistik</button></div></section>
+      <section class="panel"><h3>Progress Batch</h3><p>Gambaran ringkas penyertaan setiap batch. Batch dengan rekod terbaru akan dipaparkan di atas.</p><div id="publicBatchProgressGrid" class="progress-wrap"><div class="empty">Memuatkan progress batch...</div></div></section>
+      <section class="panel"><h3>Roadmap Kempen</h3><div class="campaign-steps"><div class="campaign-step"><b>1</b><h4>Daftar</h4><p>Alumni isi nama, telefon, Tahun SPM dan maklumat asas.</p></div><div class="campaign-step"><b>2</b><h4>Semak</h4><p>Admin batch menyemak duplicate, typo dan kesahihan rekod.</p></div><div class="campaign-step"><b>3</b><h4>Verify</h4><p>Rekod disahkan sebelum masuk statistik dan direktori dalaman admin.</p></div><div class="campaign-step"><b>4</b><h4>Gerak</h4><p>Data digunakan untuk reunion, kebajikan, jaringan kerjaya dan legasi sekolah.</p></div></div></section>
+      <section class="privacy-strip"><strong>Nota privasi:</strong> Nombor telefon, email, alamat dan data peribadi tidak dipaparkan kepada umum. Paparan awam ini hanya menunjukkan statistik ringkas untuk membina keyakinan dan momentum kempen.</section>`;
+  };
+  bindDashboard = function(){
+    const inviteText=buildInviteTextV3Q();
+    document.querySelectorAll('[data-jump-public]').forEach(b=>b.addEventListener('click',()=>{currentSection=Number(b.dataset.jumpPublic);renderSection();}));
+    document.getElementById('btnOpenAdminFromHome')?.addEventListener('click', openAdminModal);
+    const img = document.getElementById('campaignPosterImgV3N'); if(img) img.src = CAMPAIGN_POSTER_DATA_V3N;
+    document.getElementById('btnOpenBatchRepListV3N')?.addEventListener('click', openBatchAdminListV3N);
+    document.getElementById('btnOpenBatchRepListAlertV3R')?.addEventListener('click', openBatchAdminListV3N);
+    document.getElementById('btnOpenBecomeRepV3R')?.addEventListener('click', ()=>openBatchRepRequestV3R());
+    document.getElementById('btnOpenBecomeRepCardV3R')?.addEventListener('click', ()=>openBatchRepRequestV3R());
+    document.getElementById('btnOpenPosterV3N')?.addEventListener('click', openCampaignPosterV3N);
+    document.getElementById('btnCopyHomeInviteV3Q')?.addEventListener('click',()=>copyTextV3Q(inviteText,'Teks jemputan sudah disalin. Tampal di WhatsApp group batch.'));
+    document.getElementById('btnWhatsappHomeInviteV3Q')?.addEventListener('click',()=>openWhatsappShareV3Q(inviteText));
+    document.getElementById('btnSharePosterInviteV3Q')?.addEventListener('click',()=>shareOrCopyTextV3Q('Kempen Daftar Alumni SMKASAS', inviteText, 'Teks jemputan poster sudah disalin'));
+    document.getElementById('btnCopyPosterInviteV3Q')?.addEventListener('click',()=>copyTextV3Q(inviteText,'Link/teks jemputan sudah disalin'));
+    document.getElementById('btnShareStatsV3Q')?.addEventListener('click',()=>shareOrCopyTextV3Q('Statistik Kempen Alumni SMKASAS', buildStatsShareTextV3Q(), 'Statistik kempen sudah disalin'));
+    document.getElementById('btnCopyStatsV3Q')?.addEventListener('click',()=>copyTextV3Q(buildStatsShareTextV3Q(),'Statistik kempen sudah disalin'));
     loadPublicStats();
     loadPublicBatchProgressV3J();
   };
@@ -3621,6 +3888,6 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
   renderMenu();
 })();
 </script>
-<!-- KENAL Alumni SMKASAS v3M: admin correction tool + data format standard -->
+<!-- KENAL Alumni SMKASAS v3R: wakil batch WhatsApp urusetia + batch list ascending date -->
 </body>
 </html>
