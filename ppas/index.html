@@ -17,8 +17,8 @@
 /* === HERO full-bleed + kad kaca (nafas baru) === */
 .utama-hero-overlay-card{position:relative;margin:0 0 18px;min-height:480px;border-radius:30px;overflow:hidden;background:#0b787d;box-shadow:0 26px 60px rgba(11,120,125,.22)}
 .utama-hero-overlay-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 26%;display:block;transform:scale(1.03)}
-.utama-hero-overlay-layer{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,40,42,.08) 0%,rgba(7,40,42,0) 26%,rgba(7,40,42,.16) 58%,rgba(7,40,42,.46) 100%)}
-.utama-hero-overlay-content{position:absolute;left:18px;right:18px;bottom:18px;z-index:2;max-width:540px;background:rgba(255,255,255,.60);backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);border:1px solid rgba(255,255,255,.72);border-radius:22px;padding:20px 22px;box-shadow:0 18px 44px rgba(15,23,42,.16)}
+.utama-hero-overlay-layer{position:absolute;inset:0;background:transparent}
+.utama-hero-overlay-content{position:absolute;left:18px;right:18px;top:18px;bottom:auto;z-index:2;max-width:540px;background:rgba(255,255,255,.82);backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);border:1px solid rgba(255,255,255,.72);border-radius:22px;padding:20px 22px;box-shadow:0 18px 44px rgba(15,23,42,.16)}
 .uh-eyebrow{display:flex;align-items:center;gap:9px;font-size:10px;font-weight:800;letter-spacing:.13em;color:#0b787d;text-transform:uppercase;margin-bottom:12px}
 .uh-crest{height:26px;width:auto;display:block;flex:none}
 .uh-eyebrow span{line-height:1.2}
@@ -50,7 +50,7 @@
 .prtu-hours{display:flex;align-items:center;gap:9px;margin-top:14px;background:linear-gradient(135deg,rgba(246,166,35,.12),rgba(246,166,35,.04));border:1px solid rgba(246,166,35,.26);border-radius:14px;padding:12px 14px;font-size:12.5px;color:#8a5a08;font-weight:700;line-height:1.4}
 @media (max-width:560px){
   .utama-hero-overlay-card{min-height:440px;border-radius:26px}
-  .utama-hero-overlay-content{left:12px;right:12px;bottom:12px;padding:18px 18px}
+  .utama-hero-overlay-content{left:12px;right:12px;top:12px;bottom:auto;padding:18px 18px}
   .utama-hero-title{font-size:23px}
   .utama-hero-ppas-logo{height:38px}
   .prtu-stats{grid-template-columns:repeat(2,1fr)}
