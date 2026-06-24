@@ -171,7 +171,7 @@ img[alt="PPAS"]{
 @media(max-width:900px){.kasih-buttons{grid-template-columns:repeat(2,1fr)}.kasih-detail{grid-template-columns:1fr}.kasih-list{grid-template-columns:1fr}.kasih-cta{grid-template-columns:1fr}.kasih-hero{min-height:360px}}
 </style>
 </head><body>
-<header class="topbar"><div class="app brand"><div class="brandmark"><div class="mini-logo">✦</div><div><span class="kenal">KENAL</span> <span class="ppas">PPAS</span></div></div><div class="top-icons"><button class="round">✨</button><button class="round">♡</button></div></div></header>
+<header class="topbar"><div class="app brand"><div class="brandmark"><div class="mini-logo">✦</div><div><span class="kenal">KENAL</span> <span class="ppas">PPAS</span></div></div><div class="top-icons"><button class="round" onclick="showScreen('peta')" title="Peta Jalan (sulit)">🗺️</button><button class="round">✨</button><button class="round" onclick="showScreen('kasih')" title="KASIH">♡</button></div></div></header>
 <main class="app">
 <section class="screen active" id="utama">
 <div class="utama-hero-overlay-card">
@@ -293,7 +293,7 @@ img[alt="PPAS"]{
 
 <div class="ppas-layer" id="kasihLayer"><div class="layer-top"><div class="layer-head"><button class="round" onclick="closeKasihLayer()">←</button><div class="layer-title" id="kasihLayerTitle">KASIH PPAS</div><button class="round" onclick="closeKasihLayer()">×</button></div></div><div class="app" style="padding:18px 0 30px"><div class="hero kasih-layer-hero"><div class="content"><span class="pill" id="kasihLayerPill">KASIH PPAS</span><h3 id="kasihLayerHead">KASIH PPAS</h3><p id="kasihLayerText">Komuniti • Akses • Sumber • Ilmu • Harmoni.</p></div></div><div class="tabs" id="kasihTabs"></div><div id="kasihTabBody"></div></div></div>
 <div class="overlay" id="modal"><div class="modal-box"><div class="modal-head"><button class="round" onclick="closeModal()">←</button><h3 id="modalTitle">Info</h3><button class="close" onclick="closeModal()">×</button></div><div class="modal-content" id="modalContent"></div></div></div>
-<nav class="bottom-nav"><button class="nav active" onclick="showScreen('utama')"><span>⌂</span>UTAMA</button><button class="nav" onclick="showScreen('daerah')"><span>⌖</span>DAERAH</button><button class="nav" onclick="showScreen('cari')"><span>⌕</span>CARI</button><button class="nav" onclick="showScreen('buku')"><span>☰</span>BUKU</button><button class="nav" onclick="showScreen('kasih')"><span>♡</span>KASIH</button><button class="nav" onclick="showScreen('peta')"><span>◷</span>PETA</button></nav>
+<nav class="bottom-nav"><button class="nav active" onclick="showScreen('utama')"><span>⌂</span>UTAMA</button><button class="nav" onclick="showScreen('daerah')"><span>⌖</span>DAERAH</button><button class="nav" onclick="showScreen('cari')"><span>⌕</span>CARI</button><button class="nav" onclick="showScreen('buku')"><span>☰</span>BUKU</button><button class="nav" onclick="showScreen('kasih')"><span>♡</span>KASIH</button></nav>
 <script>
 const IMAGES={"selangor": "assets/images/image_02.webp", "sabak": "assets/images/image_03.webp", "ppas": "assets/images/image_01.webp", "building": "assets/images/image_05.webp", "hari": "assets/images/image_04.webp", "perbincangan": "assets/images/image_06.webp", "mesyuarat": "assets/images/image_07.webp", "serbaguna": "assets/images/image_08.webp", "seminar32": "assets/images/image_09.webp", "seminar160": "assets/images/image_10.webp"};
 const districts=['Sabak Bernam','Hulu Selangor','Kuala Selangor','Gombak','Petaling','Klang','Hulu Langat','Kuala Langat','Sepang'];
