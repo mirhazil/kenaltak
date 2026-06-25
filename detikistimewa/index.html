@@ -963,7 +963,7 @@
         <span class="brand-mark">K</span>
         <span class="brand-text">KENAL <small>Detik Istimewa</small></span>
       </div>
-      <div class="nav-note">✦ Silk White × Rose Gold</div>
+      <div class="nav-note" id="dtVisitorMeter" title="Respon pelawat laman ini"><span class="spark" aria-hidden="true">✦</span> Detik Istimewa</div>
     </nav>
 
     <section class="hero" id="top">
@@ -1674,6 +1674,11 @@
 })();
 </script>
 <!-- === KENAL Visitor Meter (telemetri fail-silent, tanpa nama/emel/IP) === -->
+<style>
+  #dtVisitorMeter{display:inline-flex!important}            /* atasi .nav-note{display:none} di skrin mobile */
+  #dtVisitorMeter strong{color:var(--rose-deep);font-weight:950}
+  @media(max-width:520px){ #dtVisitorMeter{font-size:12px;padding:7px 11px} }
+</style>
 <script>
 (function(){
   var SUPABASE_URL = 'https://lliyonpjrecdlpykxwqg.supabase.co';
@@ -1683,6 +1688,18 @@
   function logEvent(t){ try{ fetch(SUPABASE_URL+'/rest/v1/visitor_events',{method:'POST',keepalive:true,headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({page:PAGE,event_type:t,visitor_id:vid()})}).catch(function(){}); }catch(e){} }
   window.kenalLogEvent = logEvent;
   try{ logEvent('page_view'); }catch(e){}
+  // Meter pelawat di nav-note (rose gold). Fail-silent: gagal = kekal teks "✦ Detik Istimewa".
+  function num(n){ return Number(n||0).toLocaleString('en-US'); }
+  function loadMeter(){
+    var el = document.getElementById('dtVisitorMeter'); if(!el) return;
+    try{
+      fetch(SUPABASE_URL+'/rest/v1/rpc/kenal_visitor_funnel', {method:'POST', headers:{apikey:SUPABASE_KEY, Authorization:'Bearer '+SUPABASE_KEY, 'Content-Type':'application/json'}, body: JSON.stringify({p_page:PAGE})})
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(d){ var f=Array.isArray(d)?d[0]:d; if(!f) return; el.innerHTML='<span class="spark" aria-hidden="true">✦</span> <strong>'+num(f.page_views)+'</strong>&nbsp;lawatan<span style="opacity:.4;margin:0 4px">·</span><strong>'+num(f.unique_visitors)+'</strong>&nbsp;pelawat'; })
+        .catch(function(){});
+    }catch(e){}
+  }
+  setTimeout(loadMeter, 350);   // beri ruang page_view masuk dulu supaya kiraan termasuk lawatan ini
 })();
 </script>
 </body>
