@@ -1673,5 +1673,17 @@
   });
 })();
 </script>
+<!-- === KENAL Visitor Meter (telemetri fail-silent, tanpa nama/emel/IP) === -->
+<script>
+(function(){
+  var SUPABASE_URL = 'https://lliyonpjrecdlpykxwqg.supabase.co';
+  var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsaXlvbnBqcmVjZGxweWt4d3FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNzQwMzUsImV4cCI6MjA5Njc1MDAzNX0.iJBUDzPERFMZyPC2X0NqdjN2nDrso0aqrpe99twdsKY';
+  var PAGE = 'detikistimewa';
+  function vid(){ try{ var v=localStorage.getItem('kenal_vid'); if(!v){ v=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'vid_'+Date.now()+'_'+Math.random().toString(36).slice(2); localStorage.setItem('kenal_vid',v);} return v; }catch(e){ return null; } }
+  function logEvent(t){ try{ fetch(SUPABASE_URL+'/rest/v1/visitor_events',{method:'POST',keepalive:true,headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({page:PAGE,event_type:t,visitor_id:vid()})}).catch(function(){}); }catch(e){} }
+  window.kenalLogEvent = logEvent;
+  try{ logEvent('page_view'); }catch(e){}
+})();
+</script>
 </body>
 </html>
