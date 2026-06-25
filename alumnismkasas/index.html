@@ -419,6 +419,25 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsaXlvbnBqcmVjZGxweWt4d3FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNzQwMzUsImV4cCI6MjA5Njc1MDAzNX0.iJBUDzPERFMZyPC2X0NqdjN2nDrso0aqrpe99twdsKY';
   const SUPABASE_BATCH_MAP_KEY = 'kenal_alumni_smkasas_supabase_batch_map_v1';
   function supabaseReady(){ return !!(SUPABASE_URL && SUPABASE_KEY && SUPABASE_URL.includes('.supabase.co')); }
+  // === KENAL Visitor/Action Meter (telemetri fail-silent — tidak akan rosakkan page walau table belum wujud) ===
+  const KENAL_PAGE_ID = 'alumnismkasas';
+  function kenalVisitorId(){
+    try{
+      let v = localStorage.getItem('kenal_vid');
+      if(!v){ v = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'vid_'+Date.now()+'_'+Math.random().toString(36).slice(2); localStorage.setItem('kenal_vid', v); }
+      return v;
+    }catch(e){ return null; }
+  }
+  function logEvent(eventType){
+    try{
+      if(!supabaseReady()) return;
+      fetch(SUPABASE_URL + '/rest/v1/visitor_events', {
+        method:'POST', keepalive:true,
+        headers:{ apikey:SUPABASE_KEY, Authorization:'Bearer '+SUPABASE_KEY, 'Content-Type':'application/json', Prefer:'return=minimal' },
+        body: JSON.stringify({ page: KENAL_PAGE_ID, event_type: eventType, visitor_id: kenalVisitorId() })
+      }).catch(()=>{});
+    }catch(e){}
+  }
   function getSupabaseBatchMap(){ try{ return JSON.parse(localStorage.getItem(SUPABASE_BATCH_MAP_KEY)||'{}'); }catch(e){ return {}; } }
   function saveSupabaseBatchMap(map){ localStorage.setItem(SUPABASE_BATCH_MAP_KEY, JSON.stringify(map||{})); }
   function toIntOrNull(v){ const n=parseInt(String(v||'').trim(),10); return Number.isFinite(n)?n:null; }
@@ -1089,6 +1108,7 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
     document.getElementById('btnPickNamePhone').addEventListener('click',()=>pickContact(true));
     document.getElementById('memberForm').addEventListener('submit', async e=>{
       e.preventDefault();
+      logEvent('submit_daftar');
       const form = e.currentTarget;
       const fd=new FormData(form); const d=Object.fromEntries(fd.entries());
       d.role='Alumni'; d.verified='pending'; d.privacy='group';
@@ -1655,11 +1675,33 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
         <div class="form-card"><h4>Admin Verification</h4><div class="form-grid"><label class="field wide">PIN Admin<input id="adminVerifyPin" type="password" placeholder="Masukkan PIN admin"></label></div><div class="save-row"><button class="btn gold" id="btnLoadPendingSupabase">Load Pending Alumni</button><button class="btn ghost" id="btnClearAdminPin">Clear</button></div><div class="safe-note">Senarai pending ditarik terus dari Supabase. Direktori awam hanya memaparkan alumni yang sudah verified.</div></div>
         <div class="form-card"><h4>Status Phase 2A</h4><div class="stats"><div class="stat"><strong>PIN</strong><span>Admin sementara</span></div><div class="stat"><strong>Pending</strong><span>Load dari Supabase</span></div><div class="stat"><strong>Verified</strong><span>Papar di Direktori</span></div></div></div>
       </section>
+      <section class="panel"><h3>Respon Terkini</h3><p class="muted">Denyut nadi kempen — lawatan → klik daftar → borang dihantar → verified. Data dari sistem <strong>visitor_events</strong> (tanpa nama, emel atau IP).</p><div id="responMeterArea" class="empty">Memuatkan meter respon...</div><div class="save-row"><button class="btn ghost" id="btnRefreshRespon">Refresh Meter</button></div></section>
       <section class="panel"><h3>Senarai Pending</h3><div id="adminPendingArea" class="empty">Masukkan PIN dan klik Load Pending Alumni.</div></section>`;
   };
+  async function loadResponMeter(){
+    const el = document.getElementById('responMeterArea');
+    if(!el) return;
+    el.className = 'panel-inner';
+    try{
+      const r = await supabaseRpc('kenal_visitor_funnel', {p_page: KENAL_PAGE_ID});
+      const f = Array.isArray(r) ? r[0] : r;
+      let verified = null;
+      try{ const s = await supabaseRpc('smkasas_public_stats', {}); const o = Array.isArray(s)? s[0] : s; if(o){ for(const k in o){ if(/verif/i.test(k) && typeof o[k]==='number'){ verified=o[k]; break; } } } }catch(e){}
+      const num = n => (n==null ? '–' : Number(n).toLocaleString('en-US'));
+      el.innerHTML = `<div class="stats">
+        <div class="stat"><strong>${num(f&&f.page_views)}</strong><span>Lawatan laman</span></div>
+        <div class="stat"><strong>${num(f&&f.unique_visitors)}</strong><span>Pelawat unik</span></div>
+        <div class="stat"><strong>${num(f&&f.click_daftar)}</strong><span>Klik Daftar Alumni</span></div>
+        <div class="stat"><strong>${num(f&&f.submit_daftar)}</strong><span>Borang dihantar</span></div>
+        <div class="stat"><strong>${num(verified)}</strong><span>Alumni verified</span></div>
+      </div>`;
+    }catch(e){ el.className='empty'; el.innerHTML = '<div class="empty">Meter respon belum aktif. Pastikan SQL <strong>visitor_events</strong> + fungsi <strong>kenal_visitor_funnel</strong> sudah dijalankan di Supabase SQL Editor.</div>'; }
+  }
   bindAdminTools = function(){
     document.getElementById('btnLoadPendingSupabase')?.addEventListener('click', loadPendingAdminList);
     document.getElementById('btnClearAdminPin')?.addEventListener('click',()=>{ const i=document.getElementById('adminVerifyPin'); if(i)i.value=''; document.getElementById('adminPendingArea').innerHTML='<div class="empty">PIN dikosongkan.</div>'; });
+    document.getElementById('btnRefreshRespon')?.addEventListener('click', loadResponMeter);
+    loadResponMeter();
   };
   async function loadPendingAdminList(){
     const pin = document.getElementById('adminVerifyPin')?.value || '';
@@ -1866,7 +1908,7 @@ Saya bersedia membantu mengajak sahabat batch mendaftar dan membantu urusetia me
   };
 
   bindDashboard = function(){
-    document.querySelectorAll('[data-jump-public]').forEach(b=>b.addEventListener('click',()=>{currentSection=Number(b.dataset.jumpPublic);renderSection();}));
+    document.querySelectorAll('[data-jump-public]').forEach(b=>b.addEventListener('click',()=>{const n=Number(b.dataset.jumpPublic); if(n===1) logEvent('click_daftar'); currentSection=n;renderSection();}));
     document.getElementById('btnOpenAdminFromHome')?.addEventListener('click', openAdminModal);
     loadPublicStats();
   };
@@ -3026,7 +3068,7 @@ Saya bersedia membantu mengajak sahabat batch mendaftar dan membantu urusetia me
   };
 
   bindDashboard = function(){
-    document.querySelectorAll('[data-jump-public]').forEach(b=>b.addEventListener('click',()=>{currentSection=Number(b.dataset.jumpPublic);renderSection();}));
+    document.querySelectorAll('[data-jump-public]').forEach(b=>b.addEventListener('click',()=>{const n=Number(b.dataset.jumpPublic); if(n===1) logEvent('click_daftar'); currentSection=n;renderSection();}));
     document.getElementById('btnOpenAdminFromHome')?.addEventListener('click', openAdminModal);
     loadPublicStats();
     loadPublicBatchProgressV3J();
@@ -3688,7 +3730,7 @@ Saya bersedia membantu mengajak sahabat batch mendaftar dan membantu urusetia me
   };
 
   bindDashboard = function(){
-    document.querySelectorAll('[data-jump-public]').forEach(b=>b.addEventListener('click',()=>{currentSection=Number(b.dataset.jumpPublic);renderSection();}));
+    document.querySelectorAll('[data-jump-public]').forEach(b=>b.addEventListener('click',()=>{const n=Number(b.dataset.jumpPublic); if(n===1) logEvent('click_daftar'); currentSection=n;renderSection();}));
     document.getElementById('btnOpenAdminFromHome')?.addEventListener('click', openAdminModal);
     const img = document.getElementById('campaignPosterImgV3N'); if(img) img.src = CAMPAIGN_POSTER_DATA_V3N;
     document.getElementById('btnOpenBatchRepListV3N')?.addEventListener('click', openBatchAdminListV3N);
@@ -3866,7 +3908,7 @@ Saya bersedia membantu mengajak sahabat batch mendaftar dan membantu urusetia me
   };
   bindDashboard = function(){
     const inviteText=buildInviteTextV3Q();
-    document.querySelectorAll('[data-jump-public]').forEach(b=>b.addEventListener('click',()=>{currentSection=Number(b.dataset.jumpPublic);renderSection();}));
+    document.querySelectorAll('[data-jump-public]').forEach(b=>b.addEventListener('click',()=>{const n=Number(b.dataset.jumpPublic); if(n===1) logEvent('click_daftar'); currentSection=n;renderSection();}));
     document.getElementById('btnOpenAdminFromHome')?.addEventListener('click', openAdminModal);
     const img = document.getElementById('campaignPosterImgV3N'); if(img) img.src = CAMPAIGN_POSTER_DATA_V3N;
     document.getElementById('btnOpenBatchRepListV3N')?.addEventListener('click', openBatchAdminListV3N);
@@ -3973,6 +4015,7 @@ Saya bersedia membantu mengajak sahabat batch mendaftar dan membantu urusetia me
 
   initSMKASASBranding();
   renderMenu();
+  try{ logEvent('page_view'); }catch(e){}
 })();
 </script>
 <!-- KENAL Alumni SMKASAS v3T: kunci permohonan wakil untuk batch yang sudah ada wakil -->
