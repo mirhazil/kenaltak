@@ -246,7 +246,11 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
     .campaign-step h4{margin:0 0 6px;color:var(--navy);font-size:15px}
     .campaign-step p{margin:0;color:var(--muted);font-size:12px;font-weight:760;line-height:1.45}
     .privacy-strip{background:#f8fafc;border:1px solid var(--line);border-left:5px solid var(--gold);border-radius:18px;padding:14px;color:var(--muted);font-weight:780;line-height:1.5}
-    .public-cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .public-cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+    .visitor-meter-chip{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.10);border:1px solid rgba(214,168,79,.55);color:#fff;border-radius:999px;padding:8px 14px;font-weight:850;font-size:13px;line-height:1}
+    .visitor-meter-chip strong{color:#F3D88B;font-weight:950}
+    .visitor-meter-chip .vm-dot{width:8px;height:8px;border-radius:50%;background:#46d27f;box-shadow:0 0 0 3px rgba(70,210,127,.22)}
+    .visitor-meter-chip .vm-sep{opacity:.45;margin:0 2px}
     @media(max-width:860px){.public-dashboard-hero{grid-template-columns:1fr}.batch-progress-card{grid-template-columns:1fr}.progress-counts{justify-content:flex-start}.campaign-steps{grid-template-columns:1fr}.public-dashboard-hero .big-message h3{font-size:24px}}
   </style>
 
@@ -437,6 +441,19 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
         body: JSON.stringify({ page: KENAL_PAGE_ID, event_type: eventType, visitor_id: kenalVisitorId() })
       }).catch(()=>{});
     }catch(e){}
+  }
+  async function loadPublicVisitorMeter(){
+    const el = document.getElementById('publicVisitorMeter');
+    if(!el) return;
+    try{
+      const r = await supabaseRpc('kenal_visitor_funnel', {p_page: KENAL_PAGE_ID});
+      const f = Array.isArray(r) ? r[0] : r;
+      if(!f) return;
+      const num = n => Number(n||0).toLocaleString('en-US');
+      const v = document.getElementById('vmViews'); if(v) v.textContent = num(f.page_views);
+      const u = document.getElementById('vmUniq');  if(u) u.textContent = num(f.unique_visitors);
+      el.hidden = false;   // hanya papar bila data berjaya dimuat; gagal = chip tersembunyi (tak rosakkan hero)
+    }catch(e){ /* senyap */ }
   }
   function getSupabaseBatchMap(){ try{ return JSON.parse(localStorage.getItem(SUPABASE_BATCH_MAP_KEY)||'{}'); }catch(e){ return {}; } }
   function saveSupabaseBatchMap(map){ localStorage.setItem(SUPABASE_BATCH_MAP_KEY, JSON.stringify(map||{})); }
@@ -3901,7 +3918,7 @@ Saya bersedia membantu mengajak sahabat batch mendaftar dan membantu urusetia me
   renderDashboard = function(){
     const st = batchAdminStatsV3N();
     return `<section class="public-dashboard-hero">
-        <div class="big-message"><span class="kicker">PUBLIC DASHBOARD</span><h3>Gerakan Data Alumni ASASIANS</h3><p>Ruang awam untuk melihat perkembangan kempen alumni SMKA Sultan Azlan Shah. Paparan ini hanya menunjukkan statistik umum dan hebahan — bukan direktori peribadi alumni.</p><div class="public-cta-row"><button class="btn gold" data-jump-public="1">Daftar sebagai Alumni</button><button class="btn blue" data-jump-public="3">Batch Saya</button><button class="btn ghost" id="btnOpenAdminFromHome">Admin</button></div></div>
+        <div class="big-message"><span class="kicker">PUBLIC DASHBOARD</span><h3>Gerakan Data Alumni ASASIANS</h3><p>Ruang awam untuk melihat perkembangan kempen alumni SMKA Sultan Azlan Shah. Paparan ini hanya menunjukkan statistik umum dan hebahan — bukan direktori peribadi alumni.</p><div class="public-cta-row"><button class="btn gold" data-jump-public="1">Daftar sebagai Alumni</button><button class="btn blue" data-jump-public="3">Batch Saya</button><button class="btn ghost" id="btnOpenAdminFromHome">Admin</button><div class="visitor-meter-chip" id="publicVisitorMeter" hidden title="Respon pelawat laman ini"><span class="vm-dot"></span><strong id="vmViews">–</strong>&nbsp;lawatan<span class="vm-sep">·</span><strong id="vmUniq">–</strong>&nbsp;pelawat</div></div></div>
         <div class="campaign-card"><span class="phase-badge">Fasa 1 · Kumpul & Sahkan Data</span><h4>Sasaran Semasa</h4><p>Setiap batch melantik wakil, mengumpul data asas, dan membantu admin mengesahkan rekod alumni secara berperingkat.</p><div class="safe-note" style="margin-top:12px"><strong>Batch rasmi:</strong> BATCH 1 = Form 1 tahun 1984 / SPM 1988. Alumni hanya perlu pilih Tahun SPM.</div><div class="share-actions-v3q"><button class="mini gold" id="btnCopyHomeInviteV3Q">Copy link untuk jemput rakan anda</button><button class="mini" id="btnWhatsappHomeInviteV3Q">WhatsApp</button></div></div>
       </section>
       <section class="v3n-alert"><span class="kicker">Batch Belum Ada Wakil</span><h3>Jadi orang pertama yang hidupkan semula batch anda</h3><p>Urusetia Alumni SMKASAS sedang melengkapkan Wakil / Admin Batch bagi setiap tahun SPM. Jika batch anda masih kosong, tawarkan diri atau cadangkan sahabat batch yang sesuai. Klik butang di bawah — mesej WhatsApp akan disediakan automatik.</p><div class="public-cta-row"><button class="btn gold" id="btnOpenBecomeRepV3R">Saya Sedia Jadi Wakil Batch</button><button class="btn ghost" id="btnOpenBatchRepListAlertV3R">Lihat Batch Belum Ada Wakil</button></div></section>
@@ -3918,6 +3935,7 @@ Saya bersedia membantu mengajak sahabat batch mendaftar dan membantu urusetia me
     const inviteText=buildInviteTextV3Q();
     document.querySelectorAll('[data-jump-public]').forEach(b=>b.addEventListener('click',()=>{const n=Number(b.dataset.jumpPublic); if(n===1) logEvent('click_daftar'); currentSection=n;renderSection();}));
     document.getElementById('btnOpenAdminFromHome')?.addEventListener('click', openAdminModal);
+    loadPublicVisitorMeter();
     const img = document.getElementById('campaignPosterImgV3N'); if(img) img.src = CAMPAIGN_POSTER_DATA_V3N;
     document.getElementById('btnOpenBatchRepListV3N')?.addEventListener('click', openBatchAdminListV3N);
     document.getElementById('btnOpenBatchRepListAlertV3R')?.addEventListener('click', openBatchAdminListV3N);
