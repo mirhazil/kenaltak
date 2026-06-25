@@ -247,9 +247,9 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
     .campaign-step p{margin:0;color:var(--muted);font-size:12px;font-weight:760;line-height:1.45}
     .privacy-strip{background:#f8fafc;border:1px solid var(--line);border-left:5px solid var(--gold);border-radius:18px;padding:14px;color:var(--muted);font-weight:780;line-height:1.5}
     .public-cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
-    .visitor-meter-chip{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.10);border:1px solid rgba(214,168,79,.55);color:#fff;border-radius:999px;padding:8px 14px;font-weight:850;font-size:13px;line-height:1}
+    .visitor-meter-chip{display:inline-flex;align-items:center;gap:7px;background:#0c2747;border:1px solid rgba(214,168,79,.6);color:#fff;border-radius:999px;padding:8px 14px;font-weight:850;font-size:13px;line-height:1;vertical-align:middle;white-space:nowrap}
     .visitor-meter-chip strong{color:#F3D88B;font-weight:950}
-    .visitor-meter-chip .vm-dot{width:8px;height:8px;border-radius:50%;background:#46d27f;box-shadow:0 0 0 3px rgba(70,210,127,.22)}
+    .visitor-meter-chip .vm-dot{width:8px;height:8px;border-radius:50%;background:#46d27f;box-shadow:0 0 0 3px rgba(70,210,127,.22);flex:0 0 auto}
     .visitor-meter-chip .vm-sep{opacity:.45;margin:0 2px}
     @media(max-width:860px){.public-dashboard-hero{grid-template-columns:1fr}.batch-progress-card{grid-template-columns:1fr}.progress-counts{justify-content:flex-start}.campaign-steps{grid-template-columns:1fr}.public-dashboard-hero .big-message h3{font-size:24px}}
   </style>
@@ -442,19 +442,46 @@ body{background:radial-gradient(circle at 12% 8%,rgba(215,166,66,.25),transparen
       }).catch(()=>{});
     }catch(e){}
   }
-  async function loadPublicVisitorMeter(){
-    const el = document.getElementById('publicVisitorMeter');
-    if(!el) return;
+  // Meter pelawat awam: suntik chip di sebelah mana-mana butang Admin yang muncul (apa-apa laluan render),
+  // dan isi dari kenal_visitor_funnel (di-cache). Fail-silent: gagal = chip kekal tersembunyi.
+  let _vmCache = null, _vmFetching = false;
+  function _vmFill(chip, f){
+    try{
+      const num = n => Number(n||0).toLocaleString('en-US');
+      const vv = chip.querySelector('.vmViews, #vmViews');
+      const vu = chip.querySelector('.vmUniq, #vmUniq');
+      if(vv) vv.textContent = num(f.page_views);
+      if(vu) vu.textContent = num(f.unique_visitors);
+      chip.hidden = false;
+    }catch(e){}
+  }
+  async function _vmEnsureFunnel(cb){
+    if(_vmCache){ cb(_vmCache); return; }
+    if(_vmFetching){ setTimeout(()=>_vmEnsureFunnel(cb), 500); return; }
+    _vmFetching = true;
     try{
       const r = await supabaseRpc('kenal_visitor_funnel', {p_page: KENAL_PAGE_ID});
-      const f = Array.isArray(r) ? r[0] : r;
-      if(!f) return;
-      const num = n => Number(n||0).toLocaleString('en-US');
-      const v = document.getElementById('vmViews'); if(v) v.textContent = num(f.page_views);
-      const u = document.getElementById('vmUniq');  if(u) u.textContent = num(f.unique_visitors);
-      el.hidden = false;   // hanya papar bila data berjaya dimuat; gagal = chip tersembunyi (tak rosakkan hero)
+      _vmCache = Array.isArray(r) ? r[0] : r;
+      if(_vmCache) cb(_vmCache);
     }catch(e){ /* senyap */ }
+    finally{ _vmFetching = false; }
   }
+  function injectVisitorMeterChip(){
+    try{
+      document.querySelectorAll('#btnOpenAdminFromHome, #btnOpenAdminGate').forEach(btn=>{
+        const p = btn.parentNode; if(!p) return;
+        if(!p.querySelector('.visitor-meter-chip')){
+          const chip = document.createElement('span');
+          chip.className = 'visitor-meter-chip'; chip.hidden = true; chip.title = 'Respon pelawat laman ini';
+          chip.innerHTML = '<span class="vm-dot"></span><strong class="vmViews">–</strong>&nbsp;lawatan<span class="vm-sep">·</span><strong class="vmUniq">–</strong>&nbsp;pelawat';
+          p.insertBefore(chip, btn.nextSibling);
+        }
+      });
+      const pending = Array.prototype.slice.call(document.querySelectorAll('.visitor-meter-chip')).filter(c=>c.hidden);
+      if(pending.length) _vmEnsureFunnel(f=>pending.forEach(c=>_vmFill(c, f)));
+    }catch(e){}
+  }
+  function loadPublicVisitorMeter(){ injectVisitorMeterChip(); }   // kekalkan nama lama untuk pemanggil sedia ada
   function getSupabaseBatchMap(){ try{ return JSON.parse(localStorage.getItem(SUPABASE_BATCH_MAP_KEY)||'{}'); }catch(e){ return {}; } }
   function saveSupabaseBatchMap(map){ localStorage.setItem(SUPABASE_BATCH_MAP_KEY, JSON.stringify(map||{})); }
   function toIntOrNull(v){ const n=parseInt(String(v||'').trim(),10); return Number.isFinite(n)?n:null; }
@@ -4042,6 +4069,10 @@ Saya bersedia membantu mengajak sahabat batch mendaftar dan membantu urusetia me
   initSMKASASBranding();
   renderMenu();
   try{ logEvent('page_view'); }catch(e){}
+  try{
+    injectVisitorMeterChip();
+    new MutationObserver(()=>injectVisitorMeterChip()).observe(document.body, {childList:true, subtree:true});
+  }catch(e){}
 })();
 </script>
 <!-- KENAL Alumni SMKASAS v3T: kunci permohonan wakil untuk batch yang sudah ada wakil -->
