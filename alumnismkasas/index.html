@@ -2110,9 +2110,17 @@ Saya bersedia membantu mengajak sahabat batch mendaftar dan membantu urusetia me
   }
   async function loadAdminStats(){
     const area=document.getElementById('adminStatsArea'); if(!area)return;
+    area.innerHTML='<div class="empty">Memuatkan statistik...</div>';
     try{
       const data=await supabaseRpc('smkasas_public_stats',{}); const d=Array.isArray(data)?data[0]:data;
-      area.innerHTML=`<div class="stats"><div class="stat"><strong>${esc(d.total_registered??0)}</strong><span>Total daftar</span></div><div class="stat"><strong>${esc(d.total_verified??0)}</strong><span>Verified</span></div><div class="stat"><strong>${esc(d.total_pending??0)}</strong><span>Pending</span></div><div class="stat"><strong>${esc(d.total_rejected??0)}</strong><span>Rejected</span></div><div class="stat"><strong>${esc(d.total_batches??0)}</strong><span>Batch</span></div></div>`;
+      const statsHtml=`<div class="stats"><div class="stat"><strong>${esc(d.total_registered??0)}</strong><span>Total daftar</span></div><div class="stat"><strong>${esc(d.total_verified??0)}</strong><span>Verified</span></div><div class="stat"><strong>${esc(d.total_pending??0)}</strong><span>Pending</span></div><div class="stat"><strong>${esc(d.total_rejected??0)}</strong><span>Rejected</span></div><div class="stat"><strong>${esc(d.total_batches??0)}</strong><span>Batch</span></div></div>`;
+      let funnelHtml='';
+      try{
+        const fr=await supabaseRpc('kenal_visitor_funnel',{p_page:KENAL_PAGE_ID}); const f=Array.isArray(fr)?fr[0]:fr;
+        const num=n=>(n==null?'–':Number(n).toLocaleString('en-US'));
+        funnelHtml=`<h4 style="margin:18px 0 4px">Respon Terkini · Funnel Pelawat</h4><p class="muted">Denyut kempen — lawatan → klik daftar → borang dihantar → verified. Tanpa nama/emel/IP.</p><div class="stats"><div class="stat"><strong>${num(f&&f.page_views)}</strong><span>Lawatan laman</span></div><div class="stat"><strong>${num(f&&f.unique_visitors)}</strong><span>Pelawat unik</span></div><div class="stat"><strong>${num(f&&f.click_daftar)}</strong><span>Klik Daftar</span></div><div class="stat"><strong>${num(f&&f.submit_daftar)}</strong><span>Borang dihantar</span></div><div class="stat"><strong>${esc(d.total_verified??0)}</strong><span>Alumni verified</span></div></div>`;
+      }catch(e){ funnelHtml='<div class="note" style="margin-top:14px">Meter pelawat belum aktif. Pastikan SQL <strong>visitor_events</strong> + <strong>kenal_visitor_funnel</strong> sudah dijalankan di Supabase.</div>'; }
+      area.innerHTML=statsHtml+funnelHtml;
     }catch(e){area.innerHTML=`<div class="note">Gagal load statistik: ${esc(e.message||e)}</div>`;}
   }
   async function loadAdminBatches(){
