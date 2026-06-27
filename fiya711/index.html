@@ -56,6 +56,7 @@ table{width:100%;border-collapse:separate;border-spacing:0 8px}th{font-size:12px
 .pill{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:#fff7e6;border:1px solid var(--line);color:#72572e;font-size:13px;font-weight:900;margin:4px 4px 4px 0}.checklist{display:grid;gap:10px}.check{display:flex;gap:10px;align-items:flex-start;background:#fffaf2;border:1px solid var(--line);border-radius:16px;padding:12px}.box{width:22px;height:22px;border-radius:7px;border:2px solid #d8bf8b;flex:0 0 auto;background:#fff}.status{font-size:12px;font-weight:900;border-radius:999px;padding:5px 9px;display:inline-block;margin-left:4px}.todo{background:#fff1d2;color:#7d5720}.done{background:#eaf2e3;color:#516d42}.urgent{background:#f8ded6;color:#94432d}
 .note-box{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 10px 30px rgba(84,60,29,.10);margin:16px 0 22px}.note-box h3{margin:0 0 8px}.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.note-box label{display:block;font-size:13px;font-weight:900;color:#665746;margin:8px 0 5px}.note-box input,.note-box select,.note-box textarea,.modal-card input,.modal-card textarea{width:100%;border:1px solid var(--line);border-radius:16px;padding:12px;font:inherit;background:#fffdf8;color:var(--ink)}.note-box textarea{min-height:120px;resize:vertical}.note-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.image-preview{margin-top:10px;display:none}.image-preview img{max-width:220px;max-height:160px;border-radius:16px;border:1px solid var(--line);display:block}.tiny{font-size:12px;color:var(--muted)}.admin-filter{display:flex;gap:8px;overflow:auto;flex-wrap:wrap;margin:8px 0 12px}.admin-note-card{background:#fffaf2;border:1px solid var(--line);border-radius:18px;padding:12px;margin:10px 0}.admin-note-card h4{margin:0 0 4px}.admin-note-card p{white-space:pre-wrap;margin:8px 0}.thumb{max-width:130px;max-height:100px;border-radius:12px;border:1px solid var(--line);display:block;margin-top:8px}
 .cat-wrap{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 2px}.cat-chip{border:1px solid var(--line);background:#fff7e6;color:#72572e;border-radius:999px;padding:8px 12px;font-weight:900;font-size:13px;cursor:pointer;font-family:inherit}.cat-chip.active{background:linear-gradient(135deg,var(--gold),#d9b76c);color:#fff;border-color:transparent}.cat-chip small{font-weight:700;opacity:.85}.countrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}.gact{display:flex;gap:6px;flex-wrap:wrap}.gact .mini-btn{padding:7px 10px;font-size:12px}.del-btn{color:#94432d;border-color:#eccabf}
+.cat-list{display:grid;gap:10px;margin-top:6px}.cat-row{background:#fffaf2;border:1px solid var(--line);border-radius:16px;padding:12px}.cat-row.editing{background:#fff}.cat-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.cat-meta{font-size:13px;color:#6b5a45;margin:8px 0 6px}.cat-meta b{color:#4f3c2b}.cat-meta.over{color:#94432d}.qbar{height:8px;border-radius:999px;background:#efe2c8;overflow:hidden}.qbar > i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#d9b76c);border-radius:999px;transition:width .25s ease}
 .modal{position:fixed;inset:0;background:rgba(42,30,18,.48);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.modal-card{width:min(520px,100%);background:#fffdf8;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:20px;position:relative}.modal-card h2{font-family:Georgia,"Times New Roman",serif;font-size:30px;margin:0 0 6px}.modal-close{position:absolute;right:14px;top:12px;border:0;background:#fff3da;border-radius:999px;width:34px;height:34px;font-size:22px;cursor:pointer}.modal-card textarea{min-height:180px;resize:vertical}
 .footer{text-align:center;color:#867661;font-size:12px;margin-top:26px}
 @media(max-width:820px){.wrap{padding:14px 12px 70px}.hero{padding:22px 16px;border-radius:28px}.countbox{grid-template-columns:repeat(2,1fr)}.date-grid,.menu-grid,.grid,.grid3,.form-grid{grid-template-columns:1fr}.menu-card{min-height:128px}.layer{height:94vh;border-radius:24px 24px 0 0}.layer-head{padding:10px 12px}.layer-body{padding:12px}th:nth-child(3),td:nth-child(3){display:none}.layer-btn,.mini-btn,.tab-btn{padding:10px 12px}}
@@ -848,9 +849,21 @@ function exportNotesJson(){
 /* ===== Jemputan: senarai tetamu + kategori ===== */
 const GUEST_LS_KEY = "wedding_guests_" + WEDDING_CONFIG.projectId;
 const CAT_LS_KEY = "wedding_cats_" + WEDDING_CONFIG.projectId;
-const DEFAULT_CATS = ["Kategori A","Kategori B","Kategori C","Kategori D"];
+const DEFAULT_CATS = [
+  { name:"Famili", quota:300, sort:1 },
+  { name:"Kenalan IbuPapa", quota:300, sort:2 },
+  { name:"Kenalan AFA", quota:100, sort:3 },
+  { name:"VIPS", quota:100, sort:4 }
+];
 const GUEST_STATUS = { tak_pasti:"Tak pasti", hadir:"Hadir", tak_hadir:"Tak hadir" };
-let guestState = { guests: [], categories: [], filter: "", editing: null };
+let guestState = { guests: [], categories: [], filter: "", editing: null, editingCat: null };
+
+// Normalize categories to objects {id?, name, quota}. Accepts legacy string arrays.
+function normCats(arr){
+  return (arr || []).map(c => typeof c === "string"
+    ? { name: c, quota: 0 }
+    : { id: c.id, name: c.name, quota: parseInt(c.quota, 10) || 0 });
+}
 
 function lsGetJSON(k, fb){ try{ const v = JSON.parse(localStorage.getItem(k)); return v || fb; }catch(e){ return fb; } }
 function gval(id){ const el = document.getElementById(id); return el ? el.value : ""; }
@@ -866,13 +879,13 @@ async function loadGuestData(){
         sb.from(WEDDING_CONFIG.categoriesTable).select("*").eq("project_id", WEDDING_CONFIG.projectId).order("sort", {ascending:true})
       ]);
       guestState.guests = g.data || [];
-      guestState.categories = (c.data || []).map(x => x.name);
-      if(!guestState.categories.length) guestState.categories = DEFAULT_CATS.slice();
+      guestState.categories = (c.data || []).map(x => ({ id:x.id, name:x.name, quota: parseInt(x.quota,10) || 0 }));
+      if(!guestState.categories.length) guestState.categories = DEFAULT_CATS.map(c => ({ name:c.name, quota:c.quota }));
       return;
     }catch(e){ /* fallback to localStorage below */ }
   }
   guestState.guests = lsGetJSON(GUEST_LS_KEY, []);
-  guestState.categories = lsGetJSON(CAT_LS_KEY, DEFAULT_CATS.slice());
+  guestState.categories = normCats(lsGetJSON(CAT_LS_KEY, DEFAULT_CATS.map(c => ({ name:c.name, quota:c.quota }))));
 }
 
 function renderJemputan(){
@@ -893,7 +906,7 @@ function activatePane(name){
 function renderGuestForm(){
   const host = document.getElementById("guestFormHost");
   if(!host) return;
-  const opts = guestState.categories.map(c => `<option value="${safeHtml(c)}">${safeHtml(c)}</option>`).join("");
+  const opts = guestState.categories.map(c => `<option value="${safeHtml(c.name)}">${safeHtml(c.name)}</option>`).join("");
   const editing = !!guestState.editing;
   host.innerHTML = `
   <div class="note-box">
@@ -1031,39 +1044,147 @@ function renderGuestMaster(){
   </div>`;
 }
 
+function catUsedPax(name){
+  return guestState.guests.filter(g => (g.kategori || "") === name).reduce((s, g) => s + (parseInt(g.pax,10) || 0), 0);
+}
+function catCount(name){
+  return guestState.guests.filter(g => (g.kategori || "") === name).length;
+}
+
 function renderCategoryControls(){
   const host = document.getElementById("kategoriHost");
   if(!host) return;
-  const chips = guestState.categories.map(c => {
-    const inCat = guestState.guests.filter(g => (g.kategori || "") === c);
-    const pax = inCat.reduce((s, g) => s + (parseInt(g.pax,10) || 0), 0);
-    return `<button class="cat-chip ${guestState.filter === c ? "active" : ""}" onclick="setGuestFilter('${jsq(c)}')">${safeHtml(c)} <small>(${inCat.length} · ${pax}px)</small></button>`;
+  const totalQuota = guestState.categories.reduce((s, c) => s + (parseInt(c.quota,10) || 0), 0);
+  const totalPax = guestState.guests.reduce((s, g) => s + (parseInt(g.pax,10) || 0), 0);
+  const cards = guestState.categories.map(c => {
+    const used = catUsedPax(c.name);
+    const cnt = catCount(c.name);
+    const quota = parseInt(c.quota,10) || 0;
+    const baki = quota - used;
+    const pct = quota > 0 ? Math.min(100, Math.round(used / quota * 100)) : 0;
+    const over = quota > 0 && used > quota;
+    if(String(guestState.editingCat) === String(c.name)){
+      return `<div class="cat-row editing">
+        <div class="form-grid">
+          <div><label>Nama kategori</label><input id="catEditName" type="text" value="${safeHtml(c.name)}"></div>
+          <div><label>Kuota pax</label><input id="catEditQuota" type="number" min="0" value="${quota}"></div>
+        </div>
+        <div class="gact" style="margin-top:8px">
+          <button class="mini-btn gold" onclick="saveCategoryEdit('${jsq(c.name)}')">Simpan</button>
+          <button class="mini-btn" onclick="cancelCatEdit()">Batal</button>
+        </div>
+      </div>`;
+    }
+    return `<div class="cat-row">
+      <div class="cat-head">
+        <button class="cat-chip ${guestState.filter === c.name ? "active" : ""}" onclick="setGuestFilter('${jsq(c.name)}')">${safeHtml(c.name)} <small>(${cnt} tetamu)</small></button>
+        <div class="gact">
+          <button class="mini-btn" onclick="editCategory('${jsq(c.name)}')">Edit</button>
+          <button class="mini-btn del-btn" onclick="deleteCategory('${jsq(c.name)}')">Padam</button>
+        </div>
+      </div>
+      <div class="cat-meta ${over ? "over" : ""}">
+        Kuota <b>${quota || "—"}</b> · Terisi <b>${used}</b> · Baki <b>${quota > 0 ? baki : "—"}</b>${over ? ' <span class="status urgent">Lebih kuota!</span>' : ""}
+      </div>
+      <div class="qbar"><i style="width:${pct}%;${over ? "background:#c2553b" : ""}"></i></div>
+    </div>`;
   }).join("");
+  const overTotal = totalQuota > 0 && totalPax > totalQuota;
   host.innerHTML = `
   <div class="note-box">
-    <h3>Kategori Tetamu</h3>
-    <p class="tiny">Klik kategori untuk tapis master ikut kumpulan tetamu.</p>
-    <div class="cat-wrap">${chips || "<small>Belum ada kategori.</small>"}</div>
-    <label style="margin-top:8px">Tambah kategori baru</label>
-    <input id="catNew" type="text" placeholder="cth: Rakan Kerja Ayah, Jiran, VIP Majlis">
+    <h3>Kategori & Kuota</h3>
+    <p class="tiny">Setiap kategori ada kuota (sasaran pax) tersendiri. Klik nama kategori untuk tapis master. Tekan Edit untuk ubah nama/kuota.</p>
+    <div class="countrow">
+      <span class="pill">Jumlah kuota: ${totalQuota}</span>
+      <span class="pill ${overTotal ? "" : ""}">Jumlah pax terisi: ${totalPax}</span>
+      <span class="pill">Baki keseluruhan: ${totalQuota - totalPax}</span>
+    </div>
+    <div class="cat-list">${cards || "<small>Belum ada kategori.</small>"}</div>
+    <hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
+    <label>Tambah kategori baru</label>
+    <div class="form-grid">
+      <div><input id="catNew" type="text" placeholder="cth: Rakan Kerja Ayah, Jiran"></div>
+      <div><input id="catNewQuota" type="number" min="0" placeholder="Kuota pax (cth 50)"></div>
+    </div>
     <button class="mini-btn gold full" id="catAdd">Tambah Kategori</button>
+    <p class="tiny" style="margin-top:8px">Nota: tambah kategori baru tak ubah kuota kategori lain — ia cuma tambah satu kumpulan baharu dengan kuotanya sendiri.</p>
   </div>`;
   document.getElementById("catAdd").addEventListener("click", addCategory);
 }
 
+function editCategory(name){ guestState.editingCat = name; renderCategoryControls(); }
+function cancelCatEdit(){ guestState.editingCat = null; renderCategoryControls(); }
+
+async function saveCategoryEdit(oldName){
+  const newName = gval("catEditName").trim();
+  const quota = Math.max(0, parseInt(gval("catEditQuota") || "0", 10) || 0);
+  if(!newName){ alert("Nama kategori tak boleh kosong."); return; }
+  if(newName.toLowerCase() !== oldName.toLowerCase() &&
+     guestState.categories.some(c => c.name.toLowerCase() === newName.toLowerCase())){
+    alert("Nama kategori itu sudah wujud."); return;
+  }
+  try{
+    if(sb){
+      const cat = guestState.categories.find(c => c.name === oldName);
+      const { error } = await sb.from(WEDDING_CONFIG.categoriesTable)
+        .update({ name: newName, quota }).eq("id", cat.id);
+      if(error) throw error;
+      // Cascade rename to existing guests
+      if(newName !== oldName){
+        await sb.from(WEDDING_CONFIG.guestsTable)
+          .update({ kategori: newName })
+          .eq("project_id", WEDDING_CONFIG.projectId).eq("kategori", oldName);
+      }
+    } else {
+      const cat = guestState.categories.find(c => c.name === oldName);
+      if(cat){ cat.name = newName; cat.quota = quota; }
+      guestState.guests.forEach(g => { if(g.kategori === oldName) g.kategori = newName; });
+      localStorage.setItem(CAT_LS_KEY, JSON.stringify(guestState.categories));
+      localStorage.setItem(GUEST_LS_KEY, JSON.stringify(guestState.guests));
+    }
+    if(guestState.filter === oldName) guestState.filter = newName;
+    guestState.editingCat = null;
+    await loadGuestData();
+    renderJemputan();
+  }catch(e){ alert("Gagal kemaskini kategori: " + (e.message || e)); }
+}
+
+async function deleteCategory(name){
+  const used = catCount(name);
+  const msg = used > 0
+    ? `Kategori "${name}" ada ${used} tetamu. Padam kategori sahaja? (tetamu kekal tapi tanpa kategori ini)`
+    : `Padam kategori "${name}"?`;
+  if(!confirm(msg)) return;
+  try{
+    if(sb){
+      const cat = guestState.categories.find(c => c.name === name);
+      const { error } = await sb.from(WEDDING_CONFIG.categoriesTable).delete().eq("id", cat.id);
+      if(error) throw error;
+    } else {
+      guestState.categories = guestState.categories.filter(c => c.name !== name);
+      localStorage.setItem(CAT_LS_KEY, JSON.stringify(guestState.categories));
+    }
+    if(guestState.filter === name) guestState.filter = "";
+    if(guestState.editingCat === name) guestState.editingCat = null;
+    await loadGuestData();
+    renderJemputan();
+  }catch(e){ alert("Gagal padam kategori: " + (e.message || e)); }
+}
+
 async function addCategory(){
   const name = gval("catNew").trim();
+  const quota = Math.max(0, parseInt(gval("catNewQuota") || "0", 10) || 0);
   if(!name) return;
-  if(guestState.categories.some(c => c.toLowerCase() === name.toLowerCase())){ alert("Kategori sudah wujud."); return; }
+  if(guestState.categories.some(c => c.name.toLowerCase() === name.toLowerCase())){ alert("Kategori sudah wujud."); return; }
   const btn = document.getElementById("catAdd");
   btn.disabled = true; btn.textContent = "Menyimpan…";
   try{
     if(sb){
       const sort = guestState.categories.length + 1;
-      const { error } = await sb.from(WEDDING_CONFIG.categoriesTable).insert({ project_id: WEDDING_CONFIG.projectId, name, sort });
+      const { error } = await sb.from(WEDDING_CONFIG.categoriesTable).insert({ project_id: WEDDING_CONFIG.projectId, name, quota, sort });
       if(error) throw error;
     } else {
-      guestState.categories.push(name);
+      guestState.categories.push({ name, quota });
       localStorage.setItem(CAT_LS_KEY, JSON.stringify(guestState.categories));
     }
     await loadGuestData();
