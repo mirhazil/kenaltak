@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wedding Planner | Amelyn & Aiman 2026</title>
+  <!-- Single-file version: CSS + JS embedded for Android/content:// opening -->
+  <style>
+:root{
+  --bg:#fffaf2;--card:#ffffff;--ink:#2d241b;--muted:#786955;--gold:#b8863b;--gold2:#e6c98f;
+  --cream:#fff3da;--sage:#8aa083;--rose:#d8aaa0;--line:#eadcc3;--soft:#fff8ea;
+  --shadow:0 15px 45px rgba(79,55,25,.16);--radius:24px;--danger:#94432d;--ok:#516d42;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;scroll-behavior:smooth}
+body{
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:radial-gradient(circle at 0% 0%, rgba(230,201,143,.44), transparent 32%),
+             radial-gradient(circle at 100% 0%, rgba(216,170,160,.24), transparent 30%),
+             linear-gradient(180deg,#fffaf2 0%, #fff7eb 55%, #fffaf2 100%);
+  color:var(--ink);line-height:1.5;overflow-x:hidden;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:18px 14px 80px}
+.hero{
+  border:1px solid rgba(184,134,59,.35);border-radius:32px;padding:26px 20px;
+  background:linear-gradient(135deg, rgba(255,255,255,.82), rgba(255,243,218,.92)),
+             radial-gradient(circle at 85% 20%, rgba(184,134,59,.22), transparent 38%);
+  box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.hero:before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-80px;top:-90px;background:radial-gradient(circle, rgba(184,134,59,.20), transparent 66%);pointer-events:none}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:1;flex-wrap:wrap}
+.badge{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--muted);font-size:13px;font-weight:800;letter-spacing:.04em}
+h1{margin:18px 0 4px;font-family:Georgia,"Times New Roman",serif;font-size:clamp(36px,7vw,74px);line-height:.96;letter-spacing:-.05em;color:#382a1c}
+.names{margin:12px 0 0;font-size:clamp(20px,4.6vw,38px);font-weight:900;line-height:1.12;color:#6f4d20}
+.sub{max-width:790px;margin:15px 0 0;color:#5d4e3f;font-size:16px}
+.modebar{margin-top:14px;padding:10px 12px;border-radius:18px;border:1px solid var(--line);background:#fffdf8;color:#665746;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-weight:800}
+.countbox{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:18px}
+.countbox div{background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:18px;padding:12px;text-align:center}
+.countbox strong{display:block;font-size:24px;color:#6f4d20}.countbox span{font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase}
+.date-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
+.date-card,.menu-card,.tile{background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:20px;padding:14px}
+.date-card b{display:block;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.date-card strong{display:block;font-size:19px;margin-top:5px;color:#3d3024}.date-card span{display:block;font-size:13px;color:#776958;margin-top:5px}
+.section-title{margin:22px 2px 12px;display:flex;align-items:end;justify-content:space-between;gap:10px}.section-title h2{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:30px;letter-spacing:-.03em;color:#3b2d1f}.section-title small{color:var(--muted);font-weight:700}
+.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.menu-card{min-height:145px;cursor:pointer;box-shadow:0 10px 24px rgba(84,60,29,.08);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;position:relative;overflow:hidden}.menu-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:rgba(184,134,59,.55)}.menu-card:active{transform:scale(.99)}
+.menu-card .icon{width:44px;height:44px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,#fff5df,#f2dbab);border:1px solid #ead2a3;font-size:22px;margin-bottom:12px}.menu-card h3{margin:0 0 6px;font-size:19px;color:#3f3022}.menu-card p{margin:0;color:#665746;font-size:14px}.menu-card .openhint{margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:900;color:#7b5a24;padding:6px 9px;border-radius:999px;background:#fff8ea;border:1px solid var(--line)}
+.quick-panel{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:17px}.quick-panel h2{margin:0 0 8px;font-family:Georgia,"Times New Roman",serif;font-size:28px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.tile b{color:#4f3c2b}.tile small{display:block;color:var(--muted);margin-top:4px}
+.note{border-left:5px solid var(--gold);padding:12px 14px;background:#fff8ea;border-radius:16px;color:#5e5143;margin:12px 0}.note.small{font-size:13px}
+.mini-btn,.layer-btn,.tab-btn{border:1px solid var(--line);background:#fff;color:#4e4031;border-radius:999px;padding:10px 14px;font-weight:900;white-space:nowrap;cursor:pointer;box-shadow:0 3px 10px rgba(84,60,29,.06);font-family:inherit;text-decoration:none;text-align:center}.mini-btn.gold,.layer-btn.gold,.tab-btn.active{background:linear-gradient(135deg,var(--gold),#d9b76c);color:#fff;border-color:transparent}.mini-btn.full,.linkbtn.full{display:block;width:100%;margin-top:10px}
+.overlay{position:fixed;inset:0;background:rgba(42,30,18,.42);backdrop-filter:blur(8px);z-index:100;opacity:0;pointer-events:none;transition:opacity .22s ease}.overlay.show{opacity:1;pointer-events:auto}
+.drawer{position:fixed;inset:0;z-index:110;display:grid;place-items:end center;pointer-events:none}.drawer.show{pointer-events:auto}.layer{width:min(1080px,100%);height:min(92vh,980px);background:radial-gradient(circle at 0% 0%,rgba(230,201,143,.30),transparent 32%),linear-gradient(180deg,#fffdf8,#fff7eb);border-radius:30px 30px 0 0;box-shadow:0 -18px 60px rgba(50,35,18,.28);border:1px solid rgba(234,220,195,.85);transform:translateY(102%);transition:transform .28s ease;display:flex;flex-direction:column;overflow:hidden}.drawer.show .layer{transform:translateY(0)}
+.layer-head{position:sticky;top:0;z-index:2;background:rgba(255,250,242,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 14px}.layer-actions{display:flex;justify-content:space-between;align-items:center;gap:8px}.layer-title{margin:12px 2px 2px}.layer-title h2{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(28px,5vw,46px);letter-spacing:-.035em;color:#3a2a1b}.layer-title p{margin:6px 0 0;color:#665746}.layer-body{overflow:auto;padding:14px}
+.tabs{display:flex;gap:8px;overflow:auto;padding:4px 0 12px;margin-bottom:4px;position:sticky;top:0;z-index:1;background:linear-gradient(180deg,#fffaf2 0%, rgba(255,250,242,.92) 80%, transparent)}.pane{display:none;animation:fade .2s ease}.pane.active{display:block}@keyframes fade{from{opacity:.35;transform:translateY(5px)}to{opacity:1;transform:none}}
+.card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 10px 30px rgba(84,60,29,.10);padding:16px;margin-bottom:12px}.card h3{margin:0 0 10px;font-size:20px;color:#3f3022}
+table{width:100%;border-collapse:separate;border-spacing:0 8px}th{font-size:12px;text-align:left;color:#806f5a;text-transform:uppercase;letter-spacing:.06em;padding:0 10px}td{background:#fffaf2;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 10px;vertical-align:top}td:first-child{border-left:1px solid var(--line);border-radius:14px 0 0 14px;font-weight:900;color:#5b4329}td:last-child{border-right:1px solid var(--line);border-radius:0 14px 14px 0}.money{font-weight:900;color:#6f4d20}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:#fff7e6;border:1px solid var(--line);color:#72572e;font-size:13px;font-weight:900;margin:4px 4px 4px 0}.checklist{display:grid;gap:10px}.check{display:flex;gap:10px;align-items:flex-start;background:#fffaf2;border:1px solid var(--line);border-radius:16px;padding:12px}.box{width:22px;height:22px;border-radius:7px;border:2px solid #d8bf8b;flex:0 0 auto;background:#fff}.status{font-size:12px;font-weight:900;border-radius:999px;padding:5px 9px;display:inline-block;margin-left:4px}.todo{background:#fff1d2;color:#7d5720}.done{background:#eaf2e3;color:#516d42}.urgent{background:#f8ded6;color:#94432d}
+.note-box{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 10px 30px rgba(84,60,29,.10);margin:16px 0 22px}.note-box h3{margin:0 0 8px}.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.note-box label{display:block;font-size:13px;font-weight:900;color:#665746;margin:8px 0 5px}.note-box input,.note-box select,.note-box textarea,.modal-card input,.modal-card textarea{width:100%;border:1px solid var(--line);border-radius:16px;padding:12px;font:inherit;background:#fffdf8;color:var(--ink)}.note-box textarea{min-height:120px;resize:vertical}.note-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.image-preview{margin-top:10px;display:none}.image-preview img{max-width:220px;max-height:160px;border-radius:16px;border:1px solid var(--line);display:block}.tiny{font-size:12px;color:var(--muted)}.admin-filter{display:flex;gap:8px;overflow:auto;flex-wrap:wrap;margin:8px 0 12px}.admin-note-card{background:#fffaf2;border:1px solid var(--line);border-radius:18px;padding:12px;margin:10px 0}.admin-note-card h4{margin:0 0 4px}.admin-note-card p{white-space:pre-wrap;margin:8px 0}.thumb{max-width:130px;max-height:100px;border-radius:12px;border:1px solid var(--line);display:block;margin-top:8px}
+.modal{position:fixed;inset:0;background:rgba(42,30,18,.48);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.modal-card{width:min(520px,100%);background:#fffdf8;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:20px;position:relative}.modal-card h2{font-family:Georgia,"Times New Roman",serif;font-size:30px;margin:0 0 6px}.modal-close{position:absolute;right:14px;top:12px;border:0;background:#fff3da;border-radius:999px;width:34px;height:34px;font-size:22px;cursor:pointer}.modal-card textarea{min-height:180px;resize:vertical}
+.footer{text-align:center;color:#867661;font-size:12px;margin-top:26px}
+@media(max-width:820px){.wrap{padding:14px 12px 70px}.hero{padding:22px 16px;border-radius:28px}.countbox{grid-template-columns:repeat(2,1fr)}.date-grid,.menu-grid,.grid,.grid3,.form-grid{grid-template-columns:1fr}.menu-card{min-height:128px}.layer{height:94vh;border-radius:24px 24px 0 0}.layer-head{padding:10px 12px}.layer-body{padding:12px}th:nth-child(3),td:nth-child(3){display:none}.layer-btn,.mini-btn,.tab-btn{padding:10px 12px}}
+@media print{.overlay,.drawer,.modal,.menu-grid,.section-title,.quick-panel .mini-btn,#loginBtn,#logoutBtn{display:none!important}body{background:#fff}.wrap{max-width:none}.hero,.quick-panel,.card{box-shadow:none}}
+
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="topline">
+        <span class="badge">WEDDING MASTER PLAN · NOVEMBER 2026</span>
+        <button class="mini-btn gold" id="loginBtn">🔐 Masuk PIN</button>
+      </div>
+      <h1>Majlis Perkahwinan</h1>
+      <div class="names">Mir Amelyn Saffiya Hazil Azran<br/>❤<br/>Aiman Aizzat Mohd Yusof</div>
+      <p class="sub">
+        Pelan kerja keluarga untuk tiga fasa majlis: nikah di Masjid Raja Haji Fi Sabilillah Cyberjaya,
+        resepsi pihak perempuan di Royal Palace Cyberjaya, dan majlis pihak lelaki.
+      </p>
+
+      <div class="modebar" id="modebar">
+        <span id="modeText">Mode tetamu · nota disembunyikan</span>
+        <button class="mini-btn" id="logoutBtn" hidden>Logout</button>
+      </div>
+
+      <div class="countbox">
+        <div><strong id="cdDays">-</strong><span>Hari ke Nikah</span></div>
+        <div><strong id="cdWeeks">-</strong><span>Minggu</span></div>
+        <div><strong>100</strong><span>Pax Nikah</span></div>
+        <div><strong>800–1000</strong><span>Pax Resepsi</span></div>
+      </div>
+
+      <div class="date-grid">
+        <div class="date-card">
+          <b>Nikah</b>
+          <strong>7 Nov 2026</strong>
+          <span>9.00 – 11.00 pagi · Masjid Raja Haji Fi Sabilillah, Cyberjaya</span>
+        </div>
+        <div class="date-card">
+          <b>Resepsi Perempuan</b>
+          <strong>14 Nov 2026</strong>
+          <span>11.00 pagi – 4.00 petang · Royal Palace Cyberjaya</span>
+        </div>
+        <div class="date-card">
+          <b>Majlis Lelaki</b>
+          <strong>28 Nov 2026</strong>
+          <span>Butiran ikut pihak lelaki · selaras pakaian & rombongan keluarga</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="section-title">
+      <h2>Menu Kerja</h2>
+      <small>Klik kad untuk buka popup layer</small>
+    </div>
+
+    <section class="menu-grid" aria-label="Menu popup" id="menuGrid"></section>
+
+    <section class="quick-panel">
+      <h2>Ringkasan Pantas</h2>
+      <div class="grid3">
+        <div class="tile"><b>Nikah</b><small>Family-only ±100 pax. Jamuan ringan RM700–RM1,000.</small></div>
+        <div class="tile"><b>Resepsi</b><small>Royal Palace Cyberjaya. Dewan & catering RM25,000.</small></div>
+        <div class="tile"><b>Priority</b><small>Guest list, dokumen nikah, vendor, doorgift, MC dan krew.</small></div>
+      </div>
+      <div class="note">
+        <b>Nota:</b> Tekan “Masuk PIN” untuk buka ruang nota tindakan. Krew boleh simpan nota, Superadmin boleh baca semua melalui menu Admin Nota.
+      </div>
+      <button class="mini-btn gold" onclick="window.print()">Cetak / Save PDF</button>
+    </section>
+
+    <div class="footer">
+      Wedding Planner HTML · Amelyn & Aiman 2026 · PIN + Nota + WhatsApp + Supabase-ready
+    </div>
+  </div>
+
+  <!-- Popup layer utama -->
+  <div class="overlay" id="overlay"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="layer" role="dialog" aria-modal="true" aria-labelledby="layerTitle">
+      <div class="layer-head">
+        <div class="layer-actions">
+          <button class="layer-btn" id="backBtn">← Back</button>
+          <button class="layer-btn gold" id="closeBtn">Tutup ×</button>
+        </div>
+        <div class="layer-title">
+          <h2 id="layerTitle">Tajuk</h2>
+          <p id="layerDesc">Deskripsi layer</p>
+        </div>
+      </div>
+      <div class="layer-body" id="layerBody"></div>
+    </div>
+  </aside>
+
+  <!-- PIN modal -->
+  <div class="modal" id="pinModal" aria-hidden="true">
+    <div class="modal-card">
+      <button class="modal-close" id="pinClose">×</button>
+      <h2>Masuk PIN</h2>
+      <p>Masukkan PIN krew atau superadmin untuk buka ruang nota tindakan.</p>
+      <input id="pinInput" type="password" inputmode="text" placeholder="Masukkan PIN" />
+      <button class="mini-btn gold full" id="pinSubmit">Masuk</button>
+      <p class="tiny" id="pinMsg"></p>
+      <div class="note small">
+        <b>Mode:</b> User/Krew boleh simpan nota. Superadmin boleh buka menu Admin Nota dan baca semua nota.
+      </div>
+    </div>
+  </div>
+
+  <!-- WhatsApp modal -->
+  <div class="modal" id="waModal" aria-hidden="true">
+    <div class="modal-card">
+      <button class="modal-close" id="waClose">×</button>
+      <h2>Nota Berjaya Disimpan</h2>
+      <p>Hantar salinan nota ini ke WhatsApp Superadmin?</p>
+      <textarea id="waPreview" readonly></textarea>
+      <a class="mini-btn gold full linkbtn" id="waSend" target="_blank" rel="noopener">Hantar WhatsApp ke Superadmin</a>
+      <button class="mini-btn full" id="waJustClose">Tutup</button>
+      <p class="tiny">Nota: Browser tidak boleh auto-attach gambar ke WhatsApp. Jika ada gambar, mesej akan sertakan pautan gambar Supabase atau nama fail.</p>
+    </div>
+  </div>
+
+  <script>
+/* 
+  Wedding Planner Amelyn & Aiman 2026
+  PIN Prototype:
+  - User/Krew PIN: FIYA711
+  - Superadmin PIN: FIYA7112026
+  Nota: PIN dalam HTML/JS ialah kawalan ringan untuk prototype. Untuk live public yang benar-benar selamat, guna Supabase Auth/Edge Function.
+*/
+
+const WEDDING_CONFIG = {
+  projectId: "amelyn_aiman_2026",
+  projectTitle: "Wedding Planner Amelyn & Aiman 2026",
+  superadminWhatsapp: "60172305353",
+  userPin: "FIYA711",
+  superadminPin: "FIYA7112026",
+
+  // Isi selepas Supabase siap. Biarkan placeholder untuk guna localStorage dahulu.
+  supabaseUrl: "https://lliyonpjrecdlpykxwqg.supabase.co",
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsaXlvbnBqcmVjZGxweWt4d3FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNzQwMzUsImV4cCI6MjA5Njc1MDAzNX0.iJBUDzPERFMZyPC2X0NqdjN2nDrso0aqrpe99twdsKY",
+  notesTable: "wedding_notes",
+  storageBucket: "wedding-note-images"
+};
+
+let sb = null;
+let currentRole = localStorage.getItem("wedding_role") || "guest";
+let currentLayerKey = null;
+let lastFocused = null;
+let lastWhatsAppMessage = "";
+
+const menuItems = [
+  {key:"ringkasan", icon:"📌", title:"Ringkasan", desc:"Gambaran besar, prioriti dan keputusan perlu lock awal."},
+  {key:"nikah", icon:"🕌", title:"Nikah", desc:"Tentatif 7 Nov, checklist dokumen, jamuan ringan dan bajet."},
+  {key:"resepsi", icon:"👑", title:"Resepsi", desc:"Flow 14 Nov, catering, dewan, pelamin, MC dan layout tetamu."},
+  {key:"lelaki", icon:"🤝", title:"Sebelah Lelaki", desc:"Koordinasi rombongan keluarga untuk 28 November."},
+  {key:"timeline", icon:"🗓️", title:"Dateline", desc:"Tarikh akhir kerja dari Julai hingga majlis."},
+  {key:"jemputan", icon:"💌", title:"Jemputan", desc:"Guest list, kategori tetamu, RSVP dan edaran kad digital."},
+  {key:"bajet", icon:"💳", title:"Bajet", desc:"Anggaran kos nikah, resepsi, doorgift dan kontigensi."},
+  {key:"krew", icon:"🧭", title:"Krew", desc:"Senarai PIC: floor manager, vendor, usher, doorgift, runner."},
+  {key:"tema", icon:"🎨", title:"Tema", desc:"Barakah Royal Minimalist: warna, mood dan bahasa visual."},
+  {key:"admin", icon:"🔐", title:"Admin Nota", desc:"Dashboard superadmin untuk baca semua nota tindakan.", adminOnly:true}
+];
+
+const layerMeta = {
+  ringkasan:{title:"Ringkasan Majlis", desc:"Gambaran besar, prioriti dan keputusan awal."},
+  nikah:{title:"Majlis Nikah", desc:"7 Nov 2026 · 9.00 – 11.00 pagi · Masjid Raja Haji Fi Sabilillah Cyberjaya."},
+  resepsi:{title:"Resepsi Pihak Perempuan", desc:"14 Nov 2026 · 11.00 pagi – 4.00 petang · Royal Palace Cyberjaya."},
+  lelaki:{title:"Majlis Sebelah Lelaki", desc:"28 Nov 2026 · Koordinasi rombongan keluarga."},
+  timeline:{title:"Dateline Master", desc:"Tarikh akhir kerja supaya persiapan tidak bertindih."},
+  jemputan:{title:"Jemputan & RSVP", desc:"Pengurusan guest list, kategori tetamu dan edaran kad."},
+  bajet:{title:"Bajet Keseluruhan", desc:"Anggaran awal dan item yang perlu disahkan."},
+  krew:{title:"Setup Krew", desc:"Role, PIC dan sistem arahan hari majlis."},
+  tema:{title:"Tema & Visual", desc:"Barakah Royal Minimalist."},
+  admin:{title:"Admin Nota", desc:"Dashboard semua nota tindakan untuk superadmin."}
+};
+
+const content = {
+ringkasan: `
+  <div class="tabs">
+    <button class="tab-btn active" data-pane="brief">Brief</button>
+    <button class="tab-btn" data-pane="priority">Prioriti</button>
+    <button class="tab-btn" data-pane="decision">Keputusan</button>
+  </div>
+  <div class="pane active" data-pane="brief">
+    <div class="card"><h3>Ringkasan Projek Keluarga</h3>
+      <div class="grid3">
+        <div class="tile"><b>Fasa 1</b><small>Nikah 7 Nov 2026, 9–11 pagi, Masjid Raja Haji Fi Sabilillah. ±100 pax.</small></div>
+        <div class="tile"><b>Fasa 2</b><small>Resepsi 14 Nov 2026, 11 pagi–4 petang, Royal Palace Cyberjaya. 800–1000 pax.</small></div>
+        <div class="tile"><b>Fasa 3</b><small>Majlis sebelah lelaki 28 Nov 2026. Koordinasi keluarga & pakaian.</small></div>
+      </div>
+      <div class="note">Majlis bertunang sudah selesai pada 11 Zulhijjah lalu. Sekarang fasa pelaksanaan: dokumen, vendor, jemputan, flow dan krew.</div>
+    </div>
+  </div>
+  <div class="pane" data-pane="priority">
+    <div class="card"><h3>Prioriti Utama</h3><div class="checklist">
+      <div class="check"><span class="box"></span><div><b>Dokumen nikah</b> <span class="status urgent">UTAMA</span><br>SPPIM, HIV, wali, saksi, kursus kahwin dan pengesahan masjid.</div></div>
+      <div class="check"><span class="box"></span><div><b>Guest list</b><br>Pecahkan 100 pax nikah dan 800–1000 pax resepsi ikut kategori.</div></div>
+      <div class="check"><span class="box"></span><div><b>Vendor utama</b><br>Dewan/catering, deco, photo/video, MUA, MC, PA dan doorgift.</div></div>
+      <div class="check"><span class="box"></span><div><b>Krew hari majlis</b><br>Lantik seorang floor commander supaya Doc tidak perlu jadi orang operasi.</div></div>
+    </div></div>
+  </div>
+  <div class="pane" data-pane="decision">
+    <div class="card"><h3>Keputusan Perlu Lock</h3>
+      <table><thead><tr><th>Perkara</th><th>Keputusan</th><th>Nota</th></tr></thead><tbody>
+        <tr><td>Tema</td><td>Barakah Royal Minimalist</td><td>Ivory, champagne gold, soft sage / dusty rose.</td></tr>
+        <tr><td>Pax nikah</td><td>±100 pax</td><td>Family-only.</td></tr>
+        <tr><td>Pax resepsi</td><td>800–1000 pax</td><td>Order doorgift cadangan 1,100 unit.</td></tr>
+        <tr><td>Floor Commander</td><td>Belum isi</td><td>Wajib pilih seorang yang tegas dan tenang.</td></tr>
+        <tr><td>MC</td><td>Belum isi</td><td>Perlu dapat skrip awal.</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+`,
+nikah: `
+  <div class="tabs">
+    <button class="tab-btn active" data-pane="brief">Brief</button>
+    <button class="tab-btn" data-pane="tentatif">Tentatif</button>
+    <button class="tab-btn" data-pane="checklist">Checklist</button>
+    <button class="tab-btn" data-pane="bajet">Bajet</button>
+  </div>
+  <div class="pane active" data-pane="brief"><div class="card"><h3>Brief Majlis Nikah</h3>
+    <div class="grid"><div class="tile"><b>Tarikh & Masa</b><small>Sabtu, 7 November 2026 · 9.00 – 11.00 pagi.</small></div><div class="tile"><b>Lokasi</b><small>Masjid Raja Haji Fi Sabilillah, Cyberjaya.</small></div><div class="tile"><b>Skala</b><small>Family-only, sekitar 100 pax.</small></div><div class="tile"><b>Jamuan</b><small>Ringan sahaja. Bajet RM700 – RM1,000.</small></div></div>
+    <p><span class="pill">Mood: suci & tenang</span><span class="pill">Warna: putih/ivory</span><span class="pill">Fokus: akad & keluarga</span></p>
+  </div></div>
+  <div class="pane" data-pane="tentatif"><div class="card"><h3>Tentatif Nikah</h3>
+    <table><thead><tr><th>Masa</th><th>Atur Cara</th><th>PIC</th></tr></thead><tbody>
+      <tr><td>8.15 pagi</td><td>Keluarga teras tiba, semak dokumen, susun hantaran.</td><td>Family Liaison</td></tr>
+      <tr><td>8.45 pagi</td><td>Pihak lelaki tiba, sesi salam keluarga.</td><td>Usher Keluarga</td></tr>
+      <tr><td>9.00 pagi</td><td>Persediaan akad / taklimat ringkas.</td><td>Wali / Imam / Saksi</td></tr>
+      <tr><td>9.15 pagi</td><td>Majlis akad nikah.</td><td>Jurunikah</td></tr>
+      <tr><td>9.45 pagi</td><td>Doa, lafaz taklik, serahan mas kahwin.</td><td>Jurunikah</td></tr>
+      <tr><td>10.00 pagi</td><td>Batal air sembahyang, cincin, gambar keluarga.</td><td>Photo/Video</td></tr>
+      <tr><td>10.30 pagi</td><td>Jamuan ringan.</td><td>Food Team</td></tr>
+      <tr><td>11.00 pagi</td><td>Selesai, kemas barang & hantaran.</td><td>Runner</td></tr>
+    </tbody></table>
+  </div></div>
+  <div class="pane" data-pane="checklist"><div class="card"><h3>Checklist Nikah</h3><div class="checklist">
+    <div class="check"><span class="box"></span><div><b>Dokumen nikah</b> <span class="status urgent">UTAMA</span><br>SPPIM, HIV test, kursus kahwin, wali, saksi, IC, borang berkaitan.</div></div>
+    <div class="check"><span class="box"></span><div><b>Booking masjid</b><br>Sahkan slot 9–11 pagi, deposit/resit, ruang nikah, parking, PA, syarat makanan.</div></div>
+    <div class="check"><span class="box"></span><div><b>Mas kahwin & cincin</b><br>Sediakan dalam pouch khas, jangan last minute.</div></div>
+    <div class="check"><span class="box"></span><div><b>Hantaran</b><br>Jumlah dulang, tema, siapa bawa, siapa susun, label pihak lelaki/perempuan.</div></div>
+    <div class="check"><span class="box"></span><div><b>Jamuan ringan</b><br>Tempah pack food/kuih/air untuk ±100 pax + 10 pax buffer.</div></div>
+  </div></div></div>
+  <div class="pane" data-pane="bajet"><div class="card"><h3>Bajet Nikah</h3>
+    <table><thead><tr><th>Item</th><th>Anggaran</th><th>Nota</th></tr></thead><tbody>
+      <tr><td>Jamuan ringan</td><td class="money">RM700 – RM1,000</td><td>Untuk ±100 pax.</td></tr>
+      <tr><td>Masjid / ruang nikah</td><td class="money">Ikut booking</td><td>Sahkan resit dan pakej ruang.</td></tr>
+      <tr><td>Photo/video nikah</td><td class="money">TBC</td><td>Boleh gabung pakej resepsi.</td></tr>
+      <tr><td>Hantaran / dulang</td><td class="money">TBC</td><td>Jika DIY boleh jimat.</td></tr>
+      <tr><td>Kontigensi</td><td class="money">RM300 – RM500</td><td>Untuk tambahan air, parking, runner, barang kecemasan.</td></tr>
+    </tbody></table>
+  </div></div>
+`,
+resepsi: `
+  <div class="tabs">
+    <button class="tab-btn active" data-pane="brief">Brief</button>
+    <button class="tab-btn" data-pane="tentatif">Tentatif</button>
+    <button class="tab-btn" data-pane="checklist">Checklist</button>
+    <button class="tab-btn" data-pane="bajet">Bajet</button>
+    <button class="tab-btn" data-pane="flow">Flow Dewan</button>
+  </div>
+  <div class="pane active" data-pane="brief"><div class="card"><h3>Brief Resepsi</h3>
+    <div class="grid"><div class="tile"><b>Tarikh & Masa</b><small>Sabtu, 14 November 2026 · 11.00 pagi – 4.00 petang.</small></div><div class="tile"><b>Lokasi</b><small>Royal Palace Cyberjaya.</small></div><div class="tile"><b>Pax</b><small>800–1000 pax. Peak crowd dijangka 12.30–2.30 petang.</small></div><div class="tile"><b>Komitmen Semasa</b><small>Sewa dewan & catering RM25,000.</small></div></div>
+    <div class="note">Resepsi perlu diurus seperti event besar: aliran tetamu, makanan cukup, meja VIP, PA jelas, krew nampak dan signage mencukupi.</div>
+  </div></div>
+  <div class="pane" data-pane="tentatif"><div class="card"><h3>Tentatif Resepsi</h3>
+    <table><thead><tr><th>Masa</th><th>Atur Cara</th><th>PIC</th></tr></thead><tbody>
+      <tr><td>9.00 pagi</td><td>Vendor standby, dewan check, soundcheck, pelamin final touch.</td><td>Floor Manager</td></tr>
+      <tr><td>10.30 pagi</td><td>Krew brief akhir, meja hadiah & doorgift ready.</td><td>Event Director</td></tr>
+      <tr><td>11.00 pagi</td><td>Majlis bermula, tetamu hadir.</td><td>MC / Usher</td></tr>
+      <tr><td>11.30 pagi</td><td>Jamuan dibuka.</td><td>Catering Liaison</td></tr>
+      <tr><td>12.30 tgh</td><td>Ketibaan pengantin.</td><td>MC / Kompang / Photo</td></tr>
+      <tr><td>12.45 tgh</td><td>Perarakan masuk, selawat/kompang, naik pelamin.</td><td>Floor Manager</td></tr>
+      <tr><td>1.00 ptg</td><td>Makan beradab.</td><td>VIP Table Team</td></tr>
+      <tr><td>1.20 ptg</td><td>Doa & ucapan ringkas wakil keluarga.</td><td>MC</td></tr>
+      <tr><td>1.45 ptg</td><td>Foto keluarga, VIP, saudara.</td><td>Family Liaison</td></tr>
+      <tr><td>2.30 ptg</td><td>Sesi bergambar tetamu umum.</td><td>Photo Team</td></tr>
+      <tr><td>3.30 ptg</td><td>Majlis mula reda, semak baki doorgift/barang.</td><td>Runner</td></tr>
+      <tr><td>4.00 ptg</td><td>Majlis tamat, kemas barang penting.</td><td>Event Director</td></tr>
+    </tbody></table>
+  </div></div>
+  <div class="pane" data-pane="checklist"><div class="card"><h3>Checklist Resepsi</h3><div class="checklist">
+    <div class="check"><span class="box"></span><div><b>Sahkan kontrak dewan & catering</b> <span class="status urgent">UTAMA</span><br>Semak item termasuk/tidak termasuk: meja, kerusi, buffet, air, PA, waiter, meja beradab.</div></div>
+    <div class="check"><span class="box"></span><div><b>Floor plan</b><br>Meja VIP, keluarga, buffet line, pelamin, photobooth, meja hadiah, laluan pengantin.</div></div>
+    <div class="check"><span class="box"></span><div><b>MC & skrip</b><br>Nama penuh pengantin, nama ibu ayah, susunan panggilan keluarga, doa, cue pengantin.</div></div>
+    <div class="check"><span class="box"></span><div><b>Doorgift</b><br>Cadangan order 1,100 unit untuk 1000 pax + buffer.</div></div>
+  </div></div></div>
+  <div class="pane" data-pane="bajet"><div class="card"><h3>Bajet Resepsi</h3>
+    <table><thead><tr><th>Item</th><th>Bajet</th><th>Nota</th></tr></thead><tbody>
+      <tr><td>Dewan & catering</td><td class="money">RM25,000</td><td>Sudah booking.</td></tr>
+      <tr><td>Pelamin / dekorasi</td><td class="money">TBC</td><td>Lock konsep dahulu.</td></tr>
+      <tr><td>Photo/video</td><td class="money">TBC</td><td>Boleh ambil pakej nikah + resepsi.</td></tr>
+      <tr><td>Doorgift</td><td class="money">RM2,200 – RM8,800</td><td>Jika RM2–RM8/unit × 1,100 unit.</td></tr>
+      <tr><td>MC / PA tambahan</td><td class="money">TBC</td><td>Jika dewan tidak include PA/operator.</td></tr>
+      <tr><td>Kontigensi</td><td class="money">10%</td><td>Simpan buffer.</td></tr>
+    </tbody></table>
+  </div></div>
+  <div class="pane" data-pane="flow"><div class="card"><h3>Flow Dewan</h3>
+    <div class="grid">
+      <div class="tile"><b>Zon A — Entrance</b><small>Welcome board, QR guestbook, check-in, signage.</small></div>
+      <div class="tile"><b>Zon B — Pelamin</b><small>Laluan foto tidak bertembung dengan laluan buffet.</small></div>
+      <div class="tile"><b>Zon C — Buffet</b><small>Untuk 1000 pax, minta sekurang-kurangnya 2 line jika mampu.</small></div>
+      <div class="tile"><b>Zon D — VIP & Keluarga</b><small>Meja reserved jelas, usher khas untuk tetamu penting.</small></div>
+    </div>
+  </div></div>
+`,
+lelaki: `
+  <div class="tabs"><button class="tab-btn active" data-pane="brief">Brief</button><button class="tab-btn" data-pane="checklist">Checklist</button></div>
+  <div class="pane active" data-pane="brief"><div class="card"><h3>Brief Majlis Sebelah Lelaki</h3>
+    <p>28 November 2026. Butiran penuh ikut pihak Aiman Aizzat Mohd Yusof. Fokus keluarga perempuan ialah hadir dengan tertib, selaras pakaian, dan jaga protokol rombongan.</p>
+    <div class="grid"><div class="tile"><b>Role keluarga perempuan</b><small>Datang sebagai rombongan keluarga pengantin perempuan.</small></div><div class="tile"><b>Pakaian</b><small>Selaraskan warna keluarga teras supaya kemas dalam gambar.</small></div></div>
+  </div></div>
+  <div class="pane" data-pane="checklist"><div class="card"><h3>Checklist Sebelah Lelaki</h3><div class="checklist">
+    <div class="check"><span class="box"></span><div><b>Sahkan lokasi & masa</b><br>Minta pihak lelaki kongsi tentatif dan dress code selewat-lewatnya awal November.</div></div>
+    <div class="check"><span class="box"></span><div><b>Susun rombongan keluarga</b><br>Siapa hadir, berapa kereta, siapa bawa ibu bapa/keluarga utama.</div></div>
+  </div></div></div>
+`,
+timeline: `
+  <div class="tabs"><button class="tab-btn active" data-pane="master">Master</button><button class="tab-btn" data-pane="lastweek">Minggu Akhir</button></div>
+  <div class="pane active" data-pane="master"><div class="card"><h3>Dateline Master</h3>
+    <table><thead><tr><th>Tarikh Akhir</th><th>Kerja</th><th>Status</th></tr></thead><tbody>
+      <tr><td>15 Jul 2026</td><td>Lock tema, warna, konsep majlis, ketua projek keluarga.</td><td><span class="status todo">Perlu buat</span></td></tr>
+      <tr><td>31 Jul 2026</td><td>Booking/confirm vendor utama: deco, photo/video, MUA, MC, PA.</td><td><span class="status todo">Perlu buat</span></td></tr>
+      <tr><td>7–15 Ogos 2026</td><td>Mula fasa serius dokumen nikah: SPPIM, HIV, wali, saksi, kursus kahwin.</td><td><span class="status urgent">Jangan lewat</span></td></tr>
+      <tr><td>31 Ogos 2026</td><td>Kad digital siap, guest list 80%, doorgift shortlist.</td><td><span class="status todo">Perlu buat</span></td></tr>
+      <tr><td>14 Sep 2026</td><td>Mula edaran jemputan awal/VIP, order doorgift.</td><td><span class="status todo">Perlu buat</span></td></tr>
+      <tr><td>30 Sep 2026</td><td>Jemputan utama keluar, MC dapat skrip kasar, tentatif V1 siap.</td><td><span class="status todo">Perlu buat</span></td></tr>
+      <tr><td>31 Okt 2026</td><td>Briefing vendor & krew; rehearsal ringkas nikah/resepsi.</td><td><span class="status urgent">Wajib</span></td></tr>
+      <tr><td>7 Nov 2026</td><td>Majlis nikah.</td><td><span class="status done">Event</span></td></tr>
+      <tr><td>14 Nov 2026</td><td>Resepsi pihak perempuan.</td><td><span class="status done">Event</span></td></tr>
+      <tr><td>28 Nov 2026</td><td>Majlis pihak lelaki.</td><td><span class="status done">Event</span></td></tr>
+    </tbody></table>
+  </div></div>
+  <div class="pane" data-pane="lastweek"><div class="card"><h3>Minggu Akhir Sebelum Nikah</h3><div class="checklist">
+    <div class="check"><span class="box"></span><div><b>31 Okt</b><br>Briefing akhir semua vendor & krew.</div></div>
+    <div class="check"><span class="box"></span><div><b>3 Nov</b><br>Semak semua dokumen nikah dan cincin/mas kahwin.</div></div>
+    <div class="check"><span class="box"></span><div><b>5 Nov</b><br>Wedding kit lengkap dalam satu beg khas.</div></div>
+  </div></div></div>
+`,
+jemputan: `
+  <div class="tabs"><button class="tab-btn active" data-pane="brief">Brief</button><button class="tab-btn" data-pane="kategori">Kategori</button><button class="tab-btn" data-pane="deadline">Deadline</button></div>
+  <div class="pane active" data-pane="brief"><div class="card"><h3>Jemputan & RSVP</h3><p>Untuk 800–1000 pax, jemputan perlu dikawal dengan kategori. Jangan tunggu kad siap baru susun nama.</p><div class="note">Cadangan: WhatsApp personal untuk jemputan penting, bukan blast umum sahaja. Sediakan RSVP simple.</div></div></div>
+  <div class="pane" data-pane="kategori"><div class="card"><h3>Kategori Tetamu</h3><div class="grid"><div class="tile"><b>Kategori A</b><small>Keluarga teras, saudara rapat, pihak besan.</small></div><div class="tile"><b>Kategori B</b><small>Sahabat rapat, kenalan kerja, rakan projek, komuniti.</small></div><div class="tile"><b>Kategori C</b><small>VIP, guru, tokoh, pelanggan, kenalan rasmi.</small></div><div class="tile"><b>Kategori D</b><small>Open invite / kenalan umum jika kapasiti masih ada.</small></div></div></div></div>
+  <div class="pane" data-pane="deadline"><div class="card"><h3>Dateline Jemputan</h3><table><thead><tr><th>Tarikh</th><th>Tindakan</th><th>Nota</th></tr></thead><tbody><tr><td>31 Ogos</td><td>Design kad digital siap.</td><td>Nama penuh, lokasi, map, RSVP.</td></tr><tr><td>14 Sep</td><td>Jemputan awal/VIP.</td><td>Untuk tetamu jauh dan penting.</td></tr><tr><td>30 Sep</td><td>Jemputan utama keluar.</td><td>WhatsApp personal.</td></tr><tr><td>14 Okt</td><td>Follow-up RSVP.</td><td>Semak jumlah sebenar.</td></tr></tbody></table></div></div>
+`,
+bajet: `
+  <div class="tabs"><button class="tab-btn active" data-pane="master">Master</button><button class="tab-btn" data-pane="doorgift">Doorgift</button></div>
+  <div class="pane active" data-pane="master"><div class="card"><h3>Bajet Keseluruhan</h3>
+    <table><thead><tr><th>Kategori</th><th>Anggaran</th><th>Catatan</th></tr></thead><tbody>
+      <tr><td>Nikah: jamuan ringan</td><td class="money">RM700 – RM1,000</td><td>±100 pax.</td></tr>
+      <tr><td>Resepsi: dewan & catering</td><td class="money">RM25,000</td><td>Sudah booking.</td></tr>
+      <tr><td>Doorgift</td><td class="money">RM2,200 – RM8,800</td><td>1,100 unit × RM2–RM8.</td></tr>
+      <tr><td>Pelamin/deco</td><td class="money">TBC</td><td>Bergantung konsep Royal Palace.</td></tr>
+      <tr><td>Photo/video</td><td class="money">TBC</td><td>Cadang gabung 7 & 14 Nov.</td></tr>
+      <tr><td>Signage/printing</td><td class="money">RM300 – RM1,000</td><td>Welcome board, meja, QR, tag krew.</td></tr>
+      <tr><td>Kontigensi</td><td class="money">10%</td><td>Buffer last minute.</td></tr>
+    </tbody></table><div class="note"><b>Anggaran minimum jelas:</b> RM25,700 – RM26,000 belum termasuk doorgift, deco, photo/video, pakaian dan kontigensi.</div>
+  </div></div>
+  <div class="pane" data-pane="doorgift"><div class="card"><h3>Doorgift</h3><table><thead><tr><th>Bajet/unit</th><th>Cadangan</th><th>Jumlah 1,100 unit</th></tr></thead><tbody><tr><td>RM2–RM4</td><td>Kurma, coklat mini, kacang.</td><td class="money">RM2,200 – RM4,400</td></tr><tr><td>RM5–RM8</td><td>Madu kecil, pouch, tasbih digital, mini perfume.</td><td class="money">RM5,500 – RM8,800</td></tr></tbody></table></div></div>
+`,
+krew: `
+  <div class="tabs"><button class="tab-btn active" data-pane="role">Role</button><button class="tab-btn" data-pane="briefing">Briefing</button></div>
+  <div class="pane active" data-pane="role"><div class="card"><h3>Setup Krew Majlis</h3><table><thead><tr><th>Peranan</th><th>Tugas</th><th>Nama PIC</th></tr></thead><tbody>
+    <tr><td>Event Director</td><td>Keputusan utama, urus flow besar.</td><td>Isi kemudian</td></tr>
+    <tr><td>Floor Manager</td><td>Kawal pergerakan dewan dan cue majlis.</td><td>Isi kemudian</td></tr>
+    <tr><td>Vendor Coordinator</td><td>Hubungi catering, deco, photo/video, PA, MC.</td><td>Isi kemudian</td></tr>
+    <tr><td>Family Liaison</td><td>Panggil keluarga untuk foto, VIP, protokol.</td><td>Isi kemudian</td></tr>
+    <tr><td>Usher/VIP Team</td><td>Sambut tetamu penting dan saudara jauh.</td><td>Isi kemudian</td></tr>
+    <tr><td>Doorgift Team</td><td>Agihan terkawal, simpan stok buffer.</td><td>Isi kemudian</td></tr>
+    <tr><td>Runner</td><td>Urus kerja mengejut.</td><td>Isi kemudian</td></tr>
+  </tbody></table></div></div>
+  <div class="pane" data-pane="briefing"><div class="card"><h3>Briefing Krew</h3><div class="checklist"><div class="check"><span class="box"></span><div><b>WhatsApp group krew</b><br>Masukkan tentatif, nombor vendor, floor plan, parking map dan emergency contact.</div></div><div class="check"><span class="box"></span><div><b>Briefing 31 Okt 2026</b><br>Semua PIC mesti jelas tugas dan chain of command.</div></div></div></div></div>
+`,
+tema: `
+  <div class="tabs"><button class="tab-btn active" data-pane="brief">Brief</button><button class="tab-btn" data-pane="visual">Visual</button><button class="tab-btn" data-pane="ayat">Ayat Tema</button></div>
+  <div class="pane active" data-pane="brief"><div class="card"><h3>Tema Induk</h3><p><b>Barakah Royal Minimalist</b> — sesuai dengan nikah di masjid, resepsi di Royal Palace dan mood keluarga yang kemas, lembut dan beradab.</p><p><span class="pill">Ivory</span><span class="pill">Champagne Gold</span><span class="pill">Soft Sage</span><span class="pill">Dusty Rose</span></p></div></div>
+  <div class="pane" data-pane="visual"><div class="card"><h3>Cadangan Visual</h3><div class="grid"><div class="tile"><b>Nikah</b><small>Putih/ivory, bunga lembut, ringkas, sesuai masjid.</small></div><div class="tile"><b>Resepsi</b><small>Lebih royal: pelamin tinggi, lighting warm, meja VIP kemas.</small></div><div class="tile"><b>Kad Digital</b><small>Minimal, nama jelas, map & RSVP.</small></div><div class="tile"><b>Doorgift</b><small>Label doa ringkas, warna cream-gold.</small></div></div></div></div>
+  <div class="pane" data-pane="ayat"><div class="card"><h3>Ayat Tema Ringkas</h3><div class="note">“Dengan kasih keluarga dan doa yang mengiringi, kami meraikan penyatuan dua hati dalam barakah, sederhana dalam rasa, indah dalam kenangan.”</div></div></div>
+`
+};
+
+function initSupabase(){
+  const ok = WEDDING_CONFIG.supabaseUrl && !WEDDING_CONFIG.supabaseUrl.includes("PASTE_") &&
+             WEDDING_CONFIG.supabaseAnonKey && !WEDDING_CONFIG.supabaseAnonKey.includes("PASTE_");
+  if(ok && window.supabase){
+    sb = window.supabase.createClient(WEDDING_CONFIG.supabaseUrl, WEDDING_CONFIG.supabaseAnonKey);
+  }
+}
+
+function safeHtml(str){
+  return String(str || "").replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+
+function renderMenu(){
+  const grid = document.getElementById("menuGrid");
+  grid.innerHTML = "";
+  menuItems.forEach(item => {
+    if(item.adminOnly && currentRole !== "superadmin") return;
+    const card = document.createElement("article");
+    card.className = "menu-card";
+    card.tabIndex = 0;
+    card.setAttribute("role","button");
+    card.dataset.layer = item.key;
+    card.innerHTML = `<div class="icon">${item.icon}</div><h3>${item.title}</h3><p>${item.desc}</p><span class="openhint">Buka layer →</span>`;
+    card.addEventListener("click", () => openLayer(item.key));
+    card.addEventListener("keydown", e => {
+      if(e.key === "Enter" || e.key === " "){ e.preventDefault(); openLayer(item.key); }
+    });
+    grid.appendChild(card);
+  });
+}
+
+function updateModebar(){
+  const modeText = document.getElementById("modeText");
+  const logoutBtn = document.getElementById("logoutBtn");
+  if(currentRole === "superadmin"){
+    modeText.textContent = "Mode Superadmin · boleh baca semua nota & sync Supabase";
+    logoutBtn.hidden = false;
+  } else if(currentRole === "user"){
+    modeText.textContent = "Mode Krew/User · boleh isi & simpan nota tindakan";
+    logoutBtn.hidden = false;
+  } else {
+    modeText.textContent = "Mode tetamu · nota disembunyikan";
+    logoutBtn.hidden = true;
+  }
+  renderMenu();
+}
+
+function bindTabs(root){
+  root.querySelectorAll(".tabs").forEach(tabGroup => {
+    const buttons = tabGroup.querySelectorAll(".tab-btn");
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const paneName = btn.dataset.pane;
+        const scope = tabGroup.parentElement;
+        buttons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        scope.querySelectorAll(".pane").forEach(p => p.classList.toggle("active", p.dataset.pane === paneName));
+      });
+    });
+  });
+}
+
+async function openLayer(key){
+  currentLayerKey = key;
+  const meta = layerMeta[key];
+  if(!meta) return;
+  lastFocused = document.activeElement;
+  document.getElementById("layerTitle").textContent = meta.title;
+  document.getElementById("layerDesc").textContent = meta.desc;
+  const body = document.getElementById("layerBody");
+  body.innerHTML = key === "admin" ? adminDashboardHtml() : (content[key] || "");
+  bindTabs(body);
+
+  if(key === "admin"){
+    if(currentRole !== "superadmin"){
+      body.innerHTML = `<div class="card"><h3>Akses diperlukan</h3><p>Masukkan PIN Superadmin untuk buka dashboard nota.</p></div>`;
+    } else {
+      await loadAdminNotes();
+    }
+  } else if(currentRole === "user" || currentRole === "superadmin"){
+    body.insertAdjacentHTML("beforeend", noteBoxHtml(key, meta.title));
+    bindNoteEvents(key, meta.title);
+    await loadNoteIntoForm(key);
+  } else {
+    body.insertAdjacentHTML("beforeend", `<div class="note-box"><h3>Nota Tindakan</h3><p>Masukkan PIN user/krew atau superadmin untuk buka ruang nota.</p><button class="mini-btn gold" onclick="showPinModal()">Masuk PIN</button></div>`);
+  }
+
+  document.getElementById("overlay").classList.add("show");
+  document.getElementById("drawer").classList.add("show");
+  document.getElementById("drawer").setAttribute("aria-hidden","false");
+  document.body.style.overflow = "hidden";
+  document.getElementById("closeBtn").focus();
+}
+
+function closeLayer(){
+  document.getElementById("overlay").classList.remove("show");
+  document.getElementById("drawer").classList.remove("show");
+  document.getElementById("drawer").setAttribute("aria-hidden","true");
+  document.body.style.overflow = "";
+  document.getElementById("layerBody").innerHTML = "";
+  if(lastFocused && typeof lastFocused.focus === "function") lastFocused.focus();
+}
+
+function noteBoxHtml(key, title){
+  return `
+    <section class="note-box" id="noteBox">
+      <h3>Nota Tindakan — ${safeHtml(title)}</h3>
+      <p class="tiny">Nota ini disimpan localStorage dahulu. Jika Supabase config sudah diisi, ia akan sync ke table <b>${WEDDING_CONFIG.notesTable}</b>.</p>
+      <div class="form-grid">
+        <div><label>Status</label><select id="noteStatus"><option value="belum_mula">Belum Mula</option><option value="sedang_jalan">Sedang Jalan</option><option value="follow_up">Follow-up</option><option value="selesai">Selesai</option></select></div>
+        <div><label>PIC</label><input id="notePic" placeholder="Nama PIC / krew" /></div>
+        <div><label>Tarikh Follow-up</label><input id="noteFollowup" type="date" /></div>
+      </div>
+      <label>Upload gambar / bukti / resit</label>
+      <input id="noteImage" type="file" accept="image/*" />
+      <div class="image-preview" id="imagePreview"></div>
+      <label>Nota</label>
+      <textarea id="noteText" placeholder="Tulis nota tindakan, isu, keputusan vendor, follow-up, dll."></textarea>
+      <div class="note-actions">
+        <button class="mini-btn gold" id="saveNoteBtn">Simpan Nota</button>
+        <button class="mini-btn" id="refreshNoteBtn">Refresh Nota</button>
+        <button class="mini-btn" id="waDraftBtn">Draft WhatsApp</button>
+      </div>
+      <p class="tiny" id="noteMsg"></p>
+    </section>
+  `;
+}
+
+function localKey(componentKey){ return `wedding_note_${WEDDING_CONFIG.projectId}_${componentKey}`; }
+
+function readLocalNote(componentKey){
+  try{ return JSON.parse(localStorage.getItem(localKey(componentKey)) || "null"); }
+  catch(e){ return null; }
+}
+
+function saveLocalNote(note){
+  localStorage.setItem(localKey(note.component_key), JSON.stringify(note));
+}
+
+function allLocalNotes(){
+  const arr = [];
+  for(let i=0;i<localStorage.length;i++){
+    const k = localStorage.key(i);
+    if(k && k.startsWith(`wedding_note_${WEDDING_CONFIG.projectId}_`)){
+      try{ const n = JSON.parse(localStorage.getItem(k)); if(n) arr.push(n); }catch(e){}
+    }
+  }
+  return arr.sort((a,b) => String(b.updated_at||"").localeCompare(String(a.updated_at||"")));
+}
+
+async function loadNote(componentKey){
+  const local = readLocalNote(componentKey);
+  if(sb){
+    try{
+      const {data, error} = await sb
+        .from(WEDDING_CONFIG.notesTable)
+        .select("*")
+        .eq("project_id", WEDDING_CONFIG.projectId)
+        .eq("component_key", componentKey)
+        .maybeSingle();
+      if(error) throw error;
+      if(data){
+        saveLocalNote(data);
+        return data;
+      }
+    }catch(err){
+      console.warn("Supabase load note failed, using localStorage:", err);
+    }
+  }
+  return local;
+}
+
+async function loadNoteIntoForm(componentKey){
+  const note = await loadNote(componentKey);
+  if(!note) return;
+  document.getElementById("noteStatus").value = note.status || "belum_mula";
+  document.getElementById("notePic").value = note.pic || "";
+  document.getElementById("noteFollowup").value = note.followup_date || "";
+  document.getElementById("noteText").value = note.note || "";
+  const preview = document.getElementById("imagePreview");
+  if(note.image_url || note.local_image_data){
+    const src = note.image_url || note.local_image_data;
+    preview.style.display = "block";
+    preview.innerHTML = `<img src="${safeHtml(src)}" alt="Lampiran nota" /><p class="tiny">${safeHtml(note.image_name || "Lampiran")}</p>`;
+  }
+}
+
+function bindNoteEvents(componentKey, title){
+  const imgInput = document.getElementById("noteImage");
+  imgInput.addEventListener("change", () => {
+    const file = imgInput.files && imgInput.files[0];
+    const preview = document.getElementById("imagePreview");
+    if(!file){ preview.style.display = "none"; preview.innerHTML = ""; return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      preview.style.display = "block";
+      preview.innerHTML = `<img src="${reader.result}" alt="Preview gambar" /><p class="tiny">${safeHtml(file.name)}</p>`;
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById("saveNoteBtn").addEventListener("click", () => saveNote(componentKey, title, true));
+  document.getElementById("refreshNoteBtn").addEventListener("click", () => loadNoteIntoForm(componentKey));
+  document.getElementById("waDraftBtn").addEventListener("click", async () => {
+    const note = buildNoteFromForm(componentKey, title);
+    showWhatsAppModal(note);
+  });
+}
+
+function buildNoteFromForm(componentKey, title){
+  return {
+    project_id: WEDDING_CONFIG.projectId,
+    component_key: componentKey,
+    component_title: title,
+    status: document.getElementById("noteStatus")?.value || "belum_mula",
+    pic: document.getElementById("notePic")?.value || "",
+    followup_date: document.getElementById("noteFollowup")?.value || null,
+    note: document.getElementById("noteText")?.value || "",
+    role: currentRole,
+    updated_by: currentRole === "superadmin" ? "Superadmin" : "User/Krew",
+    updated_at: new Date().toISOString()
+  };
+}
+
+async function fileToDataUrl(file){
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadImageIfAny(componentKey){
+  const input = document.getElementById("noteImage");
+  const file = input?.files?.[0];
+  if(!file) return {};
+  if(file.size > 5 * 1024 * 1024) throw new Error("Saiz gambar melebihi 5MB. Sila kecilkan dahulu.");
+
+  if(sb){
+    const cleanName = file.name.replace(/[^\w.\-]+/g, "_");
+    const path = `${WEDDING_CONFIG.projectId}/${componentKey}/${Date.now()}-${cleanName}`;
+    const {error: uploadError} = await sb.storage.from(WEDDING_CONFIG.storageBucket).upload(path, file, {cacheControl:"3600", upsert:true});
+    if(uploadError) throw uploadError;
+    const {data} = sb.storage.from(WEDDING_CONFIG.storageBucket).getPublicUrl(path);
+    return {image_url:data.publicUrl, image_path:path, image_name:file.name};
+  } else {
+    const dataUrl = await fileToDataUrl(file);
+    return {local_image_data:dataUrl, image_name:file.name};
+  }
+}
+
+async function saveNote(componentKey, title, showWA){
+  const msg = document.getElementById("noteMsg");
+  try{
+    msg.textContent = "Menyimpan nota...";
+    let note = buildNoteFromForm(componentKey, title);
+    const imageData = await uploadImageIfAny(componentKey);
+    if(!imageData.image_url && !imageData.local_image_data){
+      const existing = readLocalNote(componentKey) || {};
+      note.image_url = existing.image_url || "";
+      note.image_path = existing.image_path || "";
+      note.image_name = existing.image_name || "";
+      note.local_image_data = existing.local_image_data || "";
+    }
+    note = {...note, ...imageData};
+    saveLocalNote(note);
+
+    if(sb){
+      const dbNote = {...note};
+      delete dbNote.local_image_data; // jangan simpan base64 dalam DB
+      const {error} = await sb
+        .from(WEDDING_CONFIG.notesTable)
+        .upsert(dbNote, {onConflict:"project_id,component_key"});
+      if(error) throw error;
+      msg.textContent = "Nota disimpan ke localStorage + Supabase.";
+    } else {
+      msg.textContent = "Nota disimpan ke localStorage. Isi Supabase URL/key untuk sync cloud.";
+    }
+    if(showWA) showWhatsAppModal(note);
+  }catch(err){
+    console.error(err);
+    msg.textContent = "Ralat simpan nota: " + (err.message || err);
+  }
+}
+
+function buildWhatsAppMessage(note){
+  const statusMap = {belum_mula:"Belum Mula", sedang_jalan:"Sedang Jalan", follow_up:"Follow-up", selesai:"Selesai"};
+  const lines = [
+    "[WEDDING NOTE: Amelyn & Aiman 2026]",
+    "",
+    "Komponen: " + (note.component_title || note.component_key),
+    "Status: " + (statusMap[note.status] || note.status || "-"),
+    "PIC: " + (note.pic || "-"),
+    "Tarikh Follow-up: " + (note.followup_date || "-"),
+    "",
+    "Nota:",
+    note.note || "-",
+  ];
+  if(note.image_url){
+    lines.push("", "Gambar/Lampiran:", note.image_url);
+  } else if(note.image_name){
+    lines.push("", "Gambar/Lampiran:", note.image_name + " (sila buka sistem untuk lihat / upload ke Supabase untuk dapat link)");
+  }
+  lines.push("", "Dihantar dari Wedding Planner.");
+  return lines.join("\n");
+}
+
+function showWhatsAppModal(note){
+  const msg = buildWhatsAppMessage(note);
+  lastWhatsAppMessage = msg;
+  document.getElementById("waPreview").value = msg;
+  document.getElementById("waSend").href = `https://wa.me/${WEDDING_CONFIG.superadminWhatsapp}?text=${encodeURIComponent(msg)}`;
+  document.getElementById("waModal").classList.add("show");
+  document.getElementById("waModal").setAttribute("aria-hidden","false");
+}
+
+function adminDashboardHtml(){
+  return `
+    <div class="card">
+      <h3>Dashboard Semua Nota</h3>
+      <p>Superadmin boleh baca semua nota yang disimpan. Jika Supabase config aktif, data dibaca dari Supabase. Jika belum, data dibaca dari localStorage device ini.</p>
+      <div class="admin-filter">
+        <button class="mini-btn gold" id="refreshAdminBtn">Refresh Nota</button>
+        <button class="mini-btn" id="exportJsonBtn">Export JSON</button>
+        <button class="mini-btn" id="printAdminBtn">Print</button>
+      </div>
+      <div id="adminNotesArea"><p class="tiny">Memuatkan nota...</p></div>
+    </div>
+  `;
+}
+
+async function loadAdminNotes(){
+  const area = document.getElementById("adminNotesArea");
+  document.getElementById("refreshAdminBtn")?.addEventListener("click", loadAdminNotes);
+  document.getElementById("printAdminBtn")?.addEventListener("click", () => window.print());
+  document.getElementById("exportJsonBtn")?.addEventListener("click", exportNotesJson);
+
+  let notes = [];
+  if(sb){
+    try{
+      const {data, error} = await sb
+        .from(WEDDING_CONFIG.notesTable)
+        .select("*")
+        .eq("project_id", WEDDING_CONFIG.projectId)
+        .order("updated_at", {ascending:false});
+      if(error) throw error;
+      notes = data || [];
+      notes.forEach(saveLocalNote);
+    }catch(err){
+      console.warn("Supabase admin load failed:", err);
+      notes = allLocalNotes();
+    }
+  } else {
+    notes = allLocalNotes();
+  }
+  area.innerHTML = renderAdminNotes(notes);
+  area.querySelectorAll("[data-wa-note]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.dataset.waNote);
+      showWhatsAppModal(notes[idx]);
+    });
+  });
+}
+
+function renderAdminNotes(notes){
+  if(!notes.length) return `<div class="note">Belum ada nota disimpan.</div>`;
+  const statusMap = {belum_mula:"Belum Mula", sedang_jalan:"Sedang Jalan", follow_up:"Follow-up", selesai:"Selesai"};
+  return notes.map((n, idx) => `
+    <div class="admin-note-card">
+      <h4>${safeHtml(n.component_title || n.component_key)} <span class="status todo">${safeHtml(statusMap[n.status] || n.status || "-")}</span></h4>
+      <div class="tiny">PIC: <b>${safeHtml(n.pic || "-")}</b> · Follow-up: <b>${safeHtml(n.followup_date || "-")}</b> · Updated: ${safeHtml(n.updated_at || "-")}</div>
+      <p>${safeHtml(n.note || "-")}</p>
+      ${n.image_url ? `<a href="${safeHtml(n.image_url)}" target="_blank" rel="noopener"><img class="thumb" src="${safeHtml(n.image_url)}" alt="Lampiran" /></a>` : ""}
+      ${n.local_image_data ? `<img class="thumb" src="${safeHtml(n.local_image_data)}" alt="Lampiran local" />` : ""}
+      <button class="mini-btn" data-wa-note="${idx}">Hantar WhatsApp</button>
+    </div>
+  `).join("");
+}
+
+function exportNotesJson(){
+  const notes = allLocalNotes();
+  const blob = new Blob([JSON.stringify(notes, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `wedding_notes_${WEDDING_CONFIG.projectId}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function showPinModal(){
+  document.getElementById("pinMsg").textContent = "";
+  document.getElementById("pinInput").value = "";
+  document.getElementById("pinModal").classList.add("show");
+  document.getElementById("pinModal").setAttribute("aria-hidden","false");
+  setTimeout(() => document.getElementById("pinInput").focus(), 50);
+}
+
+function hidePinModal(){
+  document.getElementById("pinModal").classList.remove("show");
+  document.getElementById("pinModal").setAttribute("aria-hidden","true");
+}
+
+function tryPin(){
+  const pin = document.getElementById("pinInput").value.trim();
+  const msg = document.getElementById("pinMsg");
+  if(pin === WEDDING_CONFIG.superadminPin){
+    currentRole = "superadmin";
+  } else if(pin === WEDDING_CONFIG.userPin){
+    currentRole = "user";
+  } else {
+    msg.textContent = "PIN tidak tepat. Cuba semula.";
+    return;
+  }
+  localStorage.setItem("wedding_role", currentRole);
+  updateModebar();
+  hidePinModal();
+  if(currentLayerKey && document.getElementById("drawer").classList.contains("show")){
+    openLayer(currentLayerKey);
+  }
+}
+
+function logout(){
+  currentRole = "guest";
+  localStorage.removeItem("wedding_role");
+  updateModebar();
+  if(document.getElementById("drawer").classList.contains("show")) closeLayer();
+}
+
+function updateCountdown(){
+  const target = new Date("2026-11-07T09:00:00+08:00");
+  const now = new Date();
+  const diff = target - now;
+  const days = Math.max(0, Math.ceil(diff / (1000*60*60*24)));
+  const weeks = Math.max(0, Math.ceil(days / 7));
+  document.getElementById("cdDays").textContent = days;
+  document.getElementById("cdWeeks").textContent = weeks;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  initSupabase();
+  updateCountdown();
+  updateModebar();
+
+  document.getElementById("overlay").addEventListener("click", closeLayer);
+  document.getElementById("closeBtn").addEventListener("click", closeLayer);
+  document.getElementById("backBtn").addEventListener("click", closeLayer);
+  document.getElementById("loginBtn").addEventListener("click", showPinModal);
+  document.getElementById("logoutBtn").addEventListener("click", logout);
+  document.getElementById("pinClose").addEventListener("click", hidePinModal);
+  document.getElementById("pinSubmit").addEventListener("click", tryPin);
+  document.getElementById("pinInput").addEventListener("keydown", e => { if(e.key === "Enter") tryPin(); });
+  document.getElementById("waClose").addEventListener("click", () => document.getElementById("waModal").classList.remove("show"));
+  document.getElementById("waJustClose").addEventListener("click", () => document.getElementById("waModal").classList.remove("show"));
+
+  document.addEventListener("keydown", e => {
+    if(e.key === "Escape"){
+      if(document.getElementById("pinModal").classList.contains("show")) hidePinModal();
+      else if(document.getElementById("waModal").classList.contains("show")) document.getElementById("waModal").classList.remove("show");
+      else if(document.getElementById("drawer").classList.contains("show")) closeLayer();
+    }
+  });
+});
+
+  </script>
+</body>
+</html>
