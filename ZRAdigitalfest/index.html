@@ -1248,6 +1248,7 @@
         <span class="role-chip" id="roleChip">👁️ Mode: Lihat sahaja</span>
         <button class="pin-btn" type="button" id="bajetPinBtn">🔐 Masuk PIN</button>
         <button class="pin-btn" type="button" id="logoutBtn" style="display:none">🚪 Log keluar</button>
+        <button class="pin-btn" type="button" id="toPayBtn" style="display:none">💳 Items To Pay<span class="notif" id="toPayNotif" style="display:none">0</span></button>
         <button class="pin-btn" type="button" id="reviewBtn" style="display:none">🗂️ Master Dashboard<span class="notif" id="reviewNotif" style="display:none">0</span></button>
       </div>
 
@@ -1338,6 +1339,20 @@
     </div>
   </div>
 
+  <!-- Items To Pay (Akaun) -->
+  <div class="layer" id="layerToPay" aria-hidden="true">
+    <div class="layer-inner">
+      <div class="layer-head">
+        <div>
+          <span class="eyebrow">💳 Jabatan Akaun</span>
+          <h2>Items To Pay</h2>
+        </div>
+        <button class="layer-back" type="button" data-close-layer="layerToPay">✕ Tutup</button>
+      </div>
+      <div id="toPayBody"></div>
+    </div>
+  </div>
+
   <!-- Lampiran & Nota (resit/invoice/gambar) -->
   <div class="layer" id="layerEntry" aria-hidden="true">
     <div class="layer-inner">
@@ -1376,6 +1391,21 @@
       <div class="post-list" id="postList"></div>
       <button class="btn primary" type="button" id="postConfirm" style="width:100%;margin-top:12px">✅ Pos ke item dipilih</button>
       <p class="modal-msg" id="postMsg"></p>
+    </div>
+  </div>
+
+  <!-- Tandai invoice DIBAYAR (reconcile + resit) -->
+  <div class="modal" id="payModal" aria-hidden="true">
+    <div class="modal-card" style="width:min(520px,100%)">
+      <button class="modal-close" type="button" id="payClose">×</button>
+      <h2>💵 Tandai Invoice Dibayar</h2>
+      <p id="payInfo" class="audit"></p>
+      <label class="audit">No. rujukan bayaran / resit</label>
+      <input id="payRef" type="text" placeholder="cth: Cek 10023 / Resit #A-552">
+      <label class="audit" style="display:block;margin-top:8px">Lampir resit bayaran (gambar)</label>
+      <input id="payFile" type="file" accept="image/*">
+      <button class="btn primary" type="button" id="payConfirm" style="width:100%;margin-top:14px">✅ Sahkan Dibayar &amp; Reconcile</button>
+      <p class="modal-msg" id="payMsg"></p>
     </div>
   </div>
 
@@ -1875,13 +1905,19 @@
 
   function getActual(key){ return state.actuals[key] || { item_key:key, actual_amount:0, status:"draf", admin_note:"", superadmin_note:"", updated_by:"", approved_by:"", approved_at:null }; }
 
+  // Actual kini DIKIRA auto dari resit/invoice yang sudah DIBAYAR (pay_status='paid'). Bukan keyin manual.
+  function isFinancial(r){ return (r.kind==="resit"||r.kind==="invoice") && Number(r.amount||0)>0; }
+  function countsToActual(r){ return isFinancial(r) && r.pay_status==="paid"; }
+  function actualOf(key){ return (state.receipts[key]||[]).reduce((s,r)=> s + (countsToActual(r)?Number(r.amount||0):0), 0); }
+  function toPayList(){ const out=[]; Object.values(state.receipts).forEach(arr=> arr.forEach(r=>{ if(r.kind==="invoice" && r.pay_status==="to_pay") out.push(r); })); return out.sort((a,b)=> new Date(a.created_at)-new Date(b.created_at)); }
+
   // ---- Summary / tiles ----
   function catTotals(cat){
     let budget=0, actual=0, approved=0, pending=0;
     CATALOG[cat].items.forEach(it=>{
       budget += it.budget;
       const a = getActual(it.key);
-      actual += Number(a.actual_amount||0);
+      actual += actualOf(it.key);
       if(a.status==="diluluskan") approved++;
       if(a.status==="menunggu") pending++;
     });
@@ -1915,6 +1951,7 @@
     $("logoutBtn").style.display = role==="guest" ? "none" : "inline-flex";
     $("bajetPinBtn").style.display = role==="guest" ? "inline-flex" : "none";
     $("reviewBtn").style.display = role==="superadmin" ? "inline-flex" : "none";
+    $("toPayBtn").style.display = (role==="admin"||role==="superadmin") ? "inline-flex" : "none";
     updateNotif();
   }
   const canEdit = () => role==="admin" || role==="superadmin";
@@ -1972,21 +2009,18 @@
     const t = catTotals(cat);
     const rows = c.items.map(it=>{
       const a = getActual(it.key);
-      const editable = canEdit() && (a.status!=="diluluskan" || isSA());
-      const actualCell = canEdit()
-        ? `<input class="actual-input" type="number" min="0" step="100" value="${a.actual_amount||""}" data-key="${it.key}" ${editable?"":"disabled"} placeholder="0">`
-        : `<b class="actual-static">${fmt(a.actual_amount)}</b>`;
+      const actual = actualOf(it.key);
       const nEnt = (state.receipts[it.key]||[]).length;
       const attn = itemAttn(it.key);
       const attachBtn = `<button class="row-attach" data-attach="${it.key}" title="Lampiran & nota">📎 ${nEnt||""}${(isSA()&&attn)?`<span class="attn-dot">${attn}</span>`:""}</button>`;
       return `<div class="bjt-item">
         <div class="it-head">
           <button class="row-title" data-detail="${it.key}"><span class="bjt-num">${it.no}.</span> ${it.title}</button>
-          <div class="it-actions">${statusBadge(a.status)}${attachBtn}</div>
+          <div class="it-actions">${attachBtn}</div>
         </div>
         <div class="bjt-figs">
           <div class="fig-cell"><span>Bajet 🔒</span><b class="locked">${fmt(it.budget)}</b></div>
-          <div class="fig-cell"><span>Actual Kos ✎</span>${actualCell}</div>
+          <div class="fig-cell"><span>Actual (auto)</span><b>${fmt(actual)}</b></div>
         </div>
       </div>`;
     }).join("");
@@ -1998,47 +2032,32 @@
         <span>Actual: ${fmt(t.actual)}</span>
         <span>Varian: ${varHtml(t.actual-t.budget)}</span>
       </div>
-      ${canEdit()?'<p class="audit" style="margin-top:14px">Tip: edit Actual Kos lalu klik luar kotak untuk simpan. Klik tajuk untuk resit, gambar &amp; nota.</p>':'<p class="audit" style="margin-top:14px">Mode lihat sahaja. Masuk PIN untuk mengisi kos sebenar.</p>'}
+      <p class="audit" style="margin-top:14px">Actual dikira automatik dari resit/invoice yang <b>sudah dibayar</b>. Klik tajuk item untuk urus resit, invoice &amp; nota.</p>
     `;
     $("listBody").querySelectorAll(".row-title").forEach(b=> b.addEventListener("click", ()=> openDetail(b.dataset.detail)));
     $("listBody").querySelectorAll("[data-attach]").forEach(b=> b.addEventListener("click", ()=> openEntry(b.dataset.attach)));
-    $("listBody").querySelectorAll(".actual-input").forEach(inp=> inp.addEventListener("change", ()=> saveActualInline(inp.dataset.key, inp.value)));
   }
 
-  async function saveActualInline(key, val){
-    const amount = Number(val||0);
-    await saveActual(key, { actual_amount: amount });
-    renderList(currentCat); renderSummary();
-  }
-
-  // ---- Save actual (admin = direct upsert -> menunggu; SA = via RPC) ----
+  // ---- Simpan nota item (actual TIDAK ditaip — ia dikira auto) ----
   async function saveActual(key, patch){
     const it = ALL_ITEMS.find(i=>i.key===key);
     const cur = getActual(key);
-    const next = { ...cur, ...patch, item_key:key, category:it.category, updated_by:actorName||cur.updated_by };
-    if(isSA()){
-      next.status = patch.status || (cur.status==="diluluskan"?"diluluskan":cur.status);
-    } else {
-      // admin submission -> menunggu semakan (kecuali sudah diluluskan, admin tak boleh ubah)
-      if(cur.status==="diluluskan"){ toast("Item telah diluluskan — hanya Superadmin boleh edit", true); return; }
-      next.status = "menunggu";
-    }
-    next.updated_at = new Date().toISOString();
+    const computed = actualOf(key);
+    const next = { ...cur, ...patch, item_key:key, category:it.category, actual_amount:computed, updated_by:actorName||cur.updated_by, updated_at:new Date().toISOString() };
     state.actuals[key] = next; saveLocal();
-
     if(sbReady()){
       try{
         if(isSA()){
-          const { error } = await sb.rpc("zra_sa_set_actual", { p_pin:ZRA_CFG.superadminPin, p_item_key:key, p_category:it.category, p_amount:Number(next.actual_amount||0), p_status:next.status, p_admin_note:next.admin_note||"", p_superadmin_note:next.superadmin_note||"", p_by:actorName||"" });
+          const { error } = await sb.rpc("zra_sa_set_actual", { p_pin:ZRA_CFG.superadminPin, p_item_key:key, p_category:it.category, p_amount:computed, p_status:next.status||"draf", p_admin_note:next.admin_note||"", p_superadmin_note:next.superadmin_note||"", p_by:actorName||"" });
           if(error) throw error;
         } else {
-          const { error } = await sb.from(ZRA_CFG.actualsTable).upsert({ item_key:key, category:it.category, actual_amount:Number(next.actual_amount||0), status:"menunggu", admin_note:next.admin_note||"", updated_by:actorName||"", updated_at:next.updated_at }, { onConflict:"item_key" });
+          const { error } = await sb.from(ZRA_CFG.actualsTable).upsert({ item_key:key, category:it.category, actual_amount:computed, status:next.status||"draf", admin_note:next.admin_note||"", updated_by:actorName||"", updated_at:next.updated_at }, { onConflict:"item_key" });
           if(error) throw error;
         }
         toast("Disimpan ✓");
       }catch(e){ toast("Disimpan luar talian (DB gagal: "+(e.message||e.code||"?")+")", true); }
     } else { toast("Disimpan (luar talian)"); }
-    logActivity(isSA()?"edit_actual":"isi_actual", `${isSA()?"Edit":"Isi"} Actual ${it.title} → ${fmt(next.actual_amount)}`, `Bajet #03 · ${CATALOG[it.category].label}`);
+    logActivity("edit_note", `Nota dikemaskini — ${it.title}`, `Bajet #03 · ${CATALOG[it.category].label}`);
   }
 
   // ---- Approve / reject / delete (Superadmin via RPC) ----
@@ -2077,15 +2096,17 @@
   // ---- Lampiran / Entri (resit, invoice, nota, gambar) ----
   const KINDS = { resit:"Resit", invoice:"Invoice", nota:"Nota", gambar:"Gambar", lain:"Lain" };
   function getEntries(key){ return (state.receipts[key]||[]).slice().sort((a,b)=> new Date(b.created_at) - new Date(a.created_at)); }
-  function itemAttn(key){ return (state.receipts[key]||[]).filter(r=> !r.reviewed).length; }
-  function attnTotal(){ let n=0; Object.values(state.receipts).forEach(arr=> arr.forEach(r=>{ if(!r.reviewed) n++; })); return n; }
+  function itemAttn(key){ return (state.receipts[key]||[]).filter(r=> entryNeedsAction(r)).length; }
+  function attnTotal(){ let n=0; Object.values(state.receipts).forEach(arr=> arr.forEach(r=>{ if(entryNeedsAction(r)) n++; })); return n; }
   function updateNotif(){
     const n = attnTotal();
-    // badge hanya bermakna untuk superadmin; tunjuk di dua tempat
     ["reviewNotif","masterNotif"].forEach(idb=>{
       const badge = $(idb);
       if(badge){ badge.textContent = n; badge.style.display = (n && isSA())? "inline-grid":"none"; }
     });
+    const tp = toPayList().length;
+    const tb = $("toPayNotif");
+    if(tb){ tb.textContent = tp; tb.style.display = (tp && (role==="admin"||role==="superadmin"))? "inline-grid":"none"; }
   }
 
   async function saveEntry(key){
@@ -2144,25 +2165,41 @@
     if($("layerReview").classList.contains("open")) renderReview();
   }
 
+  function payBadge(r){
+    if(r.kind==="resit"){ return r.pay_status==="paid" ? '<span class="badge b-diluluskan">✅ Dibayar · dikira</span>' : '<span class="badge b-menunggu">🆕 Perlu lulus</span>'; }
+    if(r.kind==="invoice"){
+      if(r.pay_status==="paid") return '<span class="badge b-diluluskan">✅ Dibayar · dikira</span>';
+      if(r.pay_status==="to_pay") return '<span class="badge b-nota">⏳ Untuk dibayar (Akaun)</span>';
+      return '<span class="badge b-menunggu">🆕 Perlu lulus</span>';
+    }
+    return r.reviewed ? '<span class="badge b-diluluskan">Disemak</span>' : '<span class="badge b-menunggu">Baru</span>';
+  }
   function entryCardHtml(r, withItem){
     const it = withItem ? ALL_ITEMS.find(i=>i.key===r.item_key) : null;
     const k = r.kind||"lain";
-    const postedTo = r.posted ? ALL_ITEMS.find(i=>i.key===r.posted_to) : null;
-    const canPost = isSA() && Number(r.amount||0) > 0 && r.reviewed && !r.posted;
+    const fin = isFinancial(r);
+    let acts = "";
+    if(isSA()){
+      if(k==="resit" && r.pay_status!=="paid") acts += `<button class="btn good" data-appres="${r.item_key}|${r.id}" style="padding:6px 10px">✅ Lulus &amp; Kira</button>`;
+      if(k==="invoice" && (!r.pay_status||r.pay_status==="")) acts += `<button class="btn good" data-appinv="${r.item_key}|${r.id}" style="padding:6px 10px">✅ Lulus → Akaun</button>`;
+      if(!fin && !r.reviewed) acts += `<button class="btn good" data-rev-rcpt="${r.item_key}|${r.id}" style="padding:6px 10px">✓ Disemak</button>`;
+    }
+    if(canEdit() && k==="invoice" && r.pay_status==="to_pay") acts += `<button class="btn primary" data-pay="${r.item_key}|${r.id}" style="padding:6px 10px">💵 Tandai Dibayar</button>`;
+    if(isSA()) acts += `<button class="btn danger" data-delrcpt="${r.item_key}|${r.id}" style="padding:6px 10px">Padam</button>`;
     return `<div class="receipt">
       ${r.image_url?`<img src="${r.image_url}" data-lb="${r.image_url}" alt="lampiran">`:`<div class="receipt" style="width:86px;height:86px;border:1px dashed var(--line-soft);display:grid;place-items:center;color:var(--muted);font-size:1.6rem">📝</div>`}
       <div class="r-body">
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <span class="badge b-${k}">${KINDS[k]||k}</span>
-          ${!r.reviewed?'<span class="badge b-menunggu">Baru</span>':''}
+          ${payBadge(r)}
           <b>${r.label||"(tanpa label)"}</b> ${r.amount?`<span class="r-amt">${fmt(r.amount)}</span>`:""}
         </div>
         ${it?`<div class="r-meta">${it.no}. ${it.title} · ${CATALOG[it.category].label}</div>`:""}
         ${r.note?`<div style="margin:6px 0;white-space:pre-wrap">${r.note}</div>`:""}
         <div class="r-meta">${r.uploaded_by?("oleh "+r.uploaded_by+" · "):""}${new Date(r.created_at).toLocaleString("ms-MY")}${r.image_url?` · <a href="${r.image_url}" target="_blank" rel="noopener" style="color:var(--cyan)">buka gambar ↗</a>`:""}</div>
-        ${r.posted?`<div style="margin-top:6px"><span class="posted-badge">✅ Diposkan → ${postedTo?postedTo.title:r.posted_to} (${fmt(r.posted_amount)})</span></div>`:""}
+        ${r.pay_status==="paid"&&r.paid_at?`<div class="r-meta">💵 Dibayar ${new Date(r.paid_at).toLocaleDateString("ms-MY")}${r.paid_by?(" oleh "+r.paid_by):""}${r.paid_ref?(" · ruj: "+r.paid_ref):""}${r.paid_receipt_url?` · <a href="${r.paid_receipt_url}" target="_blank" rel="noopener" style="color:var(--cyan)">resit bayaran ↗</a>`:""}</div>`:""}
       </div>
-      ${isSA()?`<div style="display:grid;gap:6px">${!r.reviewed?`<button class="btn good" data-rev-rcpt="${r.item_key}|${r.id}" style="padding:6px 10px">✓ Disemak</button>`:""}${canPost?`<button class="btn primary" data-post="${r.item_key}|${r.id}" style="padding:6px 10px">💵 Pos ke Bajet</button>`:""}<button class="btn danger" data-delrcpt="${r.item_key}|${r.id}" style="padding:6px 10px">Padam</button></div>`:""}
+      ${acts?`<div style="display:grid;gap:6px">${acts}</div>`:""}
     </div>`;
   }
 
@@ -2210,8 +2247,97 @@
   function bindEntryActions(scope){
     scope.querySelectorAll("[data-delrcpt]").forEach(b=> b.addEventListener("click", ()=>{ const [k,id]=b.dataset.delrcpt.split("|"); deleteEntry(k,id); }));
     scope.querySelectorAll("[data-rev-rcpt]").forEach(b=> b.addEventListener("click", ()=>{ const [k,id]=b.dataset.revRcpt.split("|"); markReviewed(k,id); }));
-    scope.querySelectorAll("[data-post]").forEach(b=> b.addEventListener("click", ()=>{ const [k,id]=b.dataset.post.split("|"); openPostModal(k,id); }));
+    scope.querySelectorAll("[data-appres]").forEach(b=> b.addEventListener("click", ()=>{ const [k,id]=b.dataset.appres.split("|"); approveResit(k,id); }));
+    scope.querySelectorAll("[data-appinv]").forEach(b=> b.addEventListener("click", ()=>{ const [k,id]=b.dataset.appinv.split("|"); approveInvoice(k,id); }));
+    scope.querySelectorAll("[data-pay]").forEach(b=> b.addEventListener("click", ()=>{ const [k,id]=b.dataset.pay.split("|"); openPayModal(k,id); }));
     scope.querySelectorAll("[data-lb]").forEach(img=> img.addEventListener("click", ()=>{ $("lightboxImg").src = img.dataset.lb; $("lightbox").classList.add("open"); }));
+  }
+
+  // ---- Kelulusan kewangan resit/invoice ----
+  function refreshAfterPay(key){
+    saveLocal(); renderSummary(); updateNotif();
+    if($("layerEntry").classList.contains("open")) renderEntry(key);
+    if($("layerList").classList.contains("open") && currentCat) renderList(currentCat);
+    if($("layerDetail").classList.contains("open") && currentKey) renderDetail(currentKey);
+    if($("layerToPay").classList.contains("open")) renderToPay();
+    if($("layerReview").classList.contains("open")) renderReview();
+  }
+  async function approveResit(key, id){
+    if(!isSA()) return;
+    const r=(state.receipts[key]||[]).find(x=>x.id===id); if(!r) return;
+    r.pay_status="paid"; r.reviewed=true; r.reviewed_by=actorName||""; r.reviewed_at=new Date().toISOString(); r.paid_at=new Date().toISOString(); r.paid_by=actorName||"";
+    if(sbReady()){ try{ const {error}=await sb.rpc("zra_sa_approve_resit",{p_pin:ZRA_CFG.superadminPin,p_receipt_id:id,p_by:actorName||""}); if(error) throw error; toast("Resit diluluskan — masuk actual ✅"); }catch(e){ toast("DB gagal: "+(e.message||e.code),true); } }
+    else toast("Diluluskan (luar talian)");
+    const it=ALL_ITEMS.find(i=>i.key===key);
+    logActivity("approve_resit", `Lulus resit "${r.label||"(tanpa label)"}" ${fmt(r.amount)} → kira actual ${it?it.title:key}`, `Bajet #03 · ${it?CATALOG[it.category].label:""}`);
+    refreshAfterPay(key);
+  }
+  async function approveInvoice(key, id){
+    if(!isSA()) return;
+    const r=(state.receipts[key]||[]).find(x=>x.id===id); if(!r) return;
+    r.pay_status="to_pay"; r.reviewed=true; r.reviewed_by=actorName||""; r.reviewed_at=new Date().toISOString();
+    if(sbReady()){ try{ const {error}=await sb.rpc("zra_sa_approve_invoice",{p_pin:ZRA_CFG.superadminPin,p_receipt_id:id,p_by:actorName||""}); if(error) throw error; toast("Invoice diluluskan → Items To Pay ✅"); }catch(e){ toast("DB gagal: "+(e.message||e.code),true); } }
+    else toast("Diluluskan (luar talian)");
+    const it=ALL_ITEMS.find(i=>i.key===key);
+    logActivity("approve_invoice", `Lulus invoice "${r.label||"(tanpa label)"}" ${fmt(r.amount)} → hantar ke Akaun`, `Bajet #03 · ${it?CATALOG[it.category].label:""}`);
+    refreshAfterPay(key);
+  }
+
+  // ---- Akaun: tandai invoice dibayar (reconcile) ----
+  let payCtx = null;
+  function openPayModal(key, id){
+    const r=(state.receipts[key]||[]).find(x=>x.id===id); if(!r) return;
+    payCtx={key,id,r}; const it=ALL_ITEMS.find(i=>i.key===key);
+    $("payInfo").innerHTML = `Invoice: <b>${r.label||"(tanpa label)"}</b> · ${fmt(r.amount)} · ${it?it.title:key}`;
+    $("payRef").value=""; $("payFile").value=""; $("payMsg").textContent="";
+    $("payModal").classList.add("open");
+  }
+  function closePayModal(){ $("payModal").classList.remove("open"); payCtx=null; }
+  async function payInvoice(){
+    if(!payCtx || !canEdit()) return;
+    const {key,id,r}=payCtx; const ref=$("payRef").value.trim(); const file=$("payFile").files[0];
+    const btn=$("payConfirm"); if(btn){ btn.disabled=true; btn.textContent="Menyimpan…"; }
+    let url="";
+    if(file && sbReady()){
+      try{ const path=`paid/${id}_${Date.now()}_${file.name.replace(/[^A-Za-z0-9._-]/g,"_")}`; const {error:up}=await sb.storage.from(ZRA_CFG.bucket).upload(path,file,{upsert:false}); if(up) throw up; url=sb.storage.from(ZRA_CFG.bucket).getPublicUrl(path).data.publicUrl; }
+      catch(e){ toast("Muat naik gagal: "+(e.message||e.code), true); }
+    } else if(file){ url=await new Promise(res=>{ const rd=new FileReader(); rd.onload=()=>res(rd.result); rd.readAsDataURL(file); }); }
+    r.pay_status="paid"; r.paid_at=new Date().toISOString(); r.paid_by=actorName||""; r.paid_ref=ref; r.paid_receipt_url=url;
+    const pin = isSA()?ZRA_CFG.superadminPin:ZRA_CFG.adminPin;
+    if(sbReady()){ try{ const {error}=await sb.rpc("zra_mark_invoice_paid",{p_pin:pin,p_receipt_id:id,p_paid_ref:ref,p_paid_receipt_url:url,p_by:actorName||""}); if(error) throw error; toast("Invoice dibayar — masuk actual ✅"); }catch(e){ toast("DB gagal: "+(e.message||e.code), true); } }
+    else toast("Dibayar (luar talian)");
+    const it=ALL_ITEMS.find(i=>i.key===key);
+    logActivity("pay_invoice", `Bayar invoice "${r.label||"(tanpa label)"}" ${fmt(r.amount)}${ref?(" · ruj "+ref):""} → ${it?it.title:key}`, `Akaun · ${it?CATALOG[it.category].label:""}`);
+    closePayModal(); refreshAfterPay(key);
+  }
+
+  // ---- Menu Items To Pay ----
+  function openToPay(){ renderToPay(); openLayer("layerToPay"); }
+  function renderToPay(){
+    const list=toPayList();
+    const paid=[]; Object.values(state.receipts).forEach(arr=>arr.forEach(r=>{ if(r.kind==="invoice"&&r.pay_status==="paid") paid.push(r); }));
+    paid.sort((a,b)=> new Date(b.paid_at||0)-new Date(a.paid_at||0));
+    const totalToPay=list.reduce((s,r)=>s+Number(r.amount||0),0);
+    const rowTo = r=>{ const it=ALL_ITEMS.find(i=>i.key===r.item_key); return `<div class="mcard attn">
+      <div class="mc-head"><div><span class="mc-type-tag">🧾 Invoice · ${it?CATALOG[it.category].label:""}</span><div class="mc-title">${r.label||"(tanpa label)"} — ${fmt(r.amount)}</div><div class="src-ref">${it?it.no+". "+it.title:r.item_key} · oleh ${r.uploaded_by||"—"}</div></div></div>
+      ${r.note?`<p style="margin:6px 0">${r.note}</p>`:""}
+      <div class="det-actions">${r.image_url?`<a class="btn" href="${r.image_url}" target="_blank" rel="noopener">📄 Lihat invoice</a>`:""}${canEdit()?`<button class="btn primary" data-pay="${r.item_key}|${r.id}">💵 Tandai Dibayar</button>`:""}</div>
+    </div>`; };
+    const rowPaid = r=>{ const it=ALL_ITEMS.find(i=>i.key===r.item_key); return `<div class="mcard">
+      <div class="mc-head"><div><span class="mc-type-tag">✅ Dibayar · ${it?CATALOG[it.category].label:""}</span><div class="mc-title">${r.label||"(tanpa label)"} — ${fmt(r.amount)}</div><div class="src-ref">${it?it.no+". "+it.title:""} · ${r.paid_at?new Date(r.paid_at).toLocaleDateString("ms-MY"):""}${r.paid_ref?(" · ruj "+r.paid_ref):""} · oleh ${r.paid_by||"—"}</div></div></div>
+      ${r.paid_receipt_url?`<div class="det-actions"><a class="btn" href="${r.paid_receipt_url}" target="_blank" rel="noopener">🧾 Resit bayaran</a></div>`:""}</div>`; };
+    $("toPayBody").innerHTML=`
+      <div class="m-summary">
+        <div class="sum-cell"><b style="color:${list.length?'var(--rose)':'inherit'}">${list.length}</b><span>Untuk dibayar</span></div>
+        <div class="sum-cell"><b>${fmt(totalToPay)}</b><span>Jumlah tertunggak</span></div>
+        <div class="sum-cell"><b>${paid.length}</b><span>Telah dibayar</span></div>
+      </div>
+      <div class="review-sec-title">⏳ Belum Dibayar</div>
+      ${list.length?list.map(rowTo).join(""):`<p class="audit">Tiada invoice menunggu bayaran. 🎉</p>`}
+      <div class="review-sec-title">✅ Telah Dibayar</div>
+      ${paid.length?paid.map(rowPaid).join(""):`<p class="audit">Belum ada.</p>`}
+    `;
+    bindEntryActions($("toPayBody"));
   }
 
   // ---- Pos resit ke bajet ----
@@ -2268,66 +2394,59 @@
     const a = getActual(key);
     const recs = state.receipts[key]||[];
     const nEnt = recs.length;
-    const postedIn = []; Object.values(state.receipts).forEach(arr=>arr.forEach(r=>{ if(r.posted && r.posted_to===key) postedIn.push(r); }));
-    const v = Number(a.actual_amount||0) - it.budget;
-    const editable = canEdit() && (a.status!=="diluluskan" || isSA());
+    const actual = actualOf(key);
+    const paidResit = recs.filter(r=> r.kind==="resit" && r.pay_status==="paid");
+    const paidInv = recs.filter(r=> r.kind==="invoice" && r.pay_status==="paid");
+    const v = actual - it.budget;
     $("detEyebrow").textContent = `${CATALOG[it.category].icon} ${CATALOG[it.category].label} · Item ${it.no}`;
     $("detTitle").textContent = it.title;
 
-    const auditHtml = `<p class="audit">${a.updated_by?("Dikemaskini oleh "+a.updated_by):"Belum dikemaskini"}${a.updated_at?(" · "+new Date(a.updated_at).toLocaleString("ms-MY")):""}${a.approved_by?(" · Diluluskan oleh "+a.approved_by):""}</p>`;
+    const paidLine = (paidResit.length+paidInv.length)
+      ? [...paidResit,...paidInv].map(r=>`<div class="r-meta" style="margin:3px 0">• ${KINDS[r.kind]||r.kind}: ${r.label||"(tanpa label)"} — <b style="color:var(--lime)">${fmt(r.amount)}</b> · ${r.paid_at?new Date(r.paid_at).toLocaleDateString("ms-MY"):""}</div>`).join("")
+      : `<p class="audit">Belum ada bayaran direkod. Actual = RM 0 sehingga resit/invoice dibayar.</p>`;
 
     $("detBody").innerHTML = `
       <div class="det-card">
         <h3>Skop Perkhidmatan</h3>
         <p>${it.scope}</p>
-        <p class="audit" style="margin-top:10px">Kuantiti: <b>${it.qty}</b> · Status: ${statusBadge(a.status)}</p>
+        <p class="audit" style="margin-top:10px">Kuantiti: <b>${it.qty}</b></p>
       </div>
 
       <div class="det-card">
         <h3>Kos</h3>
         <div class="det-figs">
           <div class="det-fig"><b class="locked">🔒 ${fmt(it.budget)}</b><span>Bajet (tetap)</span></div>
-          <div class="det-fig"><b>${fmt(a.actual_amount)}</b><span>Actual · Varian ${v>0?'<span class="neg">+'+fmt(v)+'</span>':(v<0?'<span class="pos">'+fmt(v)+'</span>':fmt(0))}</span></div>
+          <div class="det-fig"><b>${fmt(actual)}</b><span>Actual (auto) · Varian ${v>0?'<span class="neg">+'+fmt(v)+'</span>':(v<0?'<span class="pos">'+fmt(v)+'</span>':fmt(0))}</span></div>
         </div>
+        <p class="audit" style="margin:12px 0 6px"><b>Bayaran dikira sebagai actual:</b></p>
+        ${paidLine}
         ${canEdit()?`
           <div style="margin-top:14px">
-            <label class="audit">Actual Kos (RM)</label>
-            <input class="det-input" id="detActual" type="number" min="0" step="100" value="${a.actual_amount||""}" ${editable?"":"disabled"} placeholder="0">
+            <label class="audit">Nota Admin</label>
+            <textarea class="det-input" id="detAdminNote" placeholder="Catatan, justifikasi, perubahan skop...">${a.admin_note||""}</textarea>
           </div>
-          <div style="margin-top:12px">
-            <label class="audit">Nota Admin (untuk semakan)</label>
-            <textarea class="det-input" id="detAdminNote" ${editable?"":"disabled"} placeholder="Catatan, justifikasi, perubahan skop...">${a.admin_note||""}</textarea>
-          </div>
-          ${isSA()?`<div style="margin-top:12px"><label class="audit">Nota Superadmin</label><textarea class="det-input" id="detSANote" placeholder="Maklum balas / sebab tolak...">${a.superadmin_note||""}</textarea></div>`:(a.superadmin_note?`<p class="audit" style="margin-top:10px"><b>Nota Superadmin:</b> ${a.superadmin_note}</p>`:"")}
+          ${isSA()?`<div style="margin-top:12px"><label class="audit">Nota Superadmin</label><textarea class="det-input" id="detSANote" placeholder="Maklum balas...">${a.superadmin_note||""}</textarea></div>`:(a.superadmin_note?`<p class="audit" style="margin-top:10px"><b>Nota Superadmin:</b> ${a.superadmin_note}</p>`:"")}
           <div class="det-actions" style="margin-top:14px">
-            <button class="btn primary" id="detSave">💾 ${isSA()?"Simpan":"Simpan & Hantar Semakan"}</button>
-            ${isSA()?`<button class="btn good" id="detApprove">✅ Luluskan</button><button class="btn danger" id="detReject">⛔ Tolak</button><button class="btn danger" id="detDelete">🗑️ Padam Data</button>`:""}
+            <button class="btn primary" id="detSave">💾 Simpan Nota</button>
+            ${isSA()?`<button class="btn danger" id="detDelete">🗑️ Padam Semua Data Item</button>`:""}
           </div>`
         : (a.superadmin_note?`<p class="audit" style="margin-top:12px"><b>Nota Superadmin:</b> ${a.superadmin_note}</p>`:"")}
-        ${auditHtml}
       </div>
 
       <div class="det-card">
         <h3>🧾 Resit, Invoice & Nota</h3>
-        <p class="audit" style="margin-bottom:12px">${nEnt? nEnt+" lampiran direkod.":"Belum ada lampiran."}${(isSA()&&itemAttn(key))?` · <b style="color:var(--rose)">${itemAttn(key)} baru perlu disemak</b>`:""}</p>
-        <button class="btn primary" id="detEntries">📎 Urus Resit & Nota${nEnt?` (${nEnt})`:""}</button>
+        <p class="audit" style="margin-bottom:12px">${nEnt? nEnt+" lampiran direkod.":"Belum ada lampiran."}${(isSA()&&itemAttn(key))?` · <b style="color:var(--rose)">${itemAttn(key)} perlu tindakan</b>`:""}</p>
+        <button class="btn primary" id="detEntries">📎 Urus Resit, Invoice & Nota${nEnt?` (${nEnt})`:""}</button>
       </div>
-
-      ${postedIn.length?`<div class="det-card">
-        <h3>💵 Kos Diposkan Masuk (${fmt(postedIn.reduce((s,r)=>s+Number(r.posted_amount||0),0))})</h3>
-        ${postedIn.map(r=>`<div class="r-meta" style="margin:4px 0">• ${r.label||"(resit)"} — <b style="color:var(--lime)">${fmt(r.posted_amount)}</b> · oleh ${r.posted_by||"—"} · ${r.posted_at?new Date(r.posted_at).toLocaleDateString("ms-MY"):""}</div>`).join("")}
-      </div>`:""}
     `;
 
     // bind
     if(canEdit()){
       const save = $("detSave");
       if(save) save.addEventListener("click", async ()=>{
-        await saveActual(key, { actual_amount:Number($("detActual").value||0), admin_note:$("detAdminNote")?$("detAdminNote").value:"", superadmin_note:$("detSANote")?$("detSANote").value:(a.superadmin_note||"") });
+        await saveActual(key, { admin_note:$("detAdminNote")?$("detAdminNote").value:"", superadmin_note:$("detSANote")?$("detSANote").value:(a.superadmin_note||"") });
         renderDetail(key); renderSummary();
       });
-      if($("detApprove")) $("detApprove").addEventListener("click", ()=>saApprove(key,true));
-      if($("detReject")) $("detReject").addEventListener("click", ()=>saApprove(key,false));
       if($("detDelete")) $("detDelete").addEventListener("click", ()=>saDeleteItem(key));
     }
     if($("detEntries")) $("detEntries").addEventListener("click", ()=>openEntry(key));
@@ -2350,12 +2469,17 @@
 
   // Registry modul — setiap komponen boleh menyumbang event ke dashboard.
   // Buat masa ini: MODUL BAJET (komponen #03). Modul lain tambah di sini kelak.
+  function entryNeedsAction(r){
+    if(r.kind==="resit") return r.pay_status!=="paid";
+    if(r.kind==="invoice") return !r.pay_status; // belum lulus
+    return !r.reviewed; // nota/gambar/lain
+  }
   function buildFeed(){
     const events = [];
     ALL_ITEMS.forEach(it=>{
-      const a = getActual(it.key);
-      const hasActivity = Number(a.actual_amount||0) > 0 || a.status !== "draf" || (a.admin_note||"") || (a.superadmin_note||"");
-      if(hasActivity) events.push({ type:"item", key:it.key, ts:a.updated_at||0, it, a, source:{no:"03",name:"Bajet"}, ref:`${it.no}. ${it.title}` });
+      const act = actualOf(it.key);
+      const hasActivity = act > 0 || (getActual(it.key).admin_note||"") || (getActual(it.key).superadmin_note||"");
+      if(hasActivity) events.push({ type:"item", key:it.key, ts:getActual(it.key).updated_at||0, it, a:getActual(it.key), source:{no:"03",name:"Bajet"}, ref:`${it.no}. ${it.title}` });
     });
     Object.values(state.receipts).forEach(arr=> arr.forEach(r=>{
       const it = ALL_ITEMS.find(i=>i.key===r.item_key);
@@ -2368,31 +2492,35 @@
   function actionRow(ev){
     const src = `<span class="src-tag">🧩 #${ev.source.no} ${ev.source.name}</span><div class="src-ref">${ev.ref}</div>`;
     if(ev.type === "item"){
-      const { it, a, key } = ev; const v = Number(a.actual_amount||0)-it.budget; const attn = a.status==="menunggu";
-      const detail = `Actual <b>${fmt(a.actual_amount)}</b> vs Bajet ${fmt(it.budget)} · Var ${v>0?'<span class="neg">+'+fmt(v)+'</span>':(v<0?'<span class="pos">'+fmt(v)+'</span>':fmt(0))}${a.admin_note?`<div class="src-ref">📝 ${a.admin_note}</div>`:""}`;
-      const act = `${attn?`<button class="btn good" data-m-appr="${key}" style="padding:6px 10px">✅</button>`:""}<button class="btn" data-m-open="${key}" style="padding:6px 10px">🔎 Buka</button>`;
-      return `<tr class="${attn?"attn":""}"><td class="t-when">${relTime(ev.ts)}</td><td>💰 Bajet item<br>${src}</td><td>${detail}</td><td>${a.updated_by||"—"}</td><td>${statusBadge(a.status)}</td><td><div class="row-act">${act}</div></td></tr>`;
+      const { it, key } = ev; const act = actualOf(key); const v = act-it.budget;
+      const detail = `Actual <b>${fmt(act)}</b> vs Bajet ${fmt(it.budget)} · Var ${v>0?'<span class="neg">+'+fmt(v)+'</span>':(v<0?'<span class="pos">'+fmt(v)+'</span>':fmt(0))}`;
+      return `<tr><td class="t-when">${relTime(ev.ts)}</td><td>💰 Bajet item<br>${src}</td><td>${detail}</td><td>${ev.a.updated_by||"—"}</td><td><span class="badge b-lain">info</span></td><td><div class="row-act"><button class="btn" data-m-open="${key}" style="padding:6px 10px">🔎 Buka</button></div></td></tr>`;
     } else {
-      const r = ev.r; const k = r.kind||"lain";
-      const detail = `<span class="badge b-${k}">${KINDS[k]||k}</span> <b>${r.label||"(tanpa label)"}</b>${r.amount?` · ${fmt(r.amount)}`:""}${r.note?`<div class="src-ref">${r.note}</div>`:""}${r.image_url?`<div class="src-ref"><a href="${r.image_url}" target="_blank" rel="noopener" style="color:var(--cyan)">🖼️ buka gambar ↗</a></div>`:""}`;
-      const st = r.reviewed?'<span class="badge b-diluluskan">Disemak</span>':'<span class="badge b-ditolak">Baru</span>';
-      const act = `${!r.reviewed?`<button class="btn good" data-rev-rcpt="${r.item_key}|${r.id}" style="padding:6px 10px">✓</button>`:""}<button class="btn" data-m-attach="${r.item_key}" style="padding:6px 10px">🔎 Buka</button>`;
-      return `<tr class="${r.reviewed?"":"attn"}"><td class="t-when">${relTime(ev.ts)}</td><td>📎 Lampiran<br>${src}</td><td>${detail}</td><td>${r.uploaded_by||"—"}</td><td>${st}</td><td><div class="row-act">${act}</div></td></tr>`;
+      const r = ev.r; const k = r.kind||"lain"; const need = entryNeedsAction(r);
+      const detail = `<span class="badge b-${k}">${KINDS[k]||k}</span> <b>${r.label||"(tanpa label)"}</b>${r.amount?` · ${fmt(r.amount)}`:""}${r.note?`<div class="src-ref">${r.note}</div>`:""}${r.image_url?`<div class="src-ref"><a href="${r.image_url}" target="_blank" rel="noopener" style="color:var(--cyan)">🖼️ buka ↗</a></div>`:""}`;
+      let quick="";
+      if(isSA() && k==="resit" && r.pay_status!=="paid") quick=`<button class="btn good" data-appres="${r.item_key}|${r.id}" style="padding:6px 10px">✅ Lulus</button>`;
+      else if(isSA() && k==="invoice" && !r.pay_status) quick=`<button class="btn good" data-appinv="${r.item_key}|${r.id}" style="padding:6px 10px">✅ Lulus</button>`;
+      else if(canEdit() && k==="invoice" && r.pay_status==="to_pay") quick=`<button class="btn primary" data-pay="${r.item_key}|${r.id}" style="padding:6px 10px">💵 Bayar</button>`;
+      else if(isSA() && !isFinancial(r) && !r.reviewed) quick=`<button class="btn good" data-rev-rcpt="${r.item_key}|${r.id}" style="padding:6px 10px">✓</button>`;
+      const act = `${quick}<button class="btn" data-m-attach="${r.item_key}" style="padding:6px 10px">🔎</button>`;
+      return `<tr class="${need?"attn":""}"><td class="t-when">${relTime(ev.ts)}</td><td>${k==="invoice"?"🧾 Invoice":k==="resit"?"💵 Resit":"📎 Lampiran"}<br>${src}</td><td>${detail}</td><td>${r.uploaded_by||"—"}</td><td>${payBadge(r)}</td><td><div class="row-act">${act}</div></td></tr>`;
     }
   }
 
   function renderActionTable(){
     const feed = buildFeed();
-    const isAttn = e => (e.type==="item"&&e.a.status==="menunggu") || (e.type==="attach"&&!e.r.reviewed);
+    const attnF = e => e.type==="attach" && entryNeedsAction(e.r);
+    const topayF = e => e.type==="attach" && e.r.kind==="invoice" && e.r.pay_status==="to_pay";
     const counts = {
-      attn: feed.filter(isAttn).length,
-      approve: feed.filter(e=> e.type==="item"&&e.a.status==="menunggu").length,
+      attn: feed.filter(attnF).length,
+      topay: feed.filter(topayF).length,
       attach: feed.filter(e=> e.type==="attach").length,
       items: feed.filter(e=> e.type==="item").length
     };
     let shown = feed;
-    if(masterFilter==="attn") shown = feed.filter(isAttn);
-    else if(masterFilter==="approve") shown = feed.filter(e=> e.type==="item"&&e.a.status==="menunggu");
+    if(masterFilter==="attn") shown = feed.filter(attnF);
+    else if(masterFilter==="topay") shown = feed.filter(topayF);
     else if(masterFilter==="attach") shown = feed.filter(e=> e.type==="attach");
     else if(masterFilter==="items") shown = feed.filter(e=> e.type==="item");
 
@@ -2402,13 +2530,13 @@
       <div class="review-sec-title">📋 Jadual Tindakan</div>
       <div class="mfilters">
         ${chip("attn","🔔 Perlu perhatian",counts.attn)}
-        ${chip("approve","⏳ Menunggu lulus",counts.approve)}
-        ${chip("attach","📎 Lampiran",counts.attach)}
+        ${chip("topay","💳 Untuk dibayar",counts.topay)}
+        ${chip("attach","📎 Resit/Invoice/Nota",counts.attach)}
         ${chip("items","📋 Item",counts.items)}
       </div>
       <div class="table-wrap">
         <table class="act-table">
-          <thead><tr><th>Bila</th><th>Sumber</th><th>Butiran / Tindakan</th><th>Oleh</th><th>Status</th><th>Aksi</th></tr></thead>
+          <thead><tr><th>Bila</th><th>Sumber</th><th>Butiran</th><th>Oleh</th><th>Status</th><th>Aksi</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>`;
@@ -2513,7 +2641,8 @@
 
   function renderReview(){
     let gB=0, gA=0; ["konten","logistik"].forEach(c=>{ const t=catTotals(c); gB+=t.budget; gA+=t.actual; });
-    const attn = attnTotal() + ALL_ITEMS.filter(it=>getActual(it.key).status==="menunggu").length;
+    const attn = attnTotal();
+    const nToPay = toPayList().length;
     $("reviewBody").innerHTML = `
       <div class="dash-hero">
         <div>
@@ -2533,6 +2662,7 @@
         <div class="sum-cell"><b>${(gA-gB)>0?'<span class="neg">+'+fmt(gA-gB)+'</span>':'<span class="pos">'+fmt(gA-gB)+'</span>'}</b><span>Varian</span></div>
         <div class="sum-cell"><b style="color:${attn?'var(--rose)':'inherit'}">${attn}</b><span>Perlu perhatian</span></div>
       </div>
+      <div style="margin-bottom:14px"><button class="btn ${nToPay?'primary':''}" id="dashToPay">💳 Items To Pay${nToPay?` (${nToPay})`:""}</button></div>
       ${renderActionTable()}
       ${renderActivity()}
       ${renderTodos()}
@@ -2541,7 +2671,7 @@
     updateDashCount();
     // Jadual tindakan
     $("reviewBody").querySelectorAll("[data-mfilter]").forEach(b=> b.addEventListener("click", ()=>{ masterFilter=b.dataset.mfilter; renderReview(); }));
-    $("reviewBody").querySelectorAll("[data-m-appr]").forEach(b=> b.addEventListener("click", async ()=>{ await saApprove(b.dataset.mAppr,true,""); renderSummary(); updateNotif(); renderReview(); }));
+    if($("dashToPay")) $("dashToPay").addEventListener("click", openToPay);
     $("reviewBody").querySelectorAll("[data-m-open]").forEach(b=> b.addEventListener("click", ()=> openDetail(b.dataset.mOpen)));
     $("reviewBody").querySelectorAll("[data-m-attach]").forEach(b=> b.addEventListener("click", ()=> openEntry(b.dataset.mAttach)));
     bindEntryActions($("reviewBody"));
@@ -2583,13 +2713,16 @@
   $("logoutBtn").addEventListener("click", logout);
   $("reviewBtn").addEventListener("click", ()=>{ renderReview(); openLayer("layerReview"); });
   if($("masterBtn")) $("masterBtn").addEventListener("click", ()=> window.openMasterGate());
+  $("toPayBtn").addEventListener("click", openToPay);
   $("pinClose").addEventListener("click", closePin);
   $("postClose").addEventListener("click", closePostModal);
   $("postConfirm").addEventListener("click", postReceipt);
+  $("payClose").addEventListener("click", closePayModal);
+  $("payConfirm").addEventListener("click", payInvoice);
   $("pinSubmit").addEventListener("click", submitPin);
   $("pinInput").addEventListener("keydown", e=>{ if(e.key==="Enter") submitPin(); });
   $("lightbox").addEventListener("click", ()=> $("lightbox").classList.remove("open"));
-  document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closePin(); closePostModal(); $("lightbox").classList.remove("open"); const open=document.querySelector(".layer.open"); if(open) closeLayer(open.id); } });
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closePin(); closePostModal(); closePayModal(); $("lightbox").classList.remove("open"); const open=document.querySelector(".layer.open"); if(open) closeLayer(open.id); } });
 
   applyRole();
   loadData();
