@@ -830,12 +830,20 @@
   </style>
 </head>
 <body>
+  <script>
+    /* Refresh sentiasa kembali ke hero (atas), bukan ke seksyen terakhir */
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.addEventListener('load', function () {
+      if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+      window.scrollTo(0, 0);
+    });
+  </script>
   <header class="topbar">
     <div class="topbar-inner">
       <a class="brand" href="#top" aria-label="Kembali ke atas">
         <span class="brand-mark">Z</span>
         <span>
-          <small>Event Sandbox</small>
+          <small>Event Dashboard</small>
           <strong>ZRA DIGITAL FEST</strong>
         </span>
       </a>
@@ -853,7 +861,7 @@
     <section class="hero">
       <div class="hero-inner">
         <div>
-          <span class="eyebrow">Sandbox keseluruhan event</span>
+          <span class="eyebrow">Dashboard keseluruhan event</span>
           <h1>ZRA DIGITAL FEST</h1>
           <p>Rujukan kerja untuk menyusun Sabak Bernam Digital Fest 2026: input asas event, fokus program, aliran pergerakan, menu komponen, bajet, infrastruktur, live commerce, SME, buku, filem, muzik, influencer dan kelas streaming.</p>
           <div class="hero-actions">
