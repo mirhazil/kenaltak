@@ -624,6 +624,7 @@
     @media (max-width: 720px) { .bajet-cats { grid-template-columns: 1fr; } }
     .cat-tile {
       text-align: left;
+      color: var(--text);
       border: 1px solid var(--line-soft);
       border-radius: var(--radius);
       background: linear-gradient(150deg, var(--panel), var(--panel-2));
@@ -632,6 +633,7 @@
       gap: 14px;
       transition: transform .16s ease, border-color .16s ease;
     }
+    .cat-tile h3 { color: var(--text); }
     .cat-tile:hover { transform: translateY(-2px); border-color: var(--line); }
     .cat-tile .cat-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
     .cat-tile h3 { margin: 0; font-size: 1.3rem; }
