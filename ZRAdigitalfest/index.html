@@ -1,0 +1,1258 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZRA DIGITAL FEST - Sandbox Event</title>
+  <meta name="description" content="Sandbox operasi dan rujukan komponen Sabak Bernam Digital Fest 2026.">
+  <style>
+    :root {
+      --bg: #070a0b;
+      --panel: #111819;
+      --panel-2: #172222;
+      --ink: #050707;
+      --text: #eef5ec;
+      --muted: #aeb9b0;
+      --line: rgba(216, 255, 88, 0.22);
+      --line-soft: rgba(255, 255, 255, 0.11);
+      --lime: #d8ff58;
+      --cyan: #61d4ff;
+      --amber: #ffc65c;
+      --green: #7fd177;
+      --rose: #ff8278;
+      --max: 1180px;
+      --radius: 8px;
+      --radius-sm: 6px;
+      --shadow: 0 24px 90px rgba(0, 0, 0, 0.42);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.024) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, black, transparent 75%);
+      z-index: -1;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea { font: inherit; }
+    button { border: 0; cursor: pointer; }
+    img { display: block; max-width: 100%; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(7, 10, 11, .9);
+      border-bottom: 1px solid var(--line-soft);
+      backdrop-filter: blur(18px);
+    }
+    .topbar-inner {
+      width: min(var(--max), calc(100% - 28px));
+      margin: 0 auto;
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: linear-gradient(145deg, rgba(216,255,88,.22), rgba(97,212,255,.08));
+      color: var(--lime);
+      font-weight: 950;
+    }
+    .brand small, .eyebrow {
+      display: block;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .brand strong {
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+    .nav a, .utility-button {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      color: #dce8d8;
+      background: transparent;
+      font-size: .9rem;
+    }
+    .nav a:hover, .utility-button:hover {
+      border-color: var(--line);
+      background: rgba(216,255,88,.08);
+    }
+
+    .hero {
+      min-height: calc(100svh - 64px);
+      position: relative;
+      display: grid;
+      align-items: end;
+      overflow: hidden;
+      background: var(--ink);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(5,7,7,.96), rgba(5,7,7,.66) 45%, rgba(5,7,7,.2)),
+        linear-gradient(0deg, rgba(7,10,11,1), transparent 36%),
+        url("assets/hero-digital-fest.png") center / cover no-repeat;
+      transform: scale(1.02);
+    }
+    .hero-inner {
+      position: relative;
+      width: min(var(--max), calc(100% - 28px));
+      margin: 0 auto;
+      padding: 82px 0 44px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(330px, .72fr);
+      gap: 30px;
+      align-items: end;
+    }
+    .hero h1 {
+      margin: 12px 0 14px;
+      max-width: 9ch;
+      font-size: clamp(3.1rem, 9vw, 7.6rem);
+      line-height: .86;
+      letter-spacing: 0;
+    }
+    .hero p {
+      margin: 0;
+      max-width: 720px;
+      color: #dce8d8;
+      font-size: clamp(1rem, 1.8vw, 1.24rem);
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+    .primary-action, .secondary-action {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      border-radius: var(--radius-sm);
+      font-weight: 900;
+    }
+    .primary-action {
+      color: var(--ink);
+      background: var(--lime);
+    }
+    .secondary-action {
+      border: 1px solid var(--line-soft);
+      background: rgba(255,255,255,.09);
+      color: var(--text);
+    }
+
+    .event-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(12, 18, 18, .85);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+    .event-card h2 {
+      margin: 0 0 14px;
+      color: var(--lime);
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .countdown {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: linear-gradient(145deg, rgba(216,255,88,.16), rgba(97,212,255,.08));
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .countdown-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 12px;
+    }
+    .countdown-head span:last-child {
+      color: var(--lime);
+      white-space: nowrap;
+    }
+    .countdown-grid, .fact-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .countdown-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .count-cell, .fact {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius-sm);
+      background: rgba(0,0,0,.25);
+      padding: 10px;
+    }
+    .count-cell {
+      min-height: 72px;
+      display: grid;
+      align-content: center;
+      text-align: center;
+      gap: 4px;
+    }
+    .count-cell b {
+      font-size: clamp(1.45rem, 4vw, 2.35rem);
+      line-height: .9;
+    }
+    .count-cell span, .fact span {
+      display: block;
+      color: var(--muted);
+      font-size: .72rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .fact b {
+      display: block;
+      color: var(--text);
+      font-size: 1.05rem;
+      line-height: 1.18;
+      margin-bottom: 5px;
+    }
+
+    section {
+      padding: 66px 0;
+      border-top: 1px solid rgba(255,255,255,.065);
+    }
+    .band {
+      background: linear-gradient(180deg, rgba(16,22,22,.78), rgba(8,11,11,.96));
+    }
+    .section-inner {
+      width: min(var(--max), calc(100% - 28px));
+      margin: 0 auto;
+    }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, .75fr) minmax(280px, .25fr);
+      gap: 22px;
+      align-items: end;
+      margin-bottom: 22px;
+    }
+    .section-head h2 {
+      margin: 6px 0 0;
+      font-size: clamp(2rem, 4vw, 3.3rem);
+      line-height: .98;
+      letter-spacing: 0;
+    }
+    .section-head p { margin: 0; color: var(--muted); }
+
+    .focus-grid, .flow-grid, .menu-grid, .gallery-grid, .kpi-grid {
+      display: grid;
+      gap: 14px;
+    }
+    .focus-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .flow-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .menu-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .kpi-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+    .focus-card, .flow-card, .menu-card, .gallery-card, .kpi-card, .note-panel {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+    .focus-card, .flow-card, .kpi-card, .note-panel { padding: 16px; }
+    .focus-card h3, .flow-card h3, .menu-card h3, .gallery-card h3, .kpi-card h3 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0;
+    }
+    .focus-card p, .flow-card p, .menu-card p, .gallery-card p, .kpi-card p, .note-panel p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+    .num {
+      width: 42px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      color: var(--lime);
+      background: rgba(216,255,88,.08);
+      font-weight: 950;
+    }
+    .kpi-card b {
+      display: block;
+      color: var(--lime);
+      font-size: clamp(1.8rem, 4vw, 3.2rem);
+      line-height: .95;
+      margin-bottom: 8px;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .search {
+      flex: 1 1 330px;
+      min-height: 44px;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,.055);
+      color: var(--text);
+      padding: 0 14px;
+      outline: 0;
+    }
+    .search:focus { border-color: var(--lime); }
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .filter-button {
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,.045);
+      color: #dce8d8;
+      font-weight: 800;
+    }
+    .filter-button.active {
+      background: var(--lime);
+      color: var(--ink);
+      border-color: transparent;
+    }
+    .menu-card {
+      min-height: 242px;
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      padding: 16px;
+      color: var(--text);
+      text-align: left;
+    }
+    .menu-card:hover {
+      border-color: var(--lime);
+      transform: translateY(-1px);
+    }
+    .menu-card header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .tag, .pill {
+      min-height: 26px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 9px;
+      border-radius: 999px;
+      border: 1px solid var(--line-soft);
+      color: #dce8d8;
+      font-size: .74rem;
+      white-space: nowrap;
+    }
+    .tag.hot { color: var(--ink); background: var(--amber); border-color: transparent; font-weight: 900; }
+    .tag.ready { color: var(--ink); background: var(--lime); border-color: transparent; font-weight: 900; }
+    .tag.check { color: var(--ink); background: var(--cyan); border-color: transparent; font-weight: 900; }
+    .menu-card .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, .94fr) minmax(320px, .5fr);
+      gap: 16px;
+      align-items: start;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+    .data-table th, .data-table td {
+      padding: 13px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.075);
+      text-align: left;
+      vertical-align: top;
+    }
+    .data-table th {
+      color: var(--lime);
+      background: rgba(216,255,88,.06);
+      font-size: .78rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .data-table td {
+      color: #dce8d8;
+      font-size: .92rem;
+    }
+    .plain-list {
+      margin: 0;
+      padding-left: 18px;
+      color: #dce8d8;
+    }
+    .plain-list li + li { margin-top: 7px; }
+    .note-panel textarea {
+      width: 100%;
+      min-height: 160px;
+      resize: vertical;
+      margin-top: 12px;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius-sm);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      padding: 12px;
+      outline: 0;
+    }
+    .note-panel textarea:focus { border-color: var(--lime); }
+
+    .gallery-card { overflow: hidden; }
+    .gallery-card img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .gallery-card div { padding: 12px; }
+
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      background: rgba(0,0,0,.62);
+      z-index: 39;
+    }
+    .drawer-backdrop.open { display: block; }
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(600px, 100%);
+      height: 100svh;
+      overflow: auto;
+      transform: translateX(104%);
+      transition: transform 220ms ease;
+      z-index: 40;
+      border-left: 1px solid var(--line);
+      background: #0b1011;
+      box-shadow: var(--shadow);
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-head {
+      position: sticky;
+      top: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 18px;
+      border-bottom: 1px solid var(--line-soft);
+      background: rgba(11,16,17,.94);
+      backdrop-filter: blur(16px);
+    }
+    .drawer-head h2 {
+      margin: 5px 0 0;
+      font-size: 1.75rem;
+      line-height: 1;
+    }
+    .close {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      font-size: 1.2rem;
+    }
+    .drawer-body {
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+    }
+    .drawer-section {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 16px;
+    }
+    .drawer-section h3 {
+      margin: 0 0 10px;
+      color: var(--lime);
+      font-size: .88rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .drawer-section p { margin: 0; color: #dce8d8; }
+
+    .footer {
+      padding: 34px 0 48px;
+      border-top: 1px solid rgba(255,255,255,.065);
+      color: var(--muted);
+    }
+    .footer .section-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1000px) {
+      .hero-inner, .section-head, .split { grid-template-columns: 1fr; }
+      .focus-grid, .flow-grid, .menu-grid, .gallery-grid, .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .nav { display: none; }
+    }
+    @media (max-width: 640px) {
+      .hero { min-height: auto; }
+      .hero-inner { padding-top: 54px; }
+      .hero h1 { font-size: clamp(2.75rem, 18vw, 4.45rem); }
+      .countdown-grid, .fact-grid, .focus-grid, .flow-grid, .menu-grid, .gallery-grid, .kpi-grid { grid-template-columns: 1fr; }
+      .data-table { display: block; overflow-x: auto; }
+    }
+    @media print {
+      .topbar, .hero-actions, .toolbar, .drawer, .drawer-backdrop, .utility-button { display: none !important; }
+      body, section, .band, .focus-card, .flow-card, .menu-card, .gallery-card, .kpi-card, .note-panel, .data-table { background: #fff; color: #111; }
+      .hero { min-height: auto; }
+      .hero::before { opacity: .15; }
+      .hero-inner { grid-template-columns: 1fr; padding: 38px 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#top" aria-label="Kembali ke atas">
+        <span class="brand-mark">Z</span>
+        <span>
+          <small>Event Sandbox</small>
+          <strong>ZRA DIGITAL FEST</strong>
+        </span>
+      </a>
+      <nav class="nav" aria-label="Navigasi utama">
+        <a href="#focus">Fokus</a>
+        <a href="#flow">Aliran</a>
+        <a href="#menus">Menu</a>
+        <a href="#schedule">Jadual</a>
+        <a href="#presentation">Pembentangan</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-inner">
+        <div>
+          <span class="eyebrow">Sandbox keseluruhan event</span>
+          <h1>ZRA DIGITAL FEST</h1>
+          <p>Rujukan kerja untuk menyusun Sabak Bernam Digital Fest 2026: input asas event, fokus program, aliran pergerakan, menu komponen, bajet, infrastruktur, live commerce, SME, buku, filem, muzik, influencer dan kelas streaming.</p>
+          <div class="hero-actions">
+            <a class="primary-action" href="#menus">Buka Menu Komponen</a>
+            <a class="secondary-action" href="#flow">Lihat Aliran Event</a>
+            <button class="secondary-action" type="button" id="printBtn">Cetak / PDF</button>
+          </div>
+        </div>
+        <aside class="event-card" aria-label="Input asas event">
+          <h2>Input Asas Event</h2>
+          <div class="countdown" aria-live="polite">
+            <div class="countdown-head">
+              <span>Countdown hari pertama</span>
+              <span>31 Julai 2026</span>
+            </div>
+            <div class="countdown-grid">
+              <div class="count-cell"><b id="countDays">--</b><span>Hari</span></div>
+              <div class="count-cell"><b id="countHours">--</b><span>Jam</span></div>
+              <div class="count-cell"><b id="countMinutes">--</b><span>Minit</span></div>
+              <div class="count-cell"><b id="countSeconds">--</b><span>Saat</span></div>
+            </div>
+          </div>
+          <div class="fact-grid">
+            <div class="fact"><b>31 Jul-2 Ogos 2026</b><span>Tarikh</span></div>
+            <div class="fact"><b>3 hari 2 malam</b><span>Tempoh</span></div>
+            <div class="fact"><b>Tiga Penjuru, Grand Sabak</b><span>Lokasi utama</span></div>
+            <div class="fact"><b>Festival / Digital Economy Showcase</b><span>Format</span></div>
+            <div class="fact"><b>ZRA Strim</b><span>Media rasmi</span></div>
+            <div class="fact"><b>SME + Pelancongan + Buku + Live</b><span>Teras</span></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="focus" class="band">
+      <div class="section-inner">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Fokus program</span>
+            <h2>Empat Teras Yang Pegang Seluruh Festival</h2>
+          </div>
+          <p>Susunan ini diambil daripada proposal dan menjadi kerangka utama sebelum masuk menu komponen.</p>
+        </div>
+        <div class="focus-grid">
+          <article class="focus-card">
+            <span class="num">01</span>
+            <h3>Festival Keusahawanan SME</h3>
+            <p>Pameran SME, Bazar Karat, live selling, beg kuning, PLATS, produk tempatan dan latihan jualan digital.</p>
+          </article>
+          <article class="focus-card">
+            <span class="num">02</span>
+            <h3>Festival Pelancongan Sabak Bernam</h3>
+            <p>Menjadikan Sabak Bernam sebagai destinasi komuniti, makanan, sawah, sungai, sejarah, hotel vintaj dan acara keluarga.</p>
+          </article>
+          <article class="focus-card">
+            <span class="num">03</span>
+            <h3>Festival Buku dan Ilmu</h3>
+            <p>PPAS, jualan buku, Book Glamping, studio strim buku, kandungan ilmu dan program kanak-kanak.</p>
+          </article>
+          <article class="focus-card">
+            <span class="num">04</span>
+            <h3>Festival Penstriman Digital 48 Jam</h3>
+            <p>Live jualan, live konsert, live glamping, live buku, konten pendek, laporan capaian dan dokumentasi.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="flow">
+      <div class="section-inner">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Aliran pergerakan</span>
+            <h2>Dari Persediaan Ke Legacy Bulanan</h2>
+          </div>
+          <p>Ini aliran makro yang memudahkan pasukan semak di mana setiap komponen duduk dalam keseluruhan event.</p>
+        </div>
+        <div class="flow-grid">
+          <article class="flow-card">
+            <span class="num">A</span>
+            <h3>Pra-program</h3>
+            <p>Slide, permit, vendor, tapak, produk SME, katalog buku, akaun live, jadual video, promosi dan pendaftaran peserta.</p>
+          </article>
+          <article class="flow-card">
+            <span class="num">B</span>
+            <h3>Hari 1</h3>
+            <p>Pembukaan, akademi indoor, onboarding SME, pendaftaran Book Glamping, live jualan awal dan teaser konsert/filem.</p>
+          </article>
+          <article class="flow-card">
+            <span class="num">C</span>
+            <h3>Hari 2</h3>
+            <p>Peak traffic: kelas streaming, SME live, aktiviti buku, glamping, influencer content, live konsert dan highlight festival.</p>
+          </article>
+          <article class="flow-card">
+            <span class="num">D</span>
+            <h3>Hari 3</h3>
+            <p>Penutupan, tayangan/aktiviti keluarga, laporan awal, serahan simbolik, showcase output peserta dan promosi pasca.</p>
+          </article>
+          <article class="flow-card">
+            <span class="num">E</span>
+            <h3>Pasca event</h3>
+            <p>Laporan reach, jualan, video, live hours, cohort bulanan, Akademi Strim Buku, PLATS dan model Pekan Filem/Glamping.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="menus" class="band">
+      <div class="section-inner">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Menu operasi & komponen</span>
+            <h2>Klik Kad Untuk Semak Isi Setiap Komponen</h2>
+          </div>
+          <p>Menu ini disusun seperti draf Book Glamping: setiap komponen ada tujuan, isi, output, bajet/keperluan dan perkara perlu sah.</p>
+        </div>
+        <div class="toolbar">
+          <input class="search" id="searchInput" type="search" placeholder="Cari: SME, buku, filem, muzik, bajet, infra, influencer...">
+          <div class="filter-row" aria-label="Tapisan komponen">
+            <button class="filter-button active" type="button" data-filter="all">Semua</button>
+            <button class="filter-button" type="button" data-filter="program">Program</button>
+            <button class="filter-button" type="button" data-filter="digital">Digital</button>
+            <button class="filter-button" type="button" data-filter="ops">Operasi</button>
+            <button class="filter-button" type="button" data-filter="legacy">Legacy</button>
+          </div>
+        </div>
+        <div class="menu-grid" id="menuGrid"></div>
+      </div>
+    </section>
+
+    <section id="schedule">
+      <div class="section-inner">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Jadual rangka</span>
+            <h2>Rangka Jadual Untuk Disahkan</h2>
+          </div>
+          <p>Jadual ini bukan rundown akhir. Ia berfungsi sebagai rangka semakan supaya semua komponen mendapat ruang.</p>
+        </div>
+        <div class="split">
+          <table class="data-table" aria-label="Rangka jadual festival">
+            <thead>
+              <tr>
+                <th>Fasa</th>
+                <th>Komponen</th>
+                <th>Perlu Susun</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Pra-event</td>
+                <td>40 video, promosi, produk SME, buku, vendor, tapak, akademi</td>
+                <td>Kalender posting, senarai produk, permit, pengesahan talent dan jadual fasilitator.</td>
+              </tr>
+              <tr>
+                <td>Hari 1</td>
+                <td>Pembukaan, SME, kelas streaming, Book Glamping, live jualan</td>
+                <td>Registration, PIC, flow peserta, kaunter, live station, studio dan keselamatan.</td>
+              </tr>
+              <tr>
+                <td>Hari 2</td>
+                <td>Konsert, influencer, live 48 jam, buku, filem, e-sukan</td>
+                <td>Peak hour live, crowd control, audio, hak siaran, moderation dan konten highlight.</td>
+              </tr>
+              <tr>
+                <td>Hari 3</td>
+                <td>Penutup, showcase output, laporan awal, pasca promosi</td>
+                <td>Data awal capaian, testimoni, serahan simbolik, video recap dan post-mortem.</td>
+              </tr>
+              <tr>
+                <td>Pasca</td>
+                <td>Akademi bulanan, PLATS, PPAS, Pekan Filem, Glamping zon</td>
+                <td>Cohort, kalendar bulanan, KPI migrasi digital, laporan kepada agensi.</td>
+              </tr>
+            </tbody>
+          </table>
+          <aside class="note-panel">
+            <span class="eyebrow">Nota susunan jadual</span>
+            <p>Ruang catatan ini disimpan dalam browser komputer ini sahaja.</p>
+            <textarea id="scheduleNotes" placeholder="Contoh: letak sesi Faiz Brand sebelum beg kuning, live konsert sebagai peak slot, Book Glamping perlu slot privasi peserta..."></textarea>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="impact" class="band">
+      <div class="section-inner">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Sasaran impak</span>
+            <h2>Angka Yang Perlu Jadi Bukti Program</h2>
+          </div>
+          <p>Ini angka kerja daripada proposal dan input semasa. Bahagian ini memudahkan semak KPI sebelum pembentangan.</p>
+        </div>
+        <div class="kpi-grid">
+          <article class="kpi-card"><b>10k-20k</b><h3>Pengunjung</h3><p>Sasaran kehadiran sepanjang program.</p></article>
+          <article class="kpi-card"><b>500k</b><h3>Tontonan</h3><p>Tontonan terkumpul gabungan penstriman.</p></article>
+          <article class="kpi-card"><b>3,000</b><h3>Naskhah buku</h3><p>Sasaran jualan buku sepanjang festival.</p></article>
+          <article class="kpi-card"><b>80</b><h3>Usahawan</h3><p>SME tempatan dan serantau.</p></article>
+          <article class="kpi-card"><b>40</b><h3>Video utama</h3><p>10 video x 4 akaun utama.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="presentation">
+      <div class="section-inner">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Fokus pembentangan</span>
+            <h2>Soalan Agensi Yang Perlu Dijawab</h2>
+          </div>
+          <p>Input Tuan Hj ZRA diletakkan sebagai lapisan semakan, bukan tulang utama HTML.</p>
+        </div>
+        <table class="data-table" aria-label="Fokus pembentangan">
+          <thead>
+            <tr>
+              <th>Isu</th>
+              <th>Jawapan Perlu Disediakan</th>
+              <th>Bukti / Lampiran</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Tarikh bertembung Art Of Speed</td>
+              <td>Bezakan audience, lokasi, objektif dan kekuatan digital reach.</td>
+              <td>Kalender acara, naratif audience, pelan promosi digital.</td>
+            </tr>
+            <tr>
+              <td>Pecahan sesi dan matlamat impak</td>
+              <td>Setiap sesi perlu ada kapasiti, output, KPI, PIC dan bukti laporan.</td>
+              <td>Jadual akademi, flow live, senarai peserta.</td>
+            </tr>
+            <tr>
+              <td>Beg kuning dan live selling</td>
+              <td>Tunjuk aliran produk, link, video pendek, live CTA, transaksi dan tracking.</td>
+              <td>Demo, template produk, screenshot akaun.</td>
+            </tr>
+            <tr>
+              <td>Reach 10 juta dan 40 video</td>
+              <td>4 akaun utama: ZRA, Nynabukater, Joey, Deroyan. 10 video setiap akaun.</td>
+              <td>Content matrix, jadual posting, bukti follower, disclaimer algoritma.</td>
+            </tr>
+            <tr>
+              <td>Legacy selepas festival</td>
+              <td>Akademi bulanan, PPAS, PLATS, Pekan Filem, Konsert Kemanusiaan, Glamping daerah.</td>
+              <td>Pelan 3-6 bulan, cohort peserta, model daerah/zonal.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="sources" class="band">
+      <div class="section-inner">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Visual rujukan</span>
+            <h2>Slide Yang Digunakan Sebagai Sandaran Isi</h2>
+          </div>
+          <p>Imej ini ialah salinan ringan daripada bahan proposal supaya semakan komponen lebih cepat.</p>
+        </div>
+        <div class="gallery-grid">
+          <article class="gallery-card"><img src="assets/slide-impact.jpg" alt="Sasaran impak"><div><h3>Sasaran Impak</h3><p>Pengunjung, tontonan, buku, SME dan creator.</p></div></article>
+          <article class="gallery-card"><img src="assets/slide-zra-role.jpg" alt="Peranan ZRA Strim"><div><h3>Peranan ZRA Strim</h3><p>Promosi, streaming, kandungan dan laporan.</p></div></article>
+          <article class="gallery-card"><img src="assets/slide-live48.jpg" alt="Penstriman 48 jam"><div><h3>Live 48 Jam</h3><p>Jualan, buku, konsert, glamping dan engagement.</p></div></article>
+          <article class="gallery-card"><img src="assets/slide-bookglamping.jpg" alt="Book Glamping"><div><h3>Book Glamping</h3><p>Budaya membaca, outdoor learning dan kandungan digital.</p></div></article>
+          <article class="gallery-card"><img src="assets/slide-roi.jpg" alt="ROI PPAS"><div><h3>ROI PPAS</h3><p>Visibiliti, pelancongan ilmu dan blueprint projek.</p></div></article>
+          <article class="gallery-card"><img src="assets/slide-pekanfilem.jpg" alt="Pekan Filem"><div><h3>Pekan Filem</h3><p>Filem tempatan, pawagam vintaj dan aktiviti keluarga.</p></div></article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-head">
+      <div>
+        <span class="eyebrow" id="drawerTag">Komponen</span>
+        <h2 id="drawerTitle">Tajuk</h2>
+      </div>
+      <button class="close" type="button" id="drawerClose" aria-label="Tutup panel">x</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+
+  <footer class="footer">
+    <div class="section-inner">
+      <span>ZRA DIGITAL FEST - sandbox komponen event, v0.2, 27 Jun 2026.</span>
+      <button class="utility-button" type="button" id="copyBriefBtn">Salin Ringkasan Komponen</button>
+    </div>
+  </footer>
+
+  <script>
+    const eventStart = new Date("2026-07-31T00:00:00+08:00").getTime();
+
+    const components = [
+      {
+        no: "01",
+        title: "Input Asas & Overview Event",
+        group: "ops",
+        status: "Induk",
+        owner: "Sekretariat",
+        summary: "Nama, tarikh, lokasi, format, objektif, rakan, KPI dan versi maklumat rasmi.",
+        purpose: "Menjadi halaman induk supaya semua pihak rujuk data event yang sama.",
+        items: ["Nama kerja: ZRA Digital Fest / Sabak Bernam Digital Fest 2026", "Tarikh: 31 Julai hingga 2 Ogos 2026", "Lokasi: kawasan Tiga Penjuru berhadapan Grand Sabak Hotel", "Format: Festival / Digital Economy Showcase", "Media rasmi: ZRA Strim"],
+        outputs: ["One-page event brief", "Data rasmi yang tidak bercanggah", "Senarai PIC dan rakan agensi"],
+        checks: ["Nama akhir event perlu disahkan", "Versi logo/branding perlu dipilih"]
+      },
+      {
+        no: "02",
+        title: "Jadual & Rundown",
+        group: "ops",
+        status: "Perlu susun",
+        owner: "Event manager",
+        summary: "Rangka 3 hari 2 malam, pra-program, slot puncak, live 48 jam dan pasca event.",
+        purpose: "Mengelakkan komponen bertembung dan memastikan setiap aktiviti ada matlamat impak.",
+        items: ["Hari 1: pembukaan, onboarding, akademi, glamping mula", "Hari 2: peak festival, kelas, live, konsert, influencer", "Hari 3: penutup, laporan awal, showcase output", "Pasca: laporan, akademi bulanan dan legacy"],
+        outputs: ["Master rundown", "Rundown stage", "Rundown live", "Rundown akademi", "Rundown Book Glamping"],
+        checks: ["Konsert, filem dan live jualan tidak bertindih", "Slot peserta kanak-kanak mesti ada perlindungan privasi"]
+      },
+      {
+        no: "03",
+        title: "Bajet & Sebutharga",
+        group: "ops",
+        status: "Dalaman",
+        owner: "Kewangan / urusetia",
+        summary: "Gabungan sebutharga pengisian dan logistik untuk semakan dalaman.",
+        purpose: "Memisahkan kos pengisian, kos operasi, nilai tambah dan item yang perlu runding.",
+        items: ["Pengisian, talent, pemasaran dan kandungan: RM266,000", "Logistik, fasiliti, promosi dan pengurusan: RM348,000", "Jumlah gabungan dikesan: RM614,000", "Nota: angka bukan untuk hero atau paparan awam"],
+        outputs: ["Ringkasan bajet dalaman", "Senarai item boleh runding", "Mapping kos kepada komponen"],
+        checks: ["Sahkan jika ada kos tambahan luar sebutharga", "Bezakan bajet proposal dan bajet kelulusan"]
+      },
+      {
+        no: "04",
+        title: "Keperluan Infra & PBT",
+        group: "ops",
+        status: "Perlu sah",
+        owner: "MDSB / agensi",
+        summary: "Tong sampah, tandas, bilik mandi, barricade, lampu, ambulans dan tangki air.",
+        purpose: "Memastikan tapak boleh beroperasi selamat untuk pengunjung, glamping, bazar dan live production.",
+        items: ["20 tong sampah", "15 tandas bergerak", "6 bilik mandi bergerak lelaki/perempuan", "Barricade laluan program dan kawasan glamping buku", "Lampu warm light kawasan glamping", "Ambulans / medical team / APM", "4 tangki air Air Selangor"],
+        outputs: ["Checklist PBT", "Pelan lokasi infra", "Surat permohonan agensi"],
+        checks: ["Sahkan sumber elektrik dan internet", "Sahkan pelan hujan/petir"]
+      },
+      {
+        no: "05",
+        title: "Tapak, Logistik & Fasiliti",
+        group: "ops",
+        status: "Kritikal",
+        owner: "Pengurusan tapak",
+        summary: "Pentas utama, pameran SME, Book Glamping, penginapan, keselamatan, Team MCP dan makanan.",
+        purpose: "Menterjemah proposal tapak kepada operasi fizikal di lokasi sebenar.",
+        items: ["Pentas utama: marquee tent, pentas, PA, lampu, genset, internet", "Pameran SME: marquee 10m x 50m, booth, genset 100 KVA", "Hotel 19 bilik, hostel 4 x 4 bilik, dewan 200 pax, bilik seminar 25 pax", "Keselamatan 10 orang, krew event 25 orang, RELA 10 orang, runner 4 orang", "Kos makanan 3 kali sehari untuk 100 pax selama 3 hari"],
+        outputs: ["Pelan tapak", "Vendor list", "Shift krew", "Setup/teardown timeline"],
+        checks: ["Laluan masuk/keluar", "Backstage dan ruang media", "Crowd control waktu konsert"]
+      },
+      {
+        no: "06",
+        title: "SME, PLATS & Bazar",
+        group: "program",
+        status: "Teras",
+        owner: "SME lead",
+        summary: "Pameran SME, Bazar Karat, live selling, katalog produk dan peserta PLATS.",
+        purpose: "Menjadikan festival sebagai platform jualan sebenar untuk usahawan tempatan dan serantau.",
+        items: ["Sasaran 80 usahawan", "Booth pameran SME", "50 khemah peniaga Bazar Karat 20 x 20", "Produk untuk live commerce dan beg kuning", "Latihan jualan dan branding"],
+        outputs: ["Senarai peniaga", "Katalog produk", "Jadual live seller", "Template tawaran"],
+        checks: ["Produk siap untuk promosi sebelum event", "PIC setiap kategori produk", "Kaedah rekod jualan"]
+      },
+      {
+        no: "07",
+        title: "Buku, PPAS & Jualan Buku",
+        group: "program",
+        status: "Teras",
+        owner: "PPAS + ZRA",
+        summary: "Festival buku, jualan naskhah, live buku, studio PPAS dan kandungan ilmu.",
+        purpose: "Memajukan industri buku secara digital sambil mengangkat perpustakaan sebagai destinasi ilmu.",
+        items: ["Sasaran 3,000 naskhah buku sepanjang festival", "Live stream jualan buku", "Katalog buku dan stok", "Studio strim buku PPAS", "Buku coffee table SME Selangor"],
+        outputs: ["Katalog buku", "Host live buku", "Slot penulis/ulasan buku", "Laporan jualan buku"],
+        checks: ["Harga dan stok buku", "Hak promosi buku", "Kaedah pembayaran dan penghantaran"]
+      },
+      {
+        no: "08",
+        title: "Book Glamping",
+        group: "program",
+        status: "Perlu sah data",
+        owner: "PPAS + urusetia glamping",
+        summary: "Rehlah ilmu, aktiviti membaca, storytelling, video, sukan rakyat dan glamping selamat.",
+        purpose: "Menjadikan Book Glamping sebagai modul ilmu, sahsiah dan kandungan digital kanak-kanak.",
+        items: ["Laman draf: 40 peserta, 20L + 20P, umur 9-17, 15 khemah, 3H2M", "Slide: 30-40 peserta, umur 10-13, 8 khemah, 2H1M", "Fokus: budaya membaca, treasure hunt ilmu, video storytelling, sukan rakyat", "Pelan hujan/petir pindah ke PPAS"],
+        outputs: ["Data rasmi peserta", "Tentatif lengkap", "Dokumen ibu bapa", "Pelan keselamatan dan privasi"],
+        checks: ["Sahkan angka peserta/khemah/umur/tempoh", "Sahkan kebenaran ibu bapa untuk rakaman/live"]
+      },
+      {
+        no: "09",
+        title: "Filem: Tayangan Mamat Khalid",
+        group: "program",
+        status: "Perlu hak",
+        owner: "Kurator filem",
+        summary: "Tayangan Rock Oo dan Rock Bro sebagai permulaan tema Sabak sebagai Pekan Filem.",
+        purpose: "Membawa filem tempatan bertema rakyat ke ruang komuniti dan pawagam vintaj Grand Sabak.",
+        items: ["Tayangan dua filem: Rock Oo dan Rock Bro", "Bayaran hak cipta/lesen tayangan awam", "Honorarium 4 pelakon utama", "Peralatan tayangan asas: skrin/projektor/audio/teknikal", "Cadangan Pekan Filem 3 kali setahun"],
+        outputs: ["Surat hak tayangan", "Jadual tayangan", "Senarai tetamu filem", "Pelan Pekan Filem berkala"],
+        checks: ["Hak tayangan dan promosi", "Lokasi tayangan", "Keserasian jadual dengan konsert/live"]
+      },
+      {
+        no: "10",
+        title: "Muzik: Konsert Ramli Sarip",
+        group: "program",
+        status: "Tarikan utama",
+        owner: "Stage manager",
+        summary: "Persembahan Datuk Ramli Sarip, Panggan Band dan Konsert Kemanusiaan.",
+        purpose: "Menjadi tarikan crowd dan slot engagement tinggi untuk live stream festival.",
+        items: ["Datuk Ramli Sarip: set 90 minit / 10-12 lagu", "Crossover bersama Riz Metalasia", "Panggan Band sebagai pengiring dan persembahan Ahad", "Soundcheck, rider, audio, stage, hak promosi nama/wajah", "Cadangan Konsert Kemanusiaan setiap kali Pekan Filem"],
+        outputs: ["Rundown stage", "Technical rider", "Hak live/promosi", "Pelan crowd control"],
+        checks: ["Hak live stream konsert", "Audio untuk broadcast", "Keselamatan waktu peak crowd"]
+      },
+      {
+        no: "11",
+        title: "Influencer & Talent",
+        group: "digital",
+        status: "Reach",
+        owner: "Content lead",
+        summary: "Faiz Brand, Nynabukater, Deghoyan/Deroyan, Joey Daud dan penggunaan 4 akaun utama.",
+        purpose: "Menggerakkan capaian, latihan, video pendek, host, promosi organik dan bukti paparan.",
+        items: ["Faiz Brand: 2 sesi branding x 200 peserta", "Nynabukater: beg kuning, affiliate, event video, hebahan organik", "Deghoyan/Deroyan: strategi 10 klip video/VTT", "Joey Daud: pengacaraan, video pemasaran, tarikan keluarga", "4 akaun utama: ZRA, Nynabukater, Joey, Deroyan"],
+        outputs: ["Content matrix 4 x 10 video", "Jadual posting", "Caption bank", "Screenshot analitik"],
+        checks: ["Nama rasmi influencer perlu diselaraskan", "Disclaim reach: potensi capaian, bukan jaminan view tetap"]
+      },
+      {
+        no: "12",
+        title: "Kelas Streaming & Akademi Digital",
+        group: "program",
+        status: "Impak latihan",
+        owner: "Akademi lead",
+        summary: "Sesi skill stream, branding, beg kuning dan topik digital tambahan.",
+        purpose: "Memberi kemahiran praktikal kepada SME, PLATS, peserta buku dan komuniti untuk migrasi digital.",
+        items: ["Sesi Skill Strim: 2 jam x 2 sesi untuk 50 peserta oleh ZRA", "Sesi mengukuhkan jenama: 2 sesi x 200 peserta oleh Faiz Brand", "Mengendalikan beg kuning: 200 peserta x 1 sesi oleh Nynabukater", "Cadangan topik tambahan: AI praktikal untuk usahawan komuniti"],
+        outputs: ["Silibus 1 halaman", "Jadual fasilitator", "Borang kehadiran", "Output peserta: skrip, VTT, live plan"],
+        checks: ["Kapasiti dewan", "Sijil atau bukti penyertaan", "Cohort bimbingan bulanan"]
+      },
+      {
+        no: "13",
+        title: "Live Stream 48 Jam",
+        group: "digital",
+        status: "Teras digital",
+        owner: "ZRA Strim + Team MCP",
+        summary: "Live jualan, live konsert, live glamping dan live buku sepanjang festival.",
+        purpose: "Menghubungkan pengunjung fizikal dengan pembeli dan penonton atas talian seluruh Malaysia.",
+        items: ["Platform live 48 jam", "Streaming penjualan SME dan buku", "Live konsert", "Live glamping dengan kawalan privasi", "Team MCP: live stream, podcast, docu-cam dan rakaman arkib"],
+        outputs: ["Rundown live 48 jam", "Senarai host", "Senarai produk/buku", "Laporan reach dan engagement"],
+        checks: ["Internet, power backup, kamera, audio, moderation", "Hak siaran untuk muzik/filem/peserta"]
+      },
+      {
+        no: "14",
+        title: "Content, Reach & Dokumentasi",
+        group: "digital",
+        status: "Perlu bukti",
+        owner: "Media team",
+        summary: "40 video, 12 video ZRA, dokumentari 30 minit, foto/video dan laporan pasca program.",
+        purpose: "Menjadikan impak program boleh dibuktikan melalui kandungan, data dan dokumentasi.",
+        items: ["Jangkaan reach 10 juta melalui 4 akaun utama", "40 video: 10 video setiap akaun utama", "ZRA: 12 video kandungan digital", "Aidid Marcello: dokumentari khas 30 minit untuk cadangan siaran RTM", "Fotografi dan videografi program"],
+        outputs: ["Content calendar", "Shot list", "Folder bukti", "Master video dokumentari", "Laporan ringkas capaian"],
+        checks: ["Hak guna wajah/nama", "Akses footage", "Tarikh serahan editing"]
+      },
+      {
+        no: "15",
+        title: "Promosi, Branding & Bahan Cetak",
+        group: "ops",
+        status: "Perlu artwork",
+        owner: "Design lead",
+        summary: "Poster, bunting, backdrop, flagdrop, signage, inflatable arch dan bahan arah laluan.",
+        purpose: "Mewujudkan identiti visual event di tapak, media sosial dan bahan pembentangan.",
+        items: ["Poster, bunting, backdrop, flagdrop", "Signage dan bahan arah laluan", "Inflatable arch", "Titik foto/branding venue", "Artwork asas dan cetakan"],
+        outputs: ["Key visual", "Template poster", "Wayfinding map", "Branding checklist"],
+        checks: ["Logo rakan agensi", "Tarikh/nama rasmi", "Versi bahasa"]
+      },
+      {
+        no: "16",
+        title: "E-sukan & Aktiviti Remaja",
+        group: "program",
+        status: "Segmen remaja",
+        owner: "Youth activity lead",
+        summary: "Pertandingan Beyblade dan Mobile Legends untuk menarik remaja, keluarga dan komuniti digital.",
+        purpose: "Memberi aktiviti engagement kepada segmen muda dan menghidupkan suasana festival.",
+        items: ["Beyblade", "Mobile Legends", "Bracket ringkas", "Keperluan asas pertandingan", "Promosi segmen remaja"],
+        outputs: ["Jadual pertandingan", "Borang penyertaan", "Hadiah/peraturan", "PIC teknikal"],
+        checks: ["Internet/game setup", "Had umur", "Crowd control"]
+      },
+      {
+        no: "17",
+        title: "Risiko, Permit & Keselamatan",
+        group: "ops",
+        status: "Kritikal",
+        owner: "Safety lead",
+        summary: "Permit, pematuhan asas, crowd control, medical, laluan, cuaca dan privasi peserta.",
+        purpose: "Mengelakkan isu operasi yang boleh menjejaskan kelulusan agensi dan keselamatan pengunjung.",
+        items: ["Permit dan pematuhan asas", "Briefing SOP krew", "Medical team/APM", "Crowd control dan RELA", "Pelan hujan/petir", "Privasi peserta kanak-kanak"],
+        outputs: ["Risk register", "SOP ringkas", "Emergency contact", "Pelan laluan"],
+        checks: ["Tarikh bertembung Art Of Speed", "Jalan sebelah dataran", "Kelulusan MDSB/PPAS"]
+      },
+      {
+        no: "18",
+        title: "Legacy Bulanan",
+        group: "legacy",
+        status: "Jangka panjang",
+        owner: "PPAS + ZRA + agensi",
+        summary: "Akademi Strim Buku, Akademi PLATS, Glamping daerah dan Pekan Filem berkala.",
+        purpose: "Menjadikan festival sebagai titik mula bimbingan digital, bukan acara sekali lalu.",
+        items: ["Akademi Strim Buku bulanan dengan PPAS", "Akademi skill jualan untuk peserta PLATS", "Topik digital bulanan dipilih mengikut keperluan", "Book Glamping daerah/zonal setiap cuti sekolah", "Pekan Filem 3 kali setahun dan Konsert Kemanusiaan"],
+        outputs: ["Kalendar 3-6 bulan", "Senarai cohort", "Blueprint program daerah", "KPI bulanan"],
+        checks: ["Siapa pemilik program selepas event", "Bajet kesinambungan", "Mekanisme laporan agensi"]
+      }
+    ];
+
+    const menuGrid = document.getElementById("menuGrid");
+    const searchInput = document.getElementById("searchInput");
+    const drawer = document.getElementById("drawer");
+    const drawerBackdrop = document.getElementById("drawerBackdrop");
+    const drawerTitle = document.getElementById("drawerTitle");
+    const drawerTag = document.getElementById("drawerTag");
+    const drawerBody = document.getElementById("drawerBody");
+    let activeFilter = "all";
+
+    function statusClass(status) {
+      const lower = status.toLowerCase();
+      if (lower.includes("kritikal") || lower.includes("hak") || lower.includes("sah") || lower.includes("risiko")) return "hot";
+      if (lower.includes("teras") || lower.includes("utama") || lower.includes("induk")) return "ready";
+      return "check";
+    }
+
+    function list(items) {
+      return `<ul class="plain-list">${items.map(item => `<li>${item}</li>`).join("")}</ul>`;
+    }
+
+    function renderMenus() {
+      const query = searchInput.value.trim().toLowerCase();
+      const filtered = components.filter((item) => {
+        const haystack = `${item.title} ${item.group} ${item.status} ${item.owner} ${item.summary} ${item.purpose} ${item.items.join(" ")} ${item.outputs.join(" ")} ${item.checks.join(" ")}`.toLowerCase();
+        const groupMatch = activeFilter === "all" || item.group === activeFilter;
+        return groupMatch && (!query || haystack.includes(query));
+      });
+
+      menuGrid.innerHTML = filtered.map((item) => `
+        <button class="menu-card" type="button" data-id="${item.no}">
+          <header>
+            <span class="num">${item.no}</span>
+            <span class="tag ${statusClass(item.status)}">${item.status}</span>
+          </header>
+          <div>
+            <h3>${item.title}</h3>
+            <p>${item.summary}</p>
+          </div>
+          <div class="meta">
+            <span class="pill">${item.group}</span>
+            <span class="pill">${item.owner}</span>
+          </div>
+        </button>
+      `).join("");
+
+      menuGrid.querySelectorAll("[data-id]").forEach((card) => {
+        card.addEventListener("click", () => openDrawer(card.dataset.id));
+      });
+    }
+
+    function openDrawer(no) {
+      const item = components.find(component => component.no === no);
+      if (!item) return;
+      drawerTitle.textContent = item.title;
+      drawerTag.textContent = `Komponen ${item.no} / ${item.group}`;
+      drawerBody.innerHTML = `
+        <section class="drawer-section">
+          <h3>Tujuan</h3>
+          <p>${item.purpose}</p>
+        </section>
+        <section class="drawer-section">
+          <h3>Isi Komponen</h3>
+          ${list(item.items)}
+        </section>
+        <section class="drawer-section">
+          <h3>Output / Dokumen Perlu Ada</h3>
+          ${list(item.outputs)}
+        </section>
+        <section class="drawer-section">
+          <h3>Perlu Sahkan</h3>
+          ${list(item.checks)}
+        </section>
+      `;
+      drawer.classList.add("open");
+      drawerBackdrop.classList.add("open");
+      drawer.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDrawer() {
+      drawer.classList.remove("open");
+      drawerBackdrop.classList.remove("open");
+      drawer.setAttribute("aria-hidden", "true");
+    }
+
+    function updateCountdown() {
+      const distance = Math.max(0, eventStart - Date.now());
+      const days = Math.floor(distance / 86400000);
+      const hours = Math.floor((distance % 86400000) / 3600000);
+      const minutes = Math.floor((distance % 3600000) / 60000);
+      const seconds = Math.floor((distance % 60000) / 1000);
+      document.getElementById("countDays").textContent = String(days);
+      document.getElementById("countHours").textContent = String(hours).padStart(2, "0");
+      document.getElementById("countMinutes").textContent = String(minutes).padStart(2, "0");
+      document.getElementById("countSeconds").textContent = String(seconds).padStart(2, "0");
+    }
+
+    document.querySelectorAll(".filter-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".filter-button").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        activeFilter = button.dataset.filter;
+        renderMenus();
+      });
+    });
+    searchInput.addEventListener("input", renderMenus);
+    document.getElementById("drawerClose").addEventListener("click", closeDrawer);
+    drawerBackdrop.addEventListener("click", closeDrawer);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeDrawer();
+    });
+    document.getElementById("printBtn").addEventListener("click", () => window.print());
+
+    const scheduleNotes = document.getElementById("scheduleNotes");
+    scheduleNotes.value = localStorage.getItem("zra-schedule-notes") || "";
+    scheduleNotes.addEventListener("input", () => localStorage.setItem("zra-schedule-notes", scheduleNotes.value));
+
+    document.getElementById("copyBriefBtn").addEventListener("click", async () => {
+      const brief = [
+        "ZRA DIGITAL FEST - Ringkasan Komponen",
+        "Hero: input asas event, tarikh 31 Jul-2 Ogos 2026, lokasi Tiga Penjuru Grand Sabak, 4 teras program.",
+        "Fokus: SME, Pelancongan Sabak Bernam, Buku/Ilmu, Penstriman Digital 48 jam.",
+        "Menu utama: Jadual, Bajet, Infra, Tapak, SME, Buku, Book Glamping, Filem, Muzik, Influencer, Kelas Streaming, Live 48 Jam, Content, Promosi, E-sukan, Risiko dan Legacy.",
+        "Perlu sah: data Book Glamping, hak tayangan filem, hak live konsert, permit/PBT, jadual akademi, content matrix 40 video."
+      ].join("\\n");
+      try {
+        await navigator.clipboard.writeText(brief);
+        document.getElementById("copyBriefBtn").textContent = "Ringkasan Disalin";
+        setTimeout(() => document.getElementById("copyBriefBtn").textContent = "Salin Ringkasan Komponen", 1600);
+      } catch (error) {
+        alert(brief);
+      }
+    });
+
+    renderMenus();
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>
