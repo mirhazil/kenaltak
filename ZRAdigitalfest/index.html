@@ -576,6 +576,186 @@
       .hero::before { opacity: .15; }
       .hero-inner { grid-template-columns: 1fr; padding: 38px 0; }
     }
+
+    /* ===== Modul Bajet ===== */
+    .bajet-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .role-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      border: 1px solid var(--line-soft);
+      background: rgba(255,255,255,.05);
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .role-chip b { color: var(--text); }
+    .role-chip.sa { border-color: var(--line); color: var(--lime); }
+    .role-chip.sa b { color: var(--lime); }
+    .role-chip.admin { border-color: rgba(97,212,255,.4); color: var(--cyan); }
+    .role-chip.admin b { color: var(--cyan); }
+    .pin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: rgba(216,255,88,.1);
+      color: var(--lime);
+      font-weight: 800;
+      font-size: .85rem;
+    }
+    .pin-btn:hover { background: rgba(216,255,88,.18); }
+
+    .bajet-cats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 720px) { .bajet-cats { grid-template-columns: 1fr; } }
+    .cat-tile {
+      text-align: left;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: linear-gradient(150deg, var(--panel), var(--panel-2));
+      padding: 22px;
+      display: grid;
+      gap: 14px;
+      transition: transform .16s ease, border-color .16s ease;
+    }
+    .cat-tile:hover { transform: translateY(-2px); border-color: var(--line); }
+    .cat-tile .cat-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .cat-tile h3 { margin: 0; font-size: 1.3rem; }
+    .cat-tile .cat-icon { font-size: 1.7rem; }
+    .cat-tile .cat-count { color: var(--muted); font-size: .82rem; }
+    .cat-tile .cat-figs { display: flex; gap: 18px; flex-wrap: wrap; }
+    .cat-tile .fig b { display: block; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+    .cat-tile .fig span { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+    .cat-tile .cat-open { color: var(--lime); font-weight: 800; font-size: .82rem; }
+
+    .bajet-summary {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 720px) { .bajet-summary { grid-template-columns: 1fr 1fr; } }
+    .sum-cell {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      padding: 14px;
+    }
+    .sum-cell b { display: block; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+    .sum-cell span { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+    .pos { color: var(--green); } .neg { color: var(--rose); }
+
+    /* Overlay layers */
+    .layer-backdrop {
+      position: fixed; inset: 0; display: none;
+      background: rgba(0,0,0,.66); z-index: 50;
+    }
+    .layer-backdrop.open { display: block; }
+    .layer {
+      position: fixed; inset: 0; z-index: 51;
+      display: none; overflow: auto;
+      background: #080c0d;
+    }
+    .layer.open { display: block; }
+    .layer-inner { width: min(1080px, calc(100% - 28px)); margin: 0 auto; padding: 22px 0 60px; }
+    .layer-head {
+      position: sticky; top: 0; z-index: 2;
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      padding: 16px 0; margin-bottom: 8px;
+      background: rgba(8,12,13,.92); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .layer-head h2 { margin: 0; font-size: 1.5rem; }
+    .layer-head .eyebrow { margin: 0; }
+    .layer-back {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 14px; border-radius: var(--radius-sm);
+      border: 1px solid var(--line-soft); background: rgba(255,255,255,.06);
+      color: var(--text); font-weight: 700; font-size: .85rem;
+    }
+
+    .bjt-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    .bjt-table th, .bjt-table td { padding: 12px 10px; border-bottom: 1px solid var(--line-soft); text-align: left; vertical-align: middle; }
+    .bjt-table th { color: var(--muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; }
+    .bjt-table td.num, .bjt-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .bjt-table .row-title { background: none; border: 0; color: var(--text); font-weight: 800; font-size: .95rem; text-align: left; padding: 0; cursor: pointer; }
+    .bjt-table .row-title:hover { color: var(--lime); text-decoration: underline; }
+    .bjt-table tfoot td { font-weight: 800; border-top: 2px solid var(--line); border-bottom: 0; }
+    .locked { color: var(--muted); }
+    .actual-input {
+      width: 120px; text-align: right; font-variant-numeric: tabular-nums;
+      padding: 8px 10px; border-radius: var(--radius-sm);
+      border: 1px solid var(--line-soft); background: #0d1314; color: var(--text);
+    }
+    .actual-input:focus { outline: 2px solid var(--lime); border-color: transparent; }
+    .actual-input:disabled { opacity: .5; cursor: not-allowed; }
+    .actual-static { font-variant-numeric: tabular-nums; }
+
+    .badge { display: inline-block; padding: 4px 9px; border-radius: 999px; font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+    .b-draf { background: rgba(255,255,255,.08); color: var(--muted); }
+    .b-menunggu { background: rgba(255,198,92,.16); color: var(--amber); }
+    .b-diluluskan { background: rgba(127,209,119,.16); color: var(--green); }
+    .b-ditolak { background: rgba(255,130,120,.16); color: var(--rose); }
+
+    /* L2 detail */
+    .det-grid { display: grid; gap: 16px; }
+    .det-card { border: 1px solid var(--line-soft); border-radius: var(--radius); background: var(--panel); padding: 18px; }
+    .det-card h3 { margin: 0 0 10px; color: var(--lime); font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; }
+    .det-card p { margin: 0; color: #dce8d8; }
+    .det-figs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .det-fig { border: 1px solid var(--line-soft); border-radius: var(--radius-sm); padding: 14px; }
+    .det-fig b { display: block; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+    .det-fig span { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+    .det-input { width: 100%; padding: 11px 12px; border-radius: var(--radius-sm); border: 1px solid var(--line-soft); background: #0d1314; color: var(--text); font: inherit; }
+    .det-input:focus { outline: 2px solid var(--lime); border-color: transparent; }
+    textarea.det-input { min-height: 80px; resize: vertical; }
+    .det-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn { padding: 11px 18px; border-radius: var(--radius-sm); font-weight: 800; font-size: .85rem; border: 1px solid var(--line-soft); background: rgba(255,255,255,.06); color: var(--text); }
+    .btn.primary { background: var(--lime); color: #0a0f05; border-color: var(--lime); }
+    .btn.good { background: rgba(127,209,119,.18); color: var(--green); border-color: rgba(127,209,119,.4); }
+    .btn.danger { background: rgba(255,130,120,.16); color: var(--rose); border-color: rgba(255,130,120,.4); }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    .receipts { display: grid; gap: 10px; }
+    .receipt { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--line-soft); border-radius: var(--radius-sm); padding: 10px; }
+    .receipt img { width: 86px; height: 86px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line-soft); cursor: pointer; }
+    .receipt .r-body { flex: 1; min-width: 0; }
+    .receipt .r-amt { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--lime); }
+    .receipt .r-meta { font-size: .72rem; color: var(--muted); }
+    .audit { font-size: .76rem; color: var(--muted); }
+
+    /* PIN modal */
+    .modal { position: fixed; inset: 0; display: none; place-items: center; z-index: 60; background: rgba(0,0,0,.7); padding: 18px; }
+    .modal.open { display: grid; }
+    .modal-card { width: min(420px, 100%); background: #0c1112; border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+    .modal-card h2 { margin: 0 0 6px; }
+    .modal-card p { margin: 0 0 14px; color: var(--muted); font-size: .88rem; }
+    .modal-card input { width: 100%; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--line-soft); background: #0d1314; color: var(--text); font: inherit; margin-bottom: 12px; }
+    .modal-msg { font-size: .82rem; min-height: 18px; }
+    .modal-close { float: right; background: none; color: var(--muted); font-size: 1.4rem; line-height: 1; }
+
+    /* Toast */
+    .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); opacity: 0; pointer-events: none; z-index: 70; padding: 12px 20px; border-radius: 999px; background: var(--lime); color: #0a0f05; font-weight: 800; font-size: .85rem; transition: all .2s ease; }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.err { background: var(--rose); color: #2a0a07; }
+
+    .lightbox { position: fixed; inset: 0; display: none; place-items: center; z-index: 80; background: rgba(0,0,0,.9); padding: 20px; }
+    .lightbox.open { display: grid; }
+    .lightbox img { max-width: 96vw; max-height: 92vh; border-radius: 10px; }
   </style>
 </head>
 <body>
@@ -592,6 +772,7 @@
         <a href="#focus">Fokus</a>
         <a href="#flow">Aliran</a>
         <a href="#menus">Menu</a>
+        <a href="#bajet">Bajet</a>
         <a href="#schedule">Jadual</a>
         <a href="#presentation">Pembentangan</a>
       </nav>
@@ -730,6 +911,68 @@
           </div>
         </div>
         <div class="menu-grid" id="menuGrid"></div>
+      </div>
+    </section>
+
+    <section id="bajet" class="band">
+      <div class="section-inner">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Bajet & sebutharga kawalan</span>
+            <h2>Bajet Terkunci vs Kos Sebenar</h2>
+          </div>
+          <p>Bajet dari sebutharga rasmi tidak boleh diubah. Admin isi kos sebenar, resit, gambar &amp; nota untuk semakan; Superadmin lulus, edit atau padam.</p>
+        </div>
+
+        <div class="bajet-bar">
+          <span class="role-chip" id="roleChip">👁️ Mode: Lihat sahaja</span>
+          <button class="pin-btn" type="button" id="bajetPinBtn">🔐 Masuk PIN</button>
+          <button class="pin-btn" type="button" id="logoutBtn" style="display:none">🚪 Log keluar</button>
+          <button class="pin-btn" type="button" id="reviewBtn" style="display:none">🗂️ Semakan Superadmin</button>
+        </div>
+
+        <div class="bajet-cats">
+          <button class="cat-tile" type="button" data-cat="konten">
+            <div class="cat-top">
+              <div>
+                <span class="cat-icon">🎬</span>
+                <h3>Konten / Pengisian</h3>
+                <div class="cat-count">14 item · talent, pemasaran &amp; kandungan</div>
+              </div>
+              <span class="badge b-menunggu" id="catStatusKonten">—</span>
+            </div>
+            <div class="cat-figs">
+              <span class="fig"><b id="catBudgetKonten">RM 266,000</b><span>Bajet</span></span>
+              <span class="fig"><b id="catActualKonten">RM —</b><span>Actual</span></span>
+              <span class="fig"><b id="catVarKonten">—</b><span>Varian</span></span>
+            </div>
+            <span class="cat-open">Buka senarai →</span>
+          </button>
+
+          <button class="cat-tile" type="button" data-cat="logistik">
+            <div class="cat-top">
+              <div>
+                <span class="cat-icon">🚚</span>
+                <h3>Logistik / Fasiliti</h3>
+                <div class="cat-count">10 item · fasiliti, promosi &amp; pengurusan</div>
+              </div>
+              <span class="badge b-menunggu" id="catStatusLogistik">—</span>
+            </div>
+            <div class="cat-figs">
+              <span class="fig"><b id="catBudgetLogistik">RM 348,000</b><span>Bajet</span></span>
+              <span class="fig"><b id="catActualLogistik">RM —</b><span>Actual</span></span>
+              <span class="fig"><b id="catVarLogistik">—</b><span>Varian</span></span>
+            </div>
+            <span class="cat-open">Buka senarai →</span>
+          </button>
+        </div>
+
+        <div class="bajet-summary">
+          <div class="sum-cell"><b id="sumBudget">RM 614,000</b><span>Jumlah Bajet</span></div>
+          <div class="sum-cell"><b id="sumActual">RM —</b><span>Jumlah Actual</span></div>
+          <div class="sum-cell"><b id="sumVar">—</b><span>Varian Keseluruhan</span></div>
+          <div class="sum-cell"><b id="sumStatus">—</b><span>Status Kelulusan</span></div>
+        </div>
       </div>
     </section>
 
@@ -888,12 +1131,72 @@
     <div class="drawer-body" id="drawerBody"></div>
   </aside>
 
+  <!-- Bajet L1: senarai item -->
+  <div class="layer-backdrop" id="bjtBackdrop"></div>
+  <div class="layer" id="layerList" aria-hidden="true">
+    <div class="layer-inner">
+      <div class="layer-head">
+        <div>
+          <span class="eyebrow" id="listEyebrow">Senarai bajet</span>
+          <h2 id="listTitle">Kategori</h2>
+        </div>
+        <button class="layer-back" type="button" data-close-layer="layerList">✕ Tutup</button>
+      </div>
+      <div id="listBody"></div>
+    </div>
+  </div>
+
+  <!-- Bajet L2: butiran item -->
+  <div class="layer" id="layerDetail" aria-hidden="true">
+    <div class="layer-inner">
+      <div class="layer-head">
+        <div>
+          <span class="eyebrow" id="detEyebrow">Butiran item</span>
+          <h2 id="detTitle">Tajuk</h2>
+        </div>
+        <button class="layer-back" type="button" data-close-layer="layerDetail">← Kembali senarai</button>
+      </div>
+      <div id="detBody" class="det-grid"></div>
+    </div>
+  </div>
+
+  <!-- Semakan Superadmin -->
+  <div class="layer" id="layerReview" aria-hidden="true">
+    <div class="layer-inner">
+      <div class="layer-head">
+        <div>
+          <span class="eyebrow">Dashboard superadmin</span>
+          <h2>Item Menunggu Semakan</h2>
+        </div>
+        <button class="layer-back" type="button" data-close-layer="layerReview">✕ Tutup</button>
+      </div>
+      <div id="reviewBody"></div>
+    </div>
+  </div>
+
+  <!-- PIN modal -->
+  <div class="modal" id="pinModal" aria-hidden="true">
+    <div class="modal-card">
+      <button class="modal-close" type="button" id="pinClose">×</button>
+      <h2>Masuk PIN</h2>
+      <p>Admin: isi actual, resit, gambar &amp; nota untuk semakan. Superadmin: lulus, edit &amp; padam.</p>
+      <input id="pinInput" type="password" inputmode="text" placeholder="Masukkan PIN" autocomplete="off">
+      <button class="btn primary" type="button" id="pinSubmit" style="width:100%">Masuk</button>
+      <p class="modal-msg" id="pinMsg"></p>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox"><img id="lightboxImg" alt="Resit"></div>
+  <div class="toast" id="toast"></div>
+
   <footer class="footer">
     <div class="section-inner">
       <span>ZRA DIGITAL FEST - sandbox komponen event, v0.2, 27 Jun 2026.</span>
       <button class="utility-button" type="button" id="copyBriefBtn">Salin Ringkasan Komponen</button>
     </div>
   </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
     const eventStart = new Date("2026-07-31T00:00:00+08:00").getTime();
@@ -1253,6 +1556,431 @@
     renderMenus();
     updateCountdown();
     setInterval(updateCountdown, 1000);
+  </script>
+
+  <!-- ===== Modul Bajet ===== -->
+  <script>
+  const ZRA_CFG = {
+    supabaseUrl: "https://lliyonpjrecdlpykxwqg.supabase.co",
+    supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsaXlvbnBqcmVjZGxweWt4d3FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNzQwMzUsImV4cCI6MjA5Njc1MDAzNX0.iJBUDzPERFMZyPC2X0NqdjN2nDrso0aqrpe99twdsKY",
+    actualsTable: "zra_budget_actuals",
+    receiptsTable: "zra_budget_receipts",
+    bucket: "zra-budget-receipts",
+    adminPin: "ZRASTRIM",
+    superadminPin: "ZRASTRIM2026"
+  };
+
+  // Katalog tetap dari sebutharga 24 Jun 2026 (bajet TIDAK boleh diubah)
+  const CATALOG = {
+    konten: {
+      label: "Konten / Pengisian",
+      icon: "🎬",
+      kepada: "Perbadanan Perpustakaan Awam Selangor (PPAS)",
+      items: [
+        { key:"konten-01", no:1, title:"Persembahan Datuk Ramli Sarip", qty:"1 pakej", budget:20000, scope:"Yuran persembahan utama, set 90 minit / 10-12 lagu, crossover bersama Riz Metalasia (gitaris), penyelarasan persembahan, soundcheck/rehearsal asas, keperluan rider asas serta penggunaan nama/wajah untuk promosi program yang diluluskan." },
+        { key:"konten-02", no:2, title:"Faiz Brand (Pempengaruh)", qty:"1 pakej", budget:10000, scope:"Dua (2) sesi konsultansi penjenamaan & pemasaran produk; Sesi 1: 2 jam x 200 peserta termasuk sijil; Sesi 2: 2 jam x 200 peserta termasuk sijil; penyediaan rangka modul, bahan ringkas sesi, kehadiran pempengaruh dan hak guna bahan foto/video program untuk promosi pasca acara." },
+        { key:"konten-03", no:3, title:"Nynobucater (Pempengaruh)", qty:"1 pakej", budget:15000, scope:"Nilai capaian komuniti TT, paparan/print follower, konsultansi beg kuning TT dan affiliate, satu (1) sesi x 50 orang, tiga (3) video event, posting/hebahan organik serta bukti paparan/screenshot kandungan untuk dokumentasi program." },
+        { key:"konten-04", no:4, title:"Deghoyan (Pempengaruh)", qty:"1 pakej", budget:15000, scope:"Strategi paparan video di media sosial, perancangan 10 klip video/VTT, paparan atau masukan screenshot page, sokongan ayat posting/caption, kehadiran kandungan di lokasi serta nilai promosi digital melalui rangkaian pempengaruh." },
+        { key:"konten-05", no:5, title:"Sesi Tayangan Filem Mamat Khalid", qty:"1 pakej", budget:35000, scope:"Tayangan dua (2) filem: Rock Oo dan Rock Bro. Bayaran hak cipta/lesen tayangan awam, honorarium kehadiran empat (4) pelakon utama, penyediaan peralatan tayangan asas seperti skrin/projektor, audio dan teknikal. Tertakluk kepada proposal, kelulusan hak berkaitan dan kesesuaian jadual." },
+        { key:"konten-06", no:6, title:"Joey Daud (Artis)", qty:"1 pakej", budget:30000, scope:"Pengacaraan majlis, video pemasaran, penggunaan wajah/personaliti di poster dan bahan promosi yang diluluskan, paparan SS akaun TT, sokongan komunikasi acara, koordinasi rundown serta nilai tarikan personaliti untuk menarik audiens keluarga dan komuniti." },
+        { key:"konten-07", no:7, title:"Pengarah Dokumentari - Aidid Marcello", qty:"1 pakej", budget:10000, scope:"Pengarahan dokumentari khas program berdurasi 30 minit untuk cadangan siaran RTM; pembangunan konsep/treatment, naratif, koordinasi rakaman, pengarahan produksi, temu bual terpilih, pengawasan suntingan asas dan penyediaan master video untuk tujuan submission/semakan." },
+        { key:"konten-08", no:8, title:"Kos Editing", qty:"1 pakej", budget:5000, scope:"Suntingan kandungan video, klip pendek, bahan promosi digital dan bahan program sepanjang kempen; susunan footage, tajuk/lower-third asas, audio balancing asas, export fail dan semakan minor bagi bahan yang diluluskan." },
+        { key:"konten-09", no:9, title:"Fotografi & Videografi", qty:"1 pakej", budget:15000, scope:"Liputan fotografi & videografi program; rakaman suasana, aktiviti utama, sesi peserta, booth SME, bahan dokumentasi acara, pemilihan foto asas serta serahan fail digital untuk arkib dan promosi pasca program." },
+        { key:"konten-10", no:10, title:"e-Sukan: Beyblade & Mobile Legend", qty:"1 pakej", budget:8000, scope:"Perancangan aktiviti pertandingan, susun atur penyertaan, jadual/bracket ringkas, keperluan asas pertandingan, koordinasi peserta serta bahan promosi untuk menarik segmen remaja, keluarga dan komuniti digital." },
+        { key:"konten-11", no:11, title:"Persembahan Panggan Band", qty:"1 pakej", budget:20000, scope:"Kumpulan muzik pengiring Datuk Ramli Sarip dan persembahan hari Ahad; koordinasi personel, susunan muzik/persembahan, soundcheck bersama, keperluan teknikal asas band dan sokongan persembahan pentas. Tidak termasuk yuran artis utama di item 1." },
+        { key:"konten-12", no:12, title:"ZRA STIM", qty:"1 pakej", budget:50000, scope:"Platform live 48 jam, sesi latihan 8 jam selama 2 hari, 12 video kandungan digital, IP idea & konsultasi, streaming penjualan SME dan buku, serta nilai tambah capaian digital melalui rangkaian promosi sekitar 1.2 juta rakan TT dan 500 ribu rakan FB. Termasuk nilai live stream, VTT/video TT, bahan digital dan laporan ringkas capaian/aktiviti." },
+        { key:"konten-13", no:13, title:"I Quest Training Consultancy", qty:"1 pakej", budget:30000, scope:"Penyediaan kandungan kanak-kanak, latihan profesional kepada 25 peserta SME, klinik konsultansi kesihatan mental, penyediaan bahan ringkas sesi, fasilitasi, penyelarasan peserta dan dokumentasi output latihan/konsultansi." },
+        { key:"konten-14", no:14, title:"Penyelarasan Program & Dokumentasi", qty:"1 pakej", budget:3000, scope:"Penyelarasan keseluruhan skop, dokumentasi program, pemantauan perubahan kecil skop, pengurusan komunikasi dengan pihak terlibat, semakan deliverable, penyusunan bukti kerja serta laporan ringkas pasca program." }
+      ]
+    },
+    logistik: {
+      label: "Logistik / Fasiliti",
+      icon: "🚚",
+      kepada: "Pejabat Media Selangor",
+      items: [
+        { key:"logistik-01", no:1, title:"Pentas Utama", qty:"1 pakej", budget:50000, scope:"Marquee Tent (10m x 10m) 2 blok; pentas 20 x 30; khemah 20 x 20; khemah consol; genset; side wall M/T pentas; PA sistem; lampu; internet dan keperluan logistik pentas. Sewaan aset, pemasangan, testing teknikal, soundcheck, standby operasi, setup & teardown serta koordinasi vendor pentas." },
+        { key:"logistik-02", no:2, title:"Pameran SME", qty:"1 pakej", budget:40000, scope:"Marquee Tent 10m x 50m; booth pameran SME; genset 100 KVA; diesel dan sokongan logistik pameran/booth. Susun atur booth, laluan pengunjung, sokongan elektrik asas, tagging/penomboran booth, penyelarasan pempamer dan sokongan operasi pameran SME." },
+        { key:"logistik-03", no:3, title:"Book Glamping", qty:"1 pakej", budget:35000, scope:"Zon tematik Book Glamping: khemah, tilam angin, pelapik lantai, lampu, kerusi lipat, kipas kecil, peralatan khemah & keperluan berkaitan. Perolehan/sewaan peralatan asas, pemasangan, susun atur zon, dekorasi asas, semakan keselamatan ringkas dan penyelenggaraan harian sepanjang program." },
+        { key:"logistik-04", no:4, title:"Barangan Promosi", qty:"1 pakej", budget:25000, scope:"Poster, bunting, backdrop, flagdrop, signage, inflatable arch & bahan promosi program. Reka bentuk artwork asas, cetakan, pemasangan/penanggalan, bahan arah laluan, titik foto/branding venue dan pengurusan visual identiti program." },
+        { key:"logistik-05", no:5, title:"Penginapan, Ruang Program & Fasiliti", qty:"1 pakej", budget:50000, scope:"Hotel 19 bilik; hostel 4 x 4 bilik; Dewan Utama 200 pax; Bilik Mini Seminar 25 pax; Ruang Media; Ruang Lobi & keperluan fasiliti. Tempahan/penyelarasan ruang, susun atur asas, kaunter urusetia, koordinasi check-in peserta/krew, utiliti asas dan sokongan penggunaan fasiliti." },
+        { key:"logistik-06", no:6, title:"Petugas Keselamatan & Krew Event", qty:"1 pakej", budget:20000, scope:"Petugas keselamatan 10 orang; krew event 25 orang; RELA 10 orang; runner 4 orang serta penyelarasan operasi tapak. Elaun tugasan, briefing SOP, jadual syif, crowd control, laluan masuk/keluar, kawalan kawasan program dan sokongan operasi harian." },
+        { key:"logistik-07", no:7, title:"Khemah Peniaga Bazar Karat", qty:"1 pakej", budget:18000, scope:"Khemah peniaga Bazar Karat 20 x 20 sebanyak 50 unit termasuk lampu & kipas. Sewaan/pemasangan khemah, lampu & kipas asas, susun atur lot niaga, laluan pengunjung, penandaan lot, setup/teardown dan penyelarasan teknikal tapak bazar." },
+        { key:"logistik-08", no:8, title:"Team MCP", qty:"1 pakej", budget:35000, scope:"Live stream, podcast, docu-cam & keperluan miscellaneous external sepanjang program. Peralatan kamera/audio asas, operator teknikal, rakaman arkib, live switching asas, setup podcast, dokumentasi visual, bahan rakaman pasca program dan sokongan teknikal digital di lokasi." },
+        { key:"logistik-09", no:9, title:"Pengurusan Event", qty:"1 pakej", budget:50000, scope:"Perancangan gerak kerja; penyelarasan vendor & tapak; jadual kerja/rundown; urusan permit & pematuhan asas; koordinasi keselamatan; briefing krew; kawalan operasi harian; pemantauan risiko; setup & teardown; komunikasi stakeholder; laporan ringkas pasca program; kawalan perubahan skop dan post-mortem ringkas." },
+        { key:"logistik-10", no:10, title:"Kos Makanan", qty:"1 pakej", budget:25000, scope:"Penyediaan makanan 3 kali makan sehari selama 3 hari untuk 100 pax (anggaran 900 hidangan). Menu asas, pembungkusan, air/minuman asas, penghantaran, agihan, buffer operasi dan koordinasi kebersihan kawasan makan." }
+      ]
+    }
+  };
+
+  // ---- State ----
+  let sb = null;
+  let role = sessionStorage.getItem("zra_bajet_role") || "guest"; // guest | admin | superadmin
+  let actorName = sessionStorage.getItem("zra_bajet_actor") || "";
+  const state = { actuals: {}, receipts: {} }; // keyed by item_key
+  let currentCat = null, currentKey = null;
+
+  const ALL_ITEMS = [...CATALOG.konten.items.map(i=>({...i,category:"konten"})), ...CATALOG.logistik.items.map(i=>({...i,category:"logistik"}))];
+  const fmt = n => "RM " + Number(n||0).toLocaleString("en-MY", {minimumFractionDigits:0, maximumFractionDigits:2});
+  const $ = id => document.getElementById(id);
+
+  function sbReady(){
+    if(sb) return true;
+    if(window.supabase && ZRA_CFG.supabaseAnonKey && !ZRA_CFG.supabaseAnonKey.includes("PASTE")){
+      try { sb = window.supabase.createClient(ZRA_CFG.supabaseUrl, ZRA_CFG.supabaseAnonKey); return true; } catch(e){ return false; }
+    }
+    return false;
+  }
+
+  function toast(msg, isErr){
+    const t = $("toast"); t.textContent = msg; t.className = "toast show" + (isErr?" err":"");
+    setTimeout(()=>{ t.className = "toast"; }, 2200);
+  }
+
+  // ---- Local fallback ----
+  const LKEY = "zra_bajet_state_v1";
+  function loadLocal(){ try{ const d = JSON.parse(localStorage.getItem(LKEY)||"{}"); state.actuals = d.actuals||{}; state.receipts = d.receipts||{}; }catch(e){} }
+  function saveLocal(){ localStorage.setItem(LKEY, JSON.stringify({actuals:state.actuals, receipts:state.receipts})); }
+
+  // ---- Data load ----
+  async function loadData(){
+    loadLocal();
+    if(sbReady()){
+      try{
+        const {data:acts} = await sb.from(ZRA_CFG.actualsTable).select("*");
+        if(acts){ state.actuals = {}; acts.forEach(a=> state.actuals[a.item_key]=a); }
+        const {data:recs} = await sb.from(ZRA_CFG.receiptsTable).select("*").order("created_at",{ascending:true});
+        if(recs){ state.receipts = {}; recs.forEach(r=>{ (state.receipts[r.item_key]=state.receipts[r.item_key]||[]).push(r); }); }
+        saveLocal();
+      }catch(e){ /* keep local */ }
+    }
+    renderSummary();
+  }
+
+  function getActual(key){ return state.actuals[key] || { item_key:key, actual_amount:0, status:"draf", admin_note:"", superadmin_note:"", updated_by:"", approved_by:"", approved_at:null }; }
+
+  // ---- Summary / tiles ----
+  function catTotals(cat){
+    let budget=0, actual=0, approved=0, pending=0;
+    CATALOG[cat].items.forEach(it=>{
+      budget += it.budget;
+      const a = getActual(it.key);
+      actual += Number(a.actual_amount||0);
+      if(a.status==="diluluskan") approved++;
+      if(a.status==="menunggu") pending++;
+    });
+    return { budget, actual, approved, pending, count:CATALOG[cat].items.length };
+  }
+  function varHtml(v){ const cls = v>0?"neg":(v<0?"pos":""); const sign=v>0?"+":""; return `<span class="${cls}">${sign}${fmt(v)}</span>`; }
+
+  function renderSummary(){
+    let gB=0, gA=0, gAppr=0, gPend=0, gTotal=0;
+    ["konten","logistik"].forEach(cat=>{
+      const t = catTotals(cat); const cap = cat.charAt(0).toUpperCase()+cat.slice(1);
+      $("catActual"+cap).textContent = fmt(t.actual);
+      $("catVar"+cap).innerHTML = varHtml(t.actual - t.budget);
+      const stEl = $("catStatus"+cap);
+      stEl.textContent = `${t.approved}/${t.count} lulus`;
+      stEl.className = "badge " + (t.approved===t.count?"b-diluluskan":(t.pending?"b-menunggu":"b-draf"));
+      gB+=t.budget; gA+=t.actual; gAppr+=t.approved; gPend+=t.pending; gTotal+=t.count;
+    });
+    $("sumActual").textContent = fmt(gA);
+    $("sumVar").innerHTML = varHtml(gA-gB);
+    $("sumStatus").textContent = `${gAppr}/${gTotal} lulus${gPend?` · ${gPend} menunggu`:""}`;
+  }
+
+  // ---- Role / PIN ----
+  function applyRole(){
+    const chip = $("roleChip");
+    chip.className = "role-chip";
+    if(role==="superadmin"){ chip.classList.add("sa"); chip.innerHTML = "👑 Mode: <b>Superadmin</b>"; }
+    else if(role==="admin"){ chip.classList.add("admin"); chip.innerHTML = "✍️ Mode: <b>Admin</b>"; }
+    else { chip.innerHTML = "👁️ Mode: Lihat sahaja"; }
+    $("logoutBtn").style.display = role==="guest" ? "none" : "inline-flex";
+    $("bajetPinBtn").style.display = role==="guest" ? "inline-flex" : "none";
+    $("reviewBtn").style.display = role==="superadmin" ? "inline-flex" : "none";
+  }
+  const canEdit = () => role==="admin" || role==="superadmin";
+  const isSA = () => role==="superadmin";
+
+  function openPin(){ $("pinModal").classList.add("open"); $("pinMsg").textContent=""; $("pinInput").value=""; setTimeout(()=>$("pinInput").focus(),50); }
+  function closePin(){ $("pinModal").classList.remove("open"); }
+  function submitPin(){
+    const v = $("pinInput").value.trim();
+    if(v===ZRA_CFG.superadminPin){ role="superadmin"; }
+    else if(v===ZRA_CFG.adminPin){ role="admin"; }
+    else { $("pinMsg").innerHTML = '<span style="color:var(--rose)">PIN tidak sah.</span>'; return; }
+    sessionStorage.setItem("zra_bajet_role", role);
+    if(!actorName){
+      actorName = (prompt("Nama / inisial anda (untuk rekod):","")||"").trim();
+      sessionStorage.setItem("zra_bajet_actor", actorName);
+    }
+    closePin(); applyRole(); toast(role==="superadmin"?"Masuk sebagai Superadmin 👑":"Masuk sebagai Admin ✍️");
+    if(currentKey) renderDetail(currentKey); if(currentCat) renderList(currentCat);
+  }
+  function logout(){ role="guest"; sessionStorage.removeItem("zra_bajet_role"); applyRole(); toast("Log keluar"); if(currentKey) renderDetail(currentKey); if(currentCat) renderList(currentCat); }
+
+  // ---- Layer nav ----
+  function openLayer(id){ $("bjtBackdrop").classList.add("open"); $(id).classList.add("open"); $(id).setAttribute("aria-hidden","false"); document.body.style.overflow="hidden"; }
+  function closeLayer(id){ $(id).classList.remove("open"); $(id).setAttribute("aria-hidden","true"); if(!document.querySelector(".layer.open")){ $("bjtBackdrop").classList.remove("open"); document.body.style.overflow=""; } }
+  function closeAllLayers(){ document.querySelectorAll(".layer.open").forEach(l=>l.classList.remove("open")); $("bjtBackdrop").classList.remove("open"); document.body.style.overflow=""; }
+
+  // ---- L1 list ----
+  function statusBadge(s){ const map={draf:"Draf",menunggu:"Menunggu",diluluskan:"Diluluskan",ditolak:"Ditolak"}; return `<span class="badge b-${s}">${map[s]||s}</span>`; }
+
+  function renderList(cat){
+    currentCat = cat;
+    const c = CATALOG[cat];
+    $("listEyebrow").textContent = `${c.icon} Kepada: ${c.kepada}`;
+    $("listTitle").textContent = c.label;
+    const t = catTotals(cat);
+    const rows = c.items.map(it=>{
+      const a = getActual(it.key);
+      const editable = canEdit() && (a.status!=="diluluskan" || isSA());
+      const input = `<input class="actual-input" type="number" min="0" step="100" value="${a.actual_amount||""}" data-key="${it.key}" ${editable?"":"disabled"} placeholder="0">`;
+      return `<tr>
+        <td>${it.no}</td>
+        <td><button class="row-title" data-detail="${it.key}">${it.title}</button></td>
+        <td class="num locked">🔒 ${fmt(it.budget)}</td>
+        <td class="num">${canEdit()?input:('<span class="actual-static">'+fmt(a.actual_amount)+'</span>')}</td>
+        <td>${statusBadge(a.status)}</td>
+      </tr>`;
+    }).join("");
+    $("listBody").innerHTML = `
+      <table class="bjt-table">
+        <thead><tr><th>#</th><th>Tajuk (klik untuk butiran)</th><th class="num">Bajet 🔒</th><th class="num">Actual Kos ✎</th><th>Status</th></tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr><td></td><td>JUMLAH</td><td class="num">${fmt(t.budget)}</td><td class="num">${fmt(t.actual)}</td><td>${varHtml(t.actual-t.budget)}</td></tr></tfoot>
+      </table>
+      ${canEdit()?'<p class="audit" style="margin-top:14px">Tip: edit Actual Kos terus di sini lalu klik luar kotak untuk simpan. Klik tajuk untuk resit, gambar &amp; nota.</p>':'<p class="audit" style="margin-top:14px">Mode lihat sahaja. Masuk PIN untuk mengisi kos sebenar.</p>'}
+    `;
+    $("listBody").querySelectorAll(".row-title").forEach(b=> b.addEventListener("click", ()=> openDetail(b.dataset.detail)));
+    $("listBody").querySelectorAll(".actual-input").forEach(inp=> inp.addEventListener("change", ()=> saveActualInline(inp.dataset.key, inp.value)));
+  }
+
+  async function saveActualInline(key, val){
+    const amount = Number(val||0);
+    await saveActual(key, { actual_amount: amount });
+    renderList(currentCat); renderSummary();
+  }
+
+  // ---- Save actual (admin = direct upsert -> menunggu; SA = via RPC) ----
+  async function saveActual(key, patch){
+    const it = ALL_ITEMS.find(i=>i.key===key);
+    const cur = getActual(key);
+    const next = { ...cur, ...patch, item_key:key, category:it.category, updated_by:actorName||cur.updated_by };
+    if(isSA()){
+      next.status = patch.status || (cur.status==="diluluskan"?"diluluskan":cur.status);
+    } else {
+      // admin submission -> menunggu semakan (kecuali sudah diluluskan, admin tak boleh ubah)
+      if(cur.status==="diluluskan"){ toast("Item telah diluluskan — hanya Superadmin boleh edit", true); return; }
+      next.status = "menunggu";
+    }
+    next.updated_at = new Date().toISOString();
+    state.actuals[key] = next; saveLocal();
+
+    if(sbReady()){
+      try{
+        if(isSA()){
+          const { error } = await sb.rpc("zra_sa_set_actual", { p_pin:ZRA_CFG.superadminPin, p_item_key:key, p_category:it.category, p_amount:Number(next.actual_amount||0), p_status:next.status, p_admin_note:next.admin_note||"", p_superadmin_note:next.superadmin_note||"", p_by:actorName||"" });
+          if(error) throw error;
+        } else {
+          const { error } = await sb.from(ZRA_CFG.actualsTable).upsert({ item_key:key, category:it.category, actual_amount:Number(next.actual_amount||0), status:"menunggu", admin_note:next.admin_note||"", updated_by:actorName||"", updated_at:next.updated_at }, { onConflict:"item_key" });
+          if(error) throw error;
+        }
+        toast("Disimpan ✓");
+      }catch(e){ toast("Disimpan luar talian (DB gagal: "+(e.message||e.code||"?")+")", true); }
+    } else { toast("Disimpan (luar talian)"); }
+  }
+
+  // ---- Approve / reject / delete (Superadmin via RPC) ----
+  async function saApprove(key, approve){
+    if(!isSA()) return;
+    const status = approve ? "diluluskan" : "ditolak";
+    const note = $("detSANote") ? $("detSANote").value : "";
+    const cur = getActual(key);
+    state.actuals[key] = { ...cur, status, superadmin_note:note, approved_by:actorName, approved_at:new Date().toISOString() }; saveLocal();
+    if(sbReady()){
+      try{
+        const { error } = await sb.rpc("zra_sa_decision", { p_pin:ZRA_CFG.superadminPin, p_item_key:key, p_status:status, p_superadmin_note:note, p_by:actorName||"" });
+        if(error) throw error;
+        toast(approve?"Diluluskan ✅":"Ditolak");
+      }catch(e){ toast("DB gagal: "+(e.message||e.code), true); }
+    } else toast(approve?"Diluluskan (luar talian)":"Ditolak (luar talian)");
+    renderDetail(key); renderSummary();
+  }
+
+  async function saDeleteItem(key){
+    if(!isSA()) return;
+    if(!confirm("Padam semua data actual & resit untuk item ini? Bajet asal kekal.")) return;
+    state.actuals[key] = { item_key:key, actual_amount:0, status:"draf", admin_note:"", superadmin_note:"", updated_by:"", approved_by:"", approved_at:null };
+    state.receipts[key] = []; saveLocal();
+    if(sbReady()){
+      try{ const { error } = await sb.rpc("zra_sa_delete_item", { p_pin:ZRA_CFG.superadminPin, p_item_key:key }); if(error) throw error; toast("Dipadam"); }
+      catch(e){ toast("DB gagal: "+(e.message||e.code), true); }
+    } else toast("Dipadam (luar talian)");
+    renderDetail(key); renderSummary();
+  }
+
+  // ---- Receipts ----
+  async function addReceipt(key){
+    const file = $("rcptFile").files[0];
+    const label = $("rcptLabel").value.trim();
+    const amount = Number($("rcptAmount").value||0);
+    const note = $("rcptNote").value.trim();
+    if(!file && !label && !amount && !note){ toast("Isi sekurang-kurangnya satu maklumat resit", true); return; }
+    let image_url = "";
+    if(file && sbReady()){
+      try{
+        const path = `${key}/${Date.now()}_${file.name.replace(/[^A-Za-z0-9._-]/g,"_")}`;
+        const { error:upErr } = await sb.storage.from(ZRA_CFG.bucket).upload(path, file, { upsert:false });
+        if(upErr) throw upErr;
+        image_url = sb.storage.from(ZRA_CFG.bucket).getPublicUrl(path).data.publicUrl;
+      }catch(e){ toast("Muat naik gambar gagal: "+(e.message||e.code), true); }
+    } else if(file){
+      image_url = await new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(file); }); // local base64 fallback
+    }
+    const rec = { id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())), item_key:key, label, amount, image_url, note, uploaded_by:actorName||"", created_at:new Date().toISOString() };
+    (state.receipts[key]=state.receipts[key]||[]).push(rec); saveLocal();
+    if(sbReady()){
+      try{ const { error } = await sb.from(ZRA_CFG.receiptsTable).insert({ id:rec.id, item_key:key, label, amount, image_url, note, uploaded_by:rec.uploaded_by }); if(error) throw error; toast("Resit ditambah ✓"); }
+      catch(e){ toast("Resit disimpan luar talian: "+(e.message||e.code), true); }
+    } else toast("Resit disimpan (luar talian)");
+    renderDetail(key);
+  }
+
+  async function deleteReceipt(key, id){
+    if(!isSA()){ toast("Hanya Superadmin boleh padam resit", true); return; }
+    state.receipts[key] = (state.receipts[key]||[]).filter(r=>r.id!==id); saveLocal();
+    if(sbReady()){
+      try{ const { error } = await sb.rpc("zra_sa_delete_receipt", { p_pin:ZRA_CFG.superadminPin, p_receipt_id:id }); if(error) throw error; }catch(e){ toast("DB gagal: "+(e.message||e.code), true); }
+    }
+    renderDetail(key); toast("Resit dipadam");
+  }
+
+  // ---- L2 detail ----
+  function openDetail(key){ renderDetail(key); openLayer("layerDetail"); }
+  function renderDetail(key){
+    currentKey = key;
+    const it = ALL_ITEMS.find(i=>i.key===key); if(!it) return;
+    const a = getActual(key);
+    const recs = state.receipts[key]||[];
+    const v = Number(a.actual_amount||0) - it.budget;
+    const editable = canEdit() && (a.status!=="diluluskan" || isSA());
+    $("detEyebrow").textContent = `${CATALOG[it.category].icon} ${CATALOG[it.category].label} · Item ${it.no}`;
+    $("detTitle").textContent = it.title;
+
+    const receiptsHtml = recs.length ? recs.map(r=>`
+      <div class="receipt">
+        ${r.image_url?`<img src="${r.image_url}" data-lb="${r.image_url}" alt="resit">`:""}
+        <div class="r-body">
+          <div><b>${r.label||"Resit"}</b> ${r.amount?`<span class="r-amt">${fmt(r.amount)}</span>`:""}</div>
+          ${r.note?`<div style="margin:4px 0;white-space:pre-wrap">${r.note}</div>`:""}
+          <div class="r-meta">${r.uploaded_by?("oleh "+r.uploaded_by+" · "):""}${new Date(r.created_at).toLocaleString("ms-MY")}</div>
+        </div>
+        ${isSA()?`<button class="btn danger" data-delrcpt="${r.id}" style="padding:6px 10px">Padam</button>`:""}
+      </div>`).join("") : `<p class="audit">Belum ada resit.</p>`;
+
+    const auditHtml = `<p class="audit">${a.updated_by?("Dikemaskini oleh "+a.updated_by):"Belum dikemaskini"}${a.updated_at?(" · "+new Date(a.updated_at).toLocaleString("ms-MY")):""}${a.approved_by?(" · Diluluskan oleh "+a.approved_by):""}</p>`;
+
+    $("detBody").innerHTML = `
+      <div class="det-card">
+        <h3>Skop Perkhidmatan</h3>
+        <p>${it.scope}</p>
+        <p class="audit" style="margin-top:10px">Kuantiti: <b>${it.qty}</b> · Status: ${statusBadge(a.status)}</p>
+      </div>
+
+      <div class="det-card">
+        <h3>Kos</h3>
+        <div class="det-figs">
+          <div class="det-fig"><b class="locked">🔒 ${fmt(it.budget)}</b><span>Bajet (tetap)</span></div>
+          <div class="det-fig"><b>${fmt(a.actual_amount)}</b><span>Actual · Varian ${v>0?'<span class="neg">+'+fmt(v)+'</span>':(v<0?'<span class="pos">'+fmt(v)+'</span>':fmt(0))}</span></div>
+        </div>
+        ${canEdit()?`
+          <div style="margin-top:14px">
+            <label class="audit">Actual Kos (RM)</label>
+            <input class="det-input" id="detActual" type="number" min="0" step="100" value="${a.actual_amount||""}" ${editable?"":"disabled"} placeholder="0">
+          </div>
+          <div style="margin-top:12px">
+            <label class="audit">Nota Admin (untuk semakan)</label>
+            <textarea class="det-input" id="detAdminNote" ${editable?"":"disabled"} placeholder="Catatan, justifikasi, perubahan skop...">${a.admin_note||""}</textarea>
+          </div>
+          ${isSA()?`<div style="margin-top:12px"><label class="audit">Nota Superadmin</label><textarea class="det-input" id="detSANote" placeholder="Maklum balas / sebab tolak...">${a.superadmin_note||""}</textarea></div>`:(a.superadmin_note?`<p class="audit" style="margin-top:10px"><b>Nota Superadmin:</b> ${a.superadmin_note}</p>`:"")}
+          <div class="det-actions" style="margin-top:14px">
+            <button class="btn primary" id="detSave">💾 ${isSA()?"Simpan":"Simpan & Hantar Semakan"}</button>
+            ${isSA()?`<button class="btn good" id="detApprove">✅ Luluskan</button><button class="btn danger" id="detReject">⛔ Tolak</button><button class="btn danger" id="detDelete">🗑️ Padam Data</button>`:""}
+          </div>`
+        : (a.superadmin_note?`<p class="audit" style="margin-top:12px"><b>Nota Superadmin:</b> ${a.superadmin_note}</p>`:"")}
+        ${auditHtml}
+      </div>
+
+      <div class="det-card">
+        <h3>🧾 Resit & Gambar</h3>
+        <div class="receipts" id="receiptList">${receiptsHtml}</div>
+        ${canEdit()?`
+          <div style="margin-top:16px;display:grid;gap:10px">
+            <div class="det-figs">
+              <div><label class="audit">Label resit</label><input class="det-input" id="rcptLabel" placeholder="cth: Bayaran deposit pentas"></div>
+              <div><label class="audit">Jumlah (RM)</label><input class="det-input" id="rcptAmount" type="number" min="0" step="100" placeholder="0"></div>
+            </div>
+            <div><label class="audit">Nota resit</label><textarea class="det-input" id="rcptNote" placeholder="Catatan resit..."></textarea></div>
+            <div><label class="audit">Gambar resit</label><input class="det-input" id="rcptFile" type="file" accept="image/*"></div>
+            <div><button class="btn primary" id="rcptAdd">➕ Tambah Resit</button></div>
+          </div>`:""}
+      </div>
+    `;
+
+    // bind
+    if(canEdit()){
+      const save = $("detSave");
+      if(save) save.addEventListener("click", async ()=>{
+        await saveActual(key, { actual_amount:Number($("detActual").value||0), admin_note:$("detAdminNote")?$("detAdminNote").value:"", superadmin_note:$("detSANote")?$("detSANote").value:(a.superadmin_note||"") });
+        renderDetail(key); renderSummary();
+      });
+      if($("detApprove")) $("detApprove").addEventListener("click", ()=>saApprove(key,true));
+      if($("detReject")) $("detReject").addEventListener("click", ()=>saApprove(key,false));
+      if($("detDelete")) $("detDelete").addEventListener("click", ()=>saDeleteItem(key));
+      if($("rcptAdd")) $("rcptAdd").addEventListener("click", ()=>addReceipt(key));
+    }
+    $("detBody").querySelectorAll("[data-delrcpt]").forEach(b=> b.addEventListener("click", ()=>deleteReceipt(key, b.dataset.delrcpt)));
+    $("detBody").querySelectorAll("[data-lb]").forEach(img=> img.addEventListener("click", ()=>{ $("lightboxImg").src = img.dataset.lb; $("lightbox").classList.add("open"); }));
+  }
+
+  // ---- Review dashboard ----
+  function renderReview(){
+    const pend = ALL_ITEMS.filter(it=> getActual(it.key).status==="menunggu");
+    $("reviewBody").innerHTML = pend.length ? pend.map(it=>{
+      const a = getActual(it.key);
+      return `<div class="det-card" style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
+          <div><b>${it.title}</b><div class="audit">${CATALOG[it.category].label} · Actual ${fmt(a.actual_amount)} vs Bajet ${fmt(it.budget)}</div>${a.admin_note?`<p style="margin:6px 0">${a.admin_note}</p>`:""}</div>
+          <div class="det-actions">
+            <button class="btn" data-rev-open="${it.key}">Buka</button>
+            <button class="btn good" data-rev-appr="${it.key}">✅ Lulus</button>
+            <button class="btn danger" data-rev-rej="${it.key}">⛔ Tolak</button>
+          </div>
+        </div>
+      </div>`;
+    }).join("") : `<p class="audit">Tiada item menunggu semakan. 🎉</p>`;
+    $("reviewBody").querySelectorAll("[data-rev-open]").forEach(b=>b.addEventListener("click",()=>{ openDetail(b.dataset.revOpen); }));
+    $("reviewBody").querySelectorAll("[data-rev-appr]").forEach(b=>b.addEventListener("click",async()=>{ await saApprove(b.dataset.revAppr,true); renderReview(); }));
+    $("reviewBody").querySelectorAll("[data-rev-rej]").forEach(b=>b.addEventListener("click",async()=>{ await saApprove(b.dataset.revRej,false); renderReview(); }));
+  }
+
+  // ---- Wire up ----
+  document.querySelectorAll(".cat-tile").forEach(t=> t.addEventListener("click", ()=>{ renderList(t.dataset.cat); openLayer("layerList"); }));
+  document.querySelectorAll("[data-close-layer]").forEach(b=> b.addEventListener("click", ()=> closeLayer(b.dataset.closeLayer)));
+  $("bjtBackdrop").addEventListener("click", closeAllLayers);
+  $("bajetPinBtn").addEventListener("click", openPin);
+  $("logoutBtn").addEventListener("click", logout);
+  $("reviewBtn").addEventListener("click", ()=>{ renderReview(); openLayer("layerReview"); });
+  $("pinClose").addEventListener("click", closePin);
+  $("pinSubmit").addEventListener("click", submitPin);
+  $("pinInput").addEventListener("keydown", e=>{ if(e.key==="Enter") submitPin(); });
+  $("lightbox").addEventListener("click", ()=> $("lightbox").classList.remove("open"));
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closePin(); $("lightbox").classList.remove("open"); const open=document.querySelector(".layer.open"); if(open) closeLayer(open.id); } });
+
+  applyRole();
+  loadData();
   </script>
 </body>
 </html>
