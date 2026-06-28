@@ -838,6 +838,23 @@
     .todo .dl.over { color: var(--rose); font-weight: 800; }
     .todo-by { font-size: .72rem; color: var(--muted); margin-left: 6px; }
 
+    /* Activity history */
+    .act-day { border: 1px solid var(--line-soft); border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden; }
+    .act-day-head {
+      width: 100%; display: flex; justify-content: space-between; align-items: center;
+      padding: 11px 14px; background: rgba(255,255,255,.04); color: var(--text);
+      font-weight: 800; font-size: .85rem;
+    }
+    .act-day-head:hover { background: rgba(255,255,255,.07); }
+    .act-day-body { padding: 6px 0; }
+    .act-log { display: grid; grid-template-columns: 52px auto 1fr; gap: 10px; align-items: baseline; padding: 8px 14px; border-top: 1px solid var(--line-soft); }
+    .act-log:first-child { border-top: 0; }
+    .al-time { font-size: .74rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .al-role { font-size: .74rem; font-weight: 800; white-space: nowrap; }
+    .al-role.sa { color: var(--lime); }
+    .al-role.admin { color: var(--cyan); }
+    .al-text { font-size: .84rem; }
+
     /* L2 detail */
     .det-grid { display: grid; gap: 16px; }
     .det-card { border: 1px solid var(--line-soft); border-radius: var(--radius); background: var(--panel); padding: 18px; }
@@ -1774,7 +1791,7 @@
   let sb = null;
   let role = sessionStorage.getItem("zra_bajet_role") || "guest"; // guest | admin | superadmin
   let actorName = sessionStorage.getItem("zra_bajet_actor") || "";
-  const state = { actuals: {}, receipts: {}, todos: [] }; // keyed by item_key
+  const state = { actuals: {}, receipts: {}, todos: [], activity: [] }; // keyed by item_key
   let currentCat = null, currentKey = null;
   let pendingOpenBudget = false;
   let pendingOpenMaster = false;
@@ -1798,8 +1815,18 @@
 
   // ---- Local fallback ----
   const LKEY = "zra_bajet_state_v1";
-  function loadLocal(){ try{ const d = JSON.parse(localStorage.getItem(LKEY)||"{}"); state.actuals = d.actuals||{}; state.receipts = d.receipts||{}; state.todos = d.todos||[]; }catch(e){} }
-  function saveLocal(){ localStorage.setItem(LKEY, JSON.stringify({actuals:state.actuals, receipts:state.receipts, todos:state.todos})); }
+  function loadLocal(){ try{ const d = JSON.parse(localStorage.getItem(LKEY)||"{}"); state.actuals = d.actuals||{}; state.receipts = d.receipts||{}; state.todos = d.todos||[]; state.activity = d.activity||[]; }catch(e){} }
+  function saveLocal(){ localStorage.setItem(LKEY, JSON.stringify({actuals:state.actuals, receipts:state.receipts, todos:state.todos, activity:state.activity})); }
+
+  // ---- Log aktiviti (audit semua tindakan admin/superadmin) ----
+  async function logActivity(action, summary, source){
+    const rec = { id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())), ts:new Date().toISOString(), actor:actorName||"", role, action, source:source||"", summary };
+    (state.activity = state.activity||[]).unshift(rec);
+    if(state.activity.length > 800) state.activity.length = 800;
+    saveLocal();
+    if(sbReady()){ try{ await sb.from("zra_activity_log").insert({ id:rec.id, actor:rec.actor, role:rec.role, action:rec.action, source:rec.source, summary:rec.summary }); }catch(e){} }
+    if($("layerReview") && $("layerReview").classList.contains("open")) renderReview();
+  }
 
   // ---- Data load ----
   async function loadData(){
@@ -1812,6 +1839,8 @@
         if(recs){ state.receipts = {}; recs.forEach(r=>{ (state.receipts[r.item_key]=state.receipts[r.item_key]||[]).push(r); }); }
         const {data:tds} = await sb.from("zra_todos").select("*");
         if(tds){ state.todos = tds; }
+        const {data:logs} = await sb.from("zra_activity_log").select("*").order("ts",{ascending:false}).limit(800);
+        if(logs){ state.activity = logs; }
         saveLocal();
       }catch(e){ /* keep local */ }
     }
@@ -1983,6 +2012,7 @@
         toast("Disimpan ✓");
       }catch(e){ toast("Disimpan luar talian (DB gagal: "+(e.message||e.code||"?")+")", true); }
     } else { toast("Disimpan (luar talian)"); }
+    logActivity(isSA()?"edit_actual":"isi_actual", `${isSA()?"Edit":"Isi"} Actual ${it.title} → ${fmt(next.actual_amount)}`, `Bajet #03 · ${CATALOG[it.category].label}`);
   }
 
   // ---- Approve / reject / delete (Superadmin via RPC) ----
@@ -1999,6 +2029,8 @@
         toast(approve?"Diluluskan ✅":"Ditolak");
       }catch(e){ toast("DB gagal: "+(e.message||e.code), true); }
     } else toast(approve?"Diluluskan (luar talian)":"Ditolak (luar talian)");
+    const it = ALL_ITEMS.find(i=>i.key===key);
+    logActivity(approve?"approve":"reject", `${approve?"Luluskan":"Tolak"} ${it?it.title:key}${note?` — ${note}`:""}`, "Bajet #03");
     renderDetail(key); renderSummary();
   }
 
@@ -2011,6 +2043,8 @@
       try{ const { error } = await sb.rpc("zra_sa_delete_item", { p_pin:ZRA_CFG.superadminPin, p_item_key:key }); if(error) throw error; toast("Dipadam"); }
       catch(e){ toast("DB gagal: "+(e.message||e.code), true); }
     } else toast("Dipadam (luar talian)");
+    const it = ALL_ITEMS.find(i=>i.key===key);
+    logActivity("delete_item", `Padam data item ${it?it.title:key}`, "Bajet #03");
     renderDetail(key); renderSummary();
   }
 
@@ -2054,6 +2088,8 @@
       try{ const { error } = await sb.from(ZRA_CFG.receiptsTable).insert({ id:rec.id, item_key:key, kind, label, amount, image_url, note, uploaded_by:rec.uploaded_by, reviewed:rec.reviewed, reviewed_by:rec.reviewed_by, reviewed_at:rec.reviewed_at }); if(error) throw error; toast("Lampiran disimpan ✓"); }
       catch(e){ toast("Disimpan luar talian: "+(e.message||e.code), true); }
     } else toast("Disimpan (luar talian)");
+    const it = ALL_ITEMS.find(i=>i.key===key);
+    logActivity("add_attachment", `Tambah ${KINDS[kind]||kind}${label?` "${label}"`:""}${amount?` (${fmt(amount)})`:""} pada ${it?it.title:key}`, `Bajet #03 · ${it?CATALOG[it.category].label:""}`);
     renderEntry(key); renderList(currentCat); updateNotif();
   }
 
@@ -2063,6 +2099,8 @@
     if(sbReady()){
       try{ const { error } = await sb.rpc("zra_sa_delete_receipt", { p_pin:ZRA_CFG.superadminPin, p_receipt_id:id }); if(error) throw error; }catch(e){ toast("DB gagal: "+(e.message||e.code), true); }
     }
+    const it = ALL_ITEMS.find(i=>i.key===key);
+    logActivity("delete_attachment", `Padam lampiran pada ${it?it.title:key}`, "Bajet #03");
     renderEntry(key); updateNotif(); toast("Lampiran dipadam");
   }
 
@@ -2073,6 +2111,8 @@
     if(sbReady()){
       try{ const { error } = await sb.rpc("zra_sa_review_receipt", { p_pin:ZRA_CFG.superadminPin, p_receipt_id:id, p_by:actorName||"" }); if(error) throw error; }catch(e){ toast("DB gagal: "+(e.message||e.code), true); }
     }
+    const it = ALL_ITEMS.find(i=>i.key===key);
+    logActivity("review_attachment", `Tanda lampiran disemak — ${it?it.title:key}`, "Bajet #03");
     updateNotif(); toast("Ditanda disemak ✓");
     if($("layerEntry").classList.contains("open")) renderEntry(key);
     if($("layerReview").classList.contains("open")) renderReview();
@@ -2343,6 +2383,44 @@
       </div>`;
   }
 
+  // ---- Sejarah Aktiviti ----
+  const activityOpenDates = new Set();
+  let activityInit = false;
+  function dayKey(ts){ const d=new Date(ts); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+  function dayLabel(k){
+    const today=dayKey(Date.now());
+    const y=new Date(); y.setDate(y.getDate()-1); const yk=dayKey(y);
+    if(k===today) return "Hari Ini";
+    if(k===yk) return "Semalam";
+    const [yy,mm,dd]=k.split("-"); const bln=["Jan","Feb","Mac","Apr","Mei","Jun","Jul","Ogo","Sep","Okt","Nov","Dis"];
+    return `${dd} ${bln[+mm-1]} ${yy}`;
+  }
+  function actionIcon(a){
+    return ({edit_actual:"✏️",isi_actual:"💰",approve:"✅",reject:"⛔",delete_item:"🗑️",add_attachment:"📎",delete_attachment:"🗑️",review_attachment:"✓",add_todo:"➕",toggle_todo:"☑️",delete_todo:"✕"})[a] || "•";
+  }
+  function activityRow(a){
+    const t=new Date(a.ts);
+    return `<div class="act-log">
+      <span class="al-time">${t.toLocaleTimeString("ms-MY",{hour:"2-digit",minute:"2-digit"})}</span>
+      <span class="al-role ${a.role==="superadmin"?"sa":"admin"}">${a.role==="superadmin"?"👑":"✍️"} ${a.actor||"—"}</span>
+      <span class="al-text">${actionIcon(a.action)} ${a.summary}${a.source?` <span class="src-ref">· ${a.source}</span>`:""}</span>
+    </div>`;
+  }
+  function renderActivity(){
+    const acts=(state.activity||[]).slice().sort((a,b)=> new Date(b.ts)-new Date(a.ts));
+    const groups={}, order=[];
+    acts.forEach(a=>{ const k=dayKey(a.ts); if(!groups[k]){groups[k]=[];order.push(k);} groups[k].push(a); });
+    if(!activityInit){ if(order[0]) activityOpenDates.add(order[0]); activityInit=true; } // hari terkini buka secara default
+    const html = order.length ? order.map(k=>{
+      const open=activityOpenDates.has(k);
+      return `<div class="act-day">
+        <button class="act-day-head" data-day="${k}"><span>${dayLabel(k)} <span class="audit">(${groups[k].length})</span></span><span>${open?"▾":"▸"}</span></button>
+        ${open?`<div class="act-day-body">${groups[k].map(activityRow).join("")}</div>`:""}
+      </div>`;
+    }).join("") : `<p class="audit">Belum ada aktiviti direkod.</p>`;
+    return `<div class="review-sec-title">🕓 Sejarah Aktiviti</div>${html}`;
+  }
+
   function updateDashCount(){
     const d = Math.max(0, EVENT_START - Date.now());
     const set=(id,val)=>{ const el=$(id); if(el) el.textContent=val; };
@@ -2374,6 +2452,7 @@
         <div class="sum-cell"><b style="color:${attn?'var(--rose)':'inherit'}">${attn}</b><span>Perlu perhatian</span></div>
       </div>
       ${renderActionTable()}
+      ${renderActivity()}
       ${renderTodos()}
       ${renderCharts()}
     `;
@@ -2389,6 +2468,8 @@
     if($("todoText")) $("todoText").addEventListener("keydown", e=>{ if(e.key==="Enter") addTodo(); });
     $("reviewBody").querySelectorAll("[data-todo-toggle]").forEach(b=> b.addEventListener("click", ()=> toggleTodo(b.dataset.todoToggle)));
     $("reviewBody").querySelectorAll("[data-todo-del]").forEach(b=> b.addEventListener("click", ()=> deleteTodo(b.dataset.todoDel)));
+    // Sejarah aktiviti — buka/tutup tarikh
+    $("reviewBody").querySelectorAll("[data-day]").forEach(b=> b.addEventListener("click", ()=>{ const k=b.dataset.day; if(activityOpenDates.has(k)) activityOpenDates.delete(k); else activityOpenDates.add(k); renderReview(); }));
   }
 
   // ---- To-do CRUD ----
@@ -2398,14 +2479,18 @@
     const t = { id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())), text, deadline, done:false, created_by:actorName||"", created_at:new Date().toISOString() };
     (state.todos = state.todos||[]).push(t); saveLocal(); renderReview();
     if(sbReady()){ try{ const {error}=await sb.from("zra_todos").insert({id:t.id,text,deadline,done:false,created_by:t.created_by}); if(error) throw error; }catch(e){ toast("Tugasan luar talian: "+(e.message||e.code), true); } }
+    logActivity("add_todo", `Tambah tugasan: ${text}${deadline?` (deadline ${deadline})`:""}`, "To-Do");
   }
   async function toggleTodo(id){
     const t = (state.todos||[]).find(x=>x.id===id); if(!t) return; t.done=!t.done; saveLocal(); renderReview();
     if(sbReady()){ try{ await sb.from("zra_todos").update({done:t.done}).eq("id",id); }catch(e){} }
+    logActivity("toggle_todo", `${t.done?"Siapkan":"Buka semula"} tugasan: ${t.text}`, "To-Do");
   }
   async function deleteTodo(id){
+    const t = (state.todos||[]).find(x=>x.id===id);
     state.todos = (state.todos||[]).filter(x=>x.id!==id); saveLocal(); renderReview();
     if(sbReady()){ try{ await sb.from("zra_todos").delete().eq("id",id); }catch(e){} }
+    logActivity("delete_todo", `Padam tugasan: ${t?t.text:id}`, "To-Do");
   }
 
   // ---- Wire up ----
