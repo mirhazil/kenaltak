@@ -913,6 +913,26 @@
     .lightbox { position: fixed; inset: 0; display: none; place-items: center; z-index: 80; background: rgba(0,0,0,.9); padding: 20px; }
     .lightbox.open { display: grid; }
     .lightbox img { max-width: 96vw; max-height: 92vh; border-radius: 10px; }
+
+    /* Book Glamping modul (kandungan ditarik) */
+    #bgBody .bg-content { color:#dce8d8; font-size:.9rem; line-height:1.55; }
+    #bgBody .bg-content h3, #bgBody .bg-content h4 { color:var(--lime); font-size:.92rem; margin:12px 0 6px; }
+    #bgBody .bg-content p { margin:8px 0; }
+    #bgBody .bg-content .lead { color:var(--text); font-weight:600; }
+    #bgBody .bg-content ul { margin:8px 0; padding-left:18px; }
+    #bgBody .bg-content li { margin:3px 0; }
+    #bgBody .bg-content .grid2, #bgBody .bg-content .grid3 { display:grid; gap:12px; grid-template-columns:1fr 1fr; }
+    @media (max-width:640px){ #bgBody .bg-content .grid2, #bgBody .bg-content .grid3 { grid-template-columns:1fr; } }
+    #bgBody .bg-content .box { border:1px solid var(--line-soft); border-radius:8px; padding:12px; background:var(--panel); }
+    #bgBody .bg-content .box.warn { border-color:rgba(255,198,92,.4); }
+    #bgBody .bg-content table { width:100%; border-collapse:collapse; font-size:.82rem; margin:8px 0; }
+    #bgBody .bg-content th, #bgBody .bg-content td { border:1px solid var(--line-soft); padding:7px 9px; text-align:left; vertical-align:top; }
+    #bgBody .bg-content th { color:var(--muted); }
+    #bgBody .bg-content .chip, #bgBody .bg-content .pill { display:inline-block; padding:3px 9px; border-radius:999px; border:1px solid var(--line-soft); font-size:.74rem; margin:2px; }
+    #bgBody .bg-content .chips { display:flex; flex-wrap:wrap; gap:4px; }
+    #bgBody .bg-content .line { border-top:1px solid var(--line-soft); margin:10px 0; }
+    #bgBody .bg-content img { max-width:100%; border-radius:8px; }
+    #bgBody .bg-content .budget-total { font-weight:800; color:var(--lime); }
   </style>
 </head>
 <body>
@@ -1355,6 +1375,21 @@
     </div>
   </div>
 
+  <!-- Book Glamping — modul operasi terkunci (tarik dari kenaltak.com/bookglamping) -->
+  <div class="layer" id="layerBG" aria-hidden="true">
+    <div class="layer-inner">
+      <div class="layer-head">
+        <div>
+          <span class="eyebrow">🏕️ Lock-in · Komponen #08</span>
+          <h2>Book Glamping — Modul Operasi</h2>
+        </div>
+        <button class="layer-back" type="button" data-close-layer="layerBG">✕ Tutup</button>
+      </div>
+      <p class="audit" style="margin:4px 0 14px">15 modul operasi rasmi disedut dari Book Glamping @ SBDF 2026. Klik tajuk untuk buka butiran.</p>
+      <div id="bgBody"></div>
+    </div>
+  </div>
+
   <!-- Lampiran & Nota (resit/invoice/gambar) -->
   <div class="layer" id="layerEntry" aria-hidden="true">
     <div class="layer-inner">
@@ -1528,7 +1563,7 @@
         owner: "PPAS + urusetia glamping",
         summary: "Rehlah ilmu, aktiviti membaca, storytelling, video, sukan rakyat dan glamping selamat.",
         purpose: "Menjadikan Book Glamping sebagai modul ilmu, sahsiah dan kandungan digital kanak-kanak.",
-        items: ["Laman draf: 40 peserta, 20L + 20P, umur 9-17, 15 khemah, 3H2M", "Slide: 30-40 peserta, umur 10-13, 8 khemah, 2H1M", "Fokus: budaya membaca, treasure hunt ilmu, video storytelling, sukan rakyat", "Pelan hujan/petir pindah ke PPAS"],
+        items: ["Laman draf: 40 peserta, 20L + 20P, umur 10-15, 15 khemah, 3H2M", "Slide: 30-40 peserta, umur 10-15, 8 khemah, 2H1M", "Fokus: budaya membaca, treasure hunt ilmu, video storytelling, sukan rakyat", "Pelan hujan/petir pindah ke PPAS"],
         outputs: ["Data rasmi peserta", "Tentatif lengkap", "Dokumen ibu bapa", "Pelan keselamatan dan privasi"],
         checks: ["Sahkan angka peserta/khemah/umur/tempoh", "Sahkan kebenaran ibu bapa untuk rakaman/live"]
       },
@@ -1711,6 +1746,8 @@
       drawerTag.textContent = `Komponen ${item.no} / ${item.group}`;
       const gate = item.no === "03"
         ? `<button class="pin-btn" type="button" id="openBudgetGateBtn" style="width:100%;justify-content:center;padding:14px">🔐 Buka Bajet Terkunci</button>`
+        : item.no === "08"
+        ? `<button class="pin-btn" type="button" id="openBGGateBtn" style="width:100%;justify-content:center;padding:14px">🏕️ Buka Modul Book Glamping (Lock-in)</button>`
         : "";
       drawerBody.innerHTML = `
         ${gate}
@@ -1734,6 +1771,10 @@
       if (item.no === "03") {
         const gb = document.getElementById("openBudgetGateBtn");
         if (gb) gb.addEventListener("click", () => { if (window.openBudgetGate) window.openBudgetGate(); });
+      }
+      if (item.no === "08") {
+        const gb = document.getElementById("openBGGateBtn");
+        if (gb) gb.addEventListener("click", () => { if (window.openBGGate) window.openBGGate(); });
       }
       drawer.classList.add("open");
       drawerBackdrop.classList.add("open");
@@ -1800,6 +1841,350 @@
     setInterval(updateCountdown, 1000);
   </script>
 
+
+  <!-- Data Book Glamping (15 modul, ditarik dari kenaltak.com/bookglamping) -->
+  <script>
+  window.BG_SECTIONS = [
+      {
+        id:'ringkasan', num:'01', title:'Ringkasan Program', desc:'Objektif, konsep dan hasil akhir peserta.',
+        body:`
+          <p class="lead">Book Glamping @ SBDF 2026 dibina sebagai program glamping ilmu untuk remaja: bukan sekadar tidur di khemah, tetapi menghidupkan pengalaman membaca, rehlah, adab, kerja pasukan dan kandungan digital.</p>
+          <div class="grid3">
+            <div class="box"><h3>Objektif</h3><ul><li>Menghidupkan budaya membaca dalam suasana luar yang selamat.</li><li>Menghubungkan peserta dengan inspirasi Rehlah Imam Syafie.</li><li>Membina keyakinan, disiplin, adab dan sahsiah diri.</li><li>Menghasilkan kandungan digital positif untuk PPAS/SBDF.</li></ul></div>
+            <div class="box"><h3>Sasaran</h3><ul><li>40 peserta berumur 9–17 tahun.</li><li>Pecahan seimbang: 20 lelaki, 20 perempuan.</li><li>4 kumpulan: Tanah, Air, Api dan Angin.</li><li>Tempoh: 31 Julai – 2 Ogos 2026, 3 hari 2 malam.</li></ul></div>
+            <div class="box"><h3>Hasil Akhir</h3><ul><li>Video storytelling kumpulan.</li><li>Presentasi 3–5 minit.</li><li>Refleksi individu.</li><li>Sijil penyertaan, hadiah kumpulan dan dokumentasi rasmi.</li></ul></div>
+          </div>
+          <div class="box warn"><h3>Keputusan Operasi Terkunci</h3><ul><li>Pendaftaran sebelum solat Jumaat; program rasmi bermula selepas Jumaat/Zohor.</li><li>7 khemah dewasa / keluarga / krew sokongan untuk anggaran 30–35 pax.</li><li>Circle malam guna BBQ drum terkawal, bukan unggun api terbuka.</li><li>Aktiviti “Kembara Imam Syafie” hanya di jalan raya sebelah Dataran MDSB.</li><li>Semasa konsert, peserta stay di kawasan khemah / zon peserta.</li><li>Majlis penutup dirancang di PPAS bersama MB/VIP, tertakluk pengesahan protokol.</li><li>Pelan hujan/petir: pindah masuk ke PPAS.</li></ul></div>
+          <div class="box"><h3>Naratif Program</h3><p>“Ilmu di mana-mana, inspirasi untuk semua.” Peserta membaca kisah Rehlah Imam Syafie, kemudian turun ke lapangan terkawal untuk mencari makna ilmu dalam ruang sebenar: perpustakaan, dataran, jalan sebelah dataran, komuniti kecil program dan rakan sebaya.</p></div>
+        `
+      },
+      {
+        id:'tentatif', num:'02', title:'Tentatif 3H2M', desc:'Susunan masa lengkap dari 31 Julai hingga 2 Ogos.',
+        body:`
+          <p class="lead">Keputusan operasi: pendaftaran dibuat sebelum solat Jumaat, manakala program rasmi bermula selepas solat Jumaat/Zohor. Ini mengelakkan slot utama bertindih dengan urusan ibadah Jumaat.</p>
+          <div class="box"><h3>Hari 1 · Jumaat, 31 Julai 2026</h3>
+            <table><thead><tr><th>Masa</th><th>Aktiviti</th><th>Lokasi</th><th>Catatan</th></tr></thead><tbody>
+              <tr><td>11.00 pagi – 12.30 tgh</td><td>Pendaftaran berperingkat sebelum Jumaat</td><td>PPAS Daerah SB</td><td>Semak borang, kesihatan, tag nama, lanyard, beg pack. Peserta lengkap check-in awal.</td></tr>
+              <tr><td>12.30 – 2.15 ptg</td><td>Makan, solat Jumaat/Zohor, rehat</td><td>PPAS / masjid berdekatan</td><td>Belum masuk modul rasmi. Peserta lelaki Muslim ke Jumaat; peserta lain rehat/aktiviti ringan terkawal.</td></tr>
+              <tr><td>2.15 – 3.00 ptg</td><td>Majlis mula rasmi, taaruf & suai kenal</td><td>PPAS</td><td>Program rasmi bermula selepas Jumaat. Pecahan kumpulan Tanah, Air, Api, Angin.</td></tr>
+              <tr><td>3.00 – 4.00 ptg</td><td>Taklimat perkhemahan</td><td>PPAS</td><td>Keselamatan, peraturan, buddy system, disiplin khemah.</td></tr>
+              <tr><td>4.00 – 5.30 ptg</td><td>Gerak ke tapak & setup khemah</td><td>Dataran MDSB</td><td>Krew pasang struktur utama; peserta bantu ringan sahaja.</td></tr>
+              <tr><td>5.30 – 6.30 ptg</td><td>Minum petang, mandi, Asar</td><td>Tapak glamping</td><td>Roll call, semak khemah, susun barang.</td></tr>
+              <tr><td>7.30 – 8.30 mlm</td><td>Maghrib & Kuliah Imam Syafie 1</td><td>Ruang solat</td><td>Tema: Ilmu, adab dan rehlah.</td></tr>
+              <tr><td>8.40 – 9.00 mlm</td><td>Isyak berjemaah</td><td>Ruang solat</td><td></td></tr>
+              <tr><td>9.00 – 9.30 mlm</td><td>Makan malam</td><td>Zon makan</td><td></td></tr>
+              <tr><td>9.30 – 10.30 mlm</td><td>Daurah Rehlah Imam Syafie 1</td><td>Circle BBQ drum</td><td>Guna BBQ drum terkawal sebagai pusat circle; bukan unggun api terbuka di tanah.</td></tr>
+              <tr><td>10.30 – 11.00 mlm</td><td>Snek malam & santai busking</td><td>Tapak</td><td>Suasana terkawal, tidak terlalu bising.</td></tr>
+              <tr><td>11.00 mlm</td><td>Lights off</td><td>Khemah</td><td>Rondaan warden malam.</td></tr>
+            </tbody></table>
+          </div>
+          <div class="box"><h3>Hari 2 · Sabtu, 1 Ogos 2026</h3>
+            <table><thead><tr><th>Masa</th><th>Aktiviti</th><th>Lokasi</th><th>Catatan</th></tr></thead><tbody>
+              <tr><td>6.00 – 7.00 pagi</td><td>Subuh & tausiyah</td><td>Ruang solat</td><td>Tema: Disiplin ilmu dan musafir.</td></tr>
+              <tr><td>7.00 – 8.00 pagi</td><td>Free flow / mandi / kemas khemah</td><td>Tapak</td><td>Pemeriksaan ringkas khemah.</td></tr>
+              <tr><td>8.00 – 9.00 pagi</td><td>Sarapan</td><td>Zon makan</td><td></td></tr>
+              <tr><td>9.00 – 10.30 pagi</td><td>ADK 1: Bedah Buku Rehlah Imam Syafie</td><td>Bilik Kuliah PPAS</td><td>Bab, watak, misi dan pengajaran.</td></tr>
+              <tr><td>10.30 – 11.00 pagi</td><td>Snek & santai</td><td>PPAS</td><td></td></tr>
+              <tr><td>11.00 – 1.00 ptg</td><td>ADK 2: Kuiz & indoor games</td><td>PPAS</td><td>Quiz buku, teka bab, susun kronologi.</td></tr>
+              <tr><td>1.00 – 2.00 ptg</td><td>Makan tengah hari & solat</td><td>PPAS</td><td></td></tr>
+              <tr><td>2.00 – 4.30 ptg</td><td>Projek “Kembara Imam Syafie”</td><td>Jalan raya sebelah Dataran MDSB</td><td>Treasure hunt mini, foto dan video storytelling dalam laluan terkawal sahaja; tidak masuk kawasan pekan bebas.</td></tr>
+              <tr><td>4.30 – 5.00 ptg</td><td>Pulang ke tapak</td><td>Dataran MDSB</td><td>Roll call penuh.</td></tr>
+              <tr><td>5.00 – 5.30 ptg</td><td>Minum petang & Asar</td><td>Tapak</td><td></td></tr>
+              <tr><td>5.30 – 6.45 ptg</td><td>Sukan rakyat 4 kumpulan</td><td>Padang</td><td>Cabaran fizikal ringan dan selamat.</td></tr>
+              <tr><td>7.30 – 8.30 mlm</td><td>Maghrib & Kuliah Imam Syafie 2</td><td>Ruang solat</td><td>Tema: Berani merantau demi ilmu.</td></tr>
+              <tr><td>9.00 – 9.30 mlm</td><td>Makan malam</td><td>Zon makan</td><td></td></tr>
+              <tr><td>9.30 – 10.30 mlm</td><td>Santai Konsert Ramli Sarip</td><td>Kawasan khemah / zon peserta</td><td>Peserta stay di kawasan khemah; tontonan/pendengaran secara zon terkawal, tidak bercampur bebas dengan crowd festival.</td></tr>
+              <tr><td>10.30 – 11.15 mlm</td><td>Snek & siapkan task presentation</td><td>Tapak</td><td>Fasilitator bantu skrip/video.</td></tr>
+              <tr><td>11.15 mlm</td><td>Lights off</td><td>Khemah</td><td>Rondaan warden.</td></tr>
+            </tbody></table>
+          </div>
+          <div class="box"><h3>Hari 3 · Ahad, 2 Ogos 2026</h3>
+            <table><thead><tr><th>Masa</th><th>Aktiviti</th><th>Lokasi</th><th>Catatan</th></tr></thead><tbody>
+              <tr><td>6.00 – 7.00 pagi</td><td>Subuh & tausiyah</td><td>Ruang solat</td><td>Tema: Ilmu dibawa pulang.</td></tr>
+              <tr><td>7.00 – 8.00 pagi</td><td>Free flow / mandi / kemas khemah</td><td>Tapak</td><td>Mula packing barang peribadi.</td></tr>
+              <tr><td>8.00 – 9.00 pagi</td><td>Sarapan</td><td>Zon makan</td><td></td></tr>
+              <tr><td>9.00 – 10.30 pagi</td><td>ADK 3: Praktis presentasi</td><td>Bilik Kuliah PPAS</td><td>Video, skrip, wakil bercakap.</td></tr>
+              <tr><td>10.30 – 11.00 pagi</td><td>Snek & santai</td><td>PPAS</td><td></td></tr>
+              <tr><td>11.00 – 12.30 tgh</td><td>ADK 4: Final quiz / indoor challenge</td><td>PPAS</td><td>Markah akhir kumpulan.</td></tr>
+              <tr><td>12.30 – 1.30 ptg</td><td>Makan tengah hari & solat</td><td>PPAS / tapak</td><td></td></tr>
+              <tr><td>1.30 – 2.00 ptg</td><td>Persediaan penutup</td><td>PPAS</td><td>Sijil, hadiah, susunan VIP dan teknikal presentasi.</td></tr>
+              <tr><td>2.00 – 4.00 ptg</td><td>Majlis penutup, presentasi, sijil & hadiah</td><td>PPAS</td><td>Bersama MB/VIP — status jemputan dan protokol masih tertakluk pengesahan.</td></tr>
+              <tr><td>4.00 – 5.00 ptg</td><td>Sign-out peserta</td><td>Kaunter keluar</td><td>Wajib diserah kepada penjaga sah.</td></tr>
+            </tbody></table>
+          </div>
+        `
+      },
+      {
+        id:'kumpulan', num:'03', title:'Kumpulan & Khemah', desc:'Pecahan peserta, khemah dan pengawasan.',
+        body:`
+          <p class="lead">Pecahan asas: 40 peserta, 20 lelaki dan 20 perempuan. Aktiviti boleh dicampur mengikut kumpulan, tetapi tidur, mandi, wuduk dan pergerakan malam wajib diasingkan mengikut jantina dan umur.</p>
+          <div class="grid2">
+            <div class="box"><h3>4 Kumpulan Aktiviti</h3><table><thead><tr><th>Kumpulan</th><th>Bil.</th><th>Fokus watak</th></tr></thead><tbody><tr><td>Tanah</td><td>10</td><td>Stabil, disiplin, tanggungjawab.</td></tr><tr><td>Air</td><td>10</td><td>Komunikasi, empati, refleksi.</td></tr><tr><td>Api</td><td>10</td><td>Semangat, kreativiti, keberanian.</td></tr><tr><td>Angin</td><td>10</td><td>Idea, mobiliti, naratif digital.</td></tr></tbody></table></div>
+            <div class="box"><h3>Pecahan Khemah</h3><table><thead><tr><th>Zon</th><th>Bil.</th><th>Kapasiti</th></tr></thead><tbody><tr><td>Peserta lelaki</td><td>4 khemah</td><td>5 peserta/khemah</td></tr><tr><td>Peserta perempuan</td><td>4 khemah</td><td>5 peserta/khemah</td></tr><tr><td>Dewasa / keluarga / krew sokongan</td><td>7 khemah</td><td>30–35 pax keseluruhan</td></tr></tbody></table></div>
+          </div>
+          <div class="box warn"><h3>Peraturan Penting</h3><ul><li>Peserta 9–12 tahun dan 13–17 tahun diberi buddy system berasingan dalam aktiviti lapangan.</li><li>Warden lelaki menjaga zon lelaki; warden perempuan menjaga zon perempuan.</li><li>Tiada peserta bergerak bersendirian ke tandas, tapak, PPAS atau keluar daripada laluan jalan sebelah dataran.</li><li>Roll call wajib sebelum/selepas setiap pergerakan lokasi.</li></ul></div>
+        `
+      },
+      {
+        id:'tapak', num:'04', title:'Tapak & Zon Operasi', desc:'Cadangan zon berdasarkan Dataran MDSB depan pentas utama.',
+        body:`
+          <p class="lead">Lokasi utama tapak ialah kawasan dataran depan pentas utama di Padang Dataran MDSB, Pekan Sabak Bernam. Susun atur perlu memisahkan zon peserta lelaki/perempuan, ruang makan, command post, solat, medic dan laluan kecemasan.</p>
+          <div class="imgbox"><img src="${planImg}" alt="Pelan tapak Dataran MDSB"></div>
+          <div class="grid2">
+            <div class="box"><h3>Zon Cadangan</h3><ul><li><b>Zon A:</b> Pentas utama / majlis penutup / pengumuman umum.</li><li><b>Zon B:</b> Khemah peserta lelaki.</li><li><b>Zon C:</b> Khemah peserta perempuan.</li><li><b>Zon D:</b> 7 khemah dewasa / keluarga / krew sokongan.</li><li><b>Zon E:</b> Command post dan warden.</li><li><b>Zon F:</b> Ruang makan dan water station.</li><li><b>Zon G:</b> Ruang solat dan wuduk.</li><li><b>Zon H:</b> Medic & first aid.</li><li><b>Zon I:</b> Circle BBQ drum terkawal.</li><li><b>Zon J:</b> Laluan kecemasan.</li><li><b>Zon K:</b> Laluan aktiviti mini di jalan raya sebelah dataran.</li></ul></div>
+            <div class="box"><h3>Prinsip Susun Tapak</h3><ul><li>Command post dekat laluan masuk dan boleh nampak zon utama.</li><li>Perimeter peserta lelaki dan perempuan jelas.</li><li>Tandas dan mandi mesti terang, dekat, tetapi tetap dikawal.</li><li>Kabel elektrik tidak melintasi laluan peserta tanpa cable ramp.</li><li>Tapak alternatif hujan/petir: PPAS sebagai lokasi perlindungan utama.</li></ul></div>
+          </div>
+          <div class="imgbox"><img src="${visual2}" alt="Visual rujukan Book Glamping"></div>
+        `
+      },
+      {
+        id:'modul', num:'05', title:'Modul Rehlah', desc:'Bedah buku, daurah, treasure hunt dan presentasi.',
+        body:`
+          <p class="lead">Modul ini menjadikan buku sebagai peta pengalaman. Peserta membaca, memilih hikmah, turun ke lapangan, merakam cerita dan membentangkan dapatan.</p>
+          <div class="grid2">
+            <div class="box"><h3>Daurah Rehlah Imam Syafie</h3><ul><li><b>Slot 1:</b> Ilmu, adab dan rehlah.</li><li><b>Slot 2:</b> Berani merantau demi ilmu.</li><li><b>Slot 3:</b> Ilmu dibawa pulang kepada keluarga dan masyarakat.</li></ul></div>
+            <div class="box"><h3>ADK Buku</h3><ul><li>Bedah bab/kisah terpilih.</li><li>Susun kronologi perjalanan.</li><li>Kuiz kosa kata dan watak.</li><li>Aktiviti “1 hikmah, 1 tindakan”.</li></ul></div>
+          </div>
+          <div class="box"><h3>Projek “Kembara Imam Syafie”</h3><table><thead><tr><th>Stesen</th><th>Tugasan</th><th>Output</th></tr></thead><tbody>
+            <tr><td>1</td><td>Cari petikan hikmah dalam buku.</td><td>Kad hikmah kumpulan.</td></tr>
+            <tr><td>2</td><td>Rakam video 60 saat: “Apa makna rehlah ilmu?”</td><td>Video pendek.</td></tr>
+            <tr><td>3</td><td>Foto simbol ilmu/komuniti di sekitar jalan sebelah Dataran MDSB.</td><td>3 foto terbaik.</td></tr>
+            <tr><td>4</td><td>Temu bual ringkas: “Kenapa membaca penting?”</td><td>1 klip testimoni.</td></tr>
+            <tr><td>5</td><td>Reka caption kempen membaca gaya PPAS.</td><td>Caption media sosial.</td></tr>
+          </tbody></table></div>
+          <div class="box"><h3>Presentasi Akhir</h3><ul><li>Durasi 3–5 minit setiap kumpulan.</li><li>Format: pembukaan, 3 dapatan, video/foto, ikrar ilmu.</li><li>Markah: kandungan buku, kerjasama, kreativiti, disiplin, penyampaian.</li></ul></div>
+        `
+      },
+      {
+        id:'imam', num:'06', title:'Profil Imam Syafie', desc:'Input biografi ringkas untuk modul inspirasi.',
+        body:`
+          <p class="lead">Profil ini sesuai untuk versi peserta: ringkas, inspiratif dan tidak terlalu akademik. Untuk bahan rasmi agama, semakan ustaz/penasihat agama tetap dicadangkan.</p>
+          <div class="grid2">
+            <div class="box"><h3>Biodata Ringkas</h3><table><tbody><tr><th>Nama</th><td>Abu Abdullah Muhammad ibn Idris al-Syafi‘i</td></tr><tr><th>Lahir</th><td>150H / 767M, lazimnya disebut Gaza/Palestin dalam banyak riwayat biografi.</td></tr><tr><th>Wafat</th><td>204H / 820M, al-Fustat, Mesir.</td></tr><tr><th>Bidang</th><td>Fiqh, hadis, bahasa Arab, usul fiqh dan metodologi hukum Islam.</td></tr><tr><th>Legasi</th><td>Pengasas mazhab Syafie dan antara tokoh utama pembentukan pemikiran hukum Islam.</td></tr></tbody></table></div>
+            <div class="box"><h3>Watak Inspirasi Peserta</h3><ul><li>Cinta ilmu sejak muda.</li><li>Berani merantau untuk mencari guru dan pengalaman.</li><li>Menghormati guru, disiplin belajar dan kuat hafalan.</li><li>Menggabungkan ilmu, adab, bahasa dan pemikiran.</li><li>Meninggalkan karya dan metodologi yang memberi kesan panjang.</li></ul></div>
+          </div>
+          <div class="box"><h3>5 Mesej Utama Untuk Anak-anak</h3><ol><li>Ilmu tidak datang sendiri; ia dicari dengan adab dan usaha.</li><li>Perjalanan membuka mata, tetapi adab menjaga hati.</li><li>Membaca ialah permulaan, mengamalkan ialah bukti.</li><li>Setiap tempat boleh menjadi kelas jika kita mahu belajar.</li><li>Karya yang baik boleh hidup lebih lama daripada umur manusia.</li></ol></div>
+          <div class="box"><h3>Nota Rujukan Biografi</h3><p>Ringkasan ini disusun daripada sumber biografi umum seperti Encyclopaedia Britannica, rujukan Shafi‘iyah dan sumber sirah popular. Rujukan rasmi dicadangkan untuk dimasukkan pada modul cetak akhir.</p></div>
+        `
+      },
+      {
+        id:'rehlah', num:'07', title:'Pengembaraan Ilmu', desc:'Peta perjalanan Imam Syafie sebagai naratif modul.',
+        body:`
+          <p class="lead">Tema pengembaraan ilmu boleh dijadikan “peta misi” peserta. Setiap lokasi sejarah Imam Syafie ditukar kepada nilai program: berani, beradab, mencari guru, menulis, berkongsi dan pulang membawa manfaat.</p>
+          <div class="box"><h3>Jejak Ilmu Imam Syafie — Versi Modul</h3><table><thead><tr><th>Jejak</th><th>Makna Sejarah</th><th>Terjemahan Program</th></tr></thead><tbody>
+            <tr><td>Gaza / Palestin</td><td>Tempat kelahiran; kehidupan awal yang sederhana.</td><td>“Ilmu boleh lahir dari kesederhanaan.”</td></tr>
+            <tr><td>Makkah</td><td>Membesar dan belajar dalam suasana ilmu.</td><td>ADK: kenali akar diri, adab dan niat belajar.</td></tr>
+            <tr><td>Lingkungan Arab Badwi</td><td>Mendalami bahasa Arab, syair dan kefasihan.</td><td>Aktiviti: bina slogan, pantun/puisi ilmu, pidato pendek.</td></tr>
+            <tr><td>Madinah</td><td>Belajar dengan Imam Malik dan tradisi hadis/fiqh.</td><td>Aktiviti: hormat guru, dengar, catat, tanya dengan adab.</td></tr>
+            <tr><td>Yemen / Najran</td><td>Pengalaman pentadbiran dan masyarakat.</td><td>Aktiviti: belajar daripada komuniti sebenar.</td></tr>
+            <tr><td>Baghdad</td><td>Bertemu perdebatan ilmu dan aliran pemikiran besar.</td><td>Aktiviti: kuiz, debat santun, susun hujah.</td></tr>
+            <tr><td>Mesir / al-Fustat</td><td>Fasa matang, pengajaran dan penulisan.</td><td>Output: video, presentasi, refleksi dan karya kumpulan.</td></tr>
+          </tbody></table></div>
+          <div class="box"><h3>Konsep Treasure Hunt Mini</h3><p>Peserta tidak perlu “melakonkan sejarah” secara literal. Mereka mencari nilai rehlah: bergerak, memerhati, mencatat, merakam dan menyampaikan semula ilmu dalam bahasa mereka sendiri. Laluan dihadkan kepada jalan raya sebelah Dataran MDSB sahaja, dengan marshal dan fasilitator setiap kumpulan.</p></div>
+        `
+      },
+      {
+        id:'fizikal', num:'08', title:'Keperluan Fizikal', desc:'Khemah, lampu, logistik, tandas, mandi dan AV.',
+        body:`
+          <p class="lead">Senarai ini menjadi checklist logistik untuk perbincangan dengan PPAS, MDSB, pembekal khemah, pembekal makanan dan pasukan keselamatan.</p>
+          <div class="grid2">
+            <div class="box"><h3>Khemah & Penginapan</h3><ul><li>8 khemah peserta.</li><li>7 khemah dewasa / keluarga / krew sokongan untuk 30–35 pax.</li><li>Groundsheet / alas tambahan.</li><li>Lampu khemah / string light.</li><li>Sleeping mat / tilam nipis.</li><li>Label nombor khemah.</li><li>Perimeter lelaki/perempuan.</li></ul></div>
+            <div class="box"><h3>Tandas & Kebersihan</h3><ul><li>Tandas lelaki/perempuan.</li><li>Shower mobile atau akses mandi yang selamat.</li><li>Tempat wuduk.</li><li>Tong sampah besar setiap zon.</li><li>Sabun, sanitizer, tisu.</li><li>Jadual mandi ikut kumpulan.</li><li>Pasukan kebersihan harian.</li></ul></div>
+            <div class="box"><h3>Elektrik & Lampu</h3><ul><li>Lampu limpah laluan.</li><li>Genset / DB box selamat.</li><li>Cable ramp untuk kabel melintang.</li><li>Charging station terkawal.</li><li>Power extension krew sahaja.</li></ul></div>
+            <div class="box"><h3>AV & Media</h3><ul><li>PA system, mic wireless.</li><li>Projector dan screen untuk ADK.</li><li>Laptop pengurusan media.</li><li>Kamera/phone production, tripod, gimbal.</li><li>MiFi/internet.</li><li>Hard disk/cloud backup.</li></ul></div>
+          </div>
+          <div class="grid2">
+            <div class="box"><h3>BBQ Drum Circle</h3><ul><li>BBQ drum / tong api terkawal.</li><li>Arang, starter selamat dan penyepit panjang.</li><li>Perimeter keselamatan sekitar drum.</li><li>Pemadam api dan baldi pasir/air.</li><li>Petugas khas kawal api sepanjang slot.</li></ul></div>
+            <div class="box"><h3>Laluan Jalan Sebelah Dataran</h3><ul><li>Kon atau barrier mudah alih.</li><li>Marshal di hujung laluan.</li><li>Fasilitator setiap kumpulan.</li><li>Vest keselamatan / reflective band.</li><li>Tiada peserta menyeberang atau keluar laluan tanpa arahan.</li></ul></div>
+          </div>
+        `
+      },
+      {
+        id:'makan', num:'09', title:'Makan Minum', desc:'11 kali sajian dan pengurusan alergi.',
+        body:`
+          <p class="lead">Anggaran minimum sajian ialah 11 kali sepanjang 3H2M. Menu mesti mesra kanak-kanak, cukup air dan mengambil kira alergi.</p>
+          <div class="box"><h3>Jadual Sajian</h3><table><thead><tr><th>Hari</th><th>Sajian</th></tr></thead><tbody><tr><td>Hari 1</td><td>Lunch, minum petang, dinner, supper.</td></tr><tr><td>Hari 2</td><td>Breakfast, snek pagi, lunch, minum petang, dinner, supper.</td></tr><tr><td>Hari 3</td><td>Breakfast, snek pagi, lunch / jamuan penutup.</td></tr></tbody></table></div>
+          <div class="grid2"><div class="box"><h3>Wajib Ada</h3><ul><li>Water station 24 jam.</li><li>Botol air peserta.</li><li>Menu rendah risiko perut.</li><li>Senarai alergi makanan.</li><li>Makanan krew, warden, medic dan marshal.</li></ul></div><div class="box warn"><h3>Risiko</h3><ul><li>Dehidrasi semasa aktiviti padang.</li><li>Makanan lambat sampai.</li><li>Peserta tidak makan kerana menu tidak sesuai.</li><li>Alergi tidak direkod awal.</li></ul></div></div>
+        `
+      },
+      {
+        id:'keselamatan', num:'10', title:'Keselamatan & SOP', desc:'SOP peserta bawah 18 tahun, medic dan cuaca.',
+        body:`
+          <p class="lead">Ini modul paling kritikal kerana peserta berumur 9–17 tahun. Keselamatan perlu didokumentasi, bukan sekadar disebut dalam taklimat.</p>
+          <div class="grid2">
+            <div class="box"><h3>SOP Wajib</h3><ul><li>Buddy system untuk semua pergerakan.</li><li>Roll call sebelum/selepas setiap aktiviti.</li><li>Warden jantina sama untuk zon tidur.</li><li>Larangan keluar kawasan tanpa fasilitator.</li><li>Sign-in dan sign-out rasmi oleh penjaga sah.</li><li>Telefon peserta dikawal ikut polisi program.</li></ul></div>
+            <div class="box"><h3>Peralatan Keselamatan</h3><ul><li>First aid kit lengkap.</li><li>Senarai ubat/alergi/asthma.</li><li>Walkie-talkie krew utama.</li><li>Pemadam api berdekatan BBQ drum, dapur dan elektrik.</li><li>Lampu limpah dan lampu kecemasan.</li><li>Nombor klinik, ambulans, PDRM, bomba.</li></ul></div>
+          </div>
+          <div class="box warn"><h3>Pelan Kecemasan</h3><ul><li><b>Hujan lebat/petir:</b> hentikan aktiviti padang; pindahkan peserta ke PPAS sebagai lokasi perlindungan rasmi.</li><li><b>Kecederaan:</b> maklum medic, rekod laporan insiden, hubungi penjaga jika perlu.</li><li><b>Peserta hilang dari kumpulan:</b> hentikan aktiviti, lockdown zon, semak buddy, lapor command post.</li><li><b>Api/elektrik:</b> kosongkan zon, matikan punca, guna laluan kecemasan.</li></ul></div>
+        `
+      },
+      {
+        id:'dokumen', num:'11', title:'Dokumen Ibu Bapa', desc:'Surat kebenaran, kesihatan, media consent dan sign-out.',
+        body:`
+          <p class="lead">Semua dokumen peserta perlu lengkap sebelum peserta dibenarkan check-in. Untuk bawah 18 tahun, kebenaran ibu bapa/penjaga dan maklumat kesihatan ialah dokumen wajib.</p>
+          <div class="box"><h3>Set Dokumen Peserta</h3><div class="chips"><span class="chip">Surat makluman</span><span class="chip">Borang kebenaran</span><span class="chip">Borang kesihatan</span><span class="chip">Indemniti</span><span class="chip">Rawatan kecemasan</span><span class="chip">Media consent</span><span class="chip">Aktiviti luar</span><span class="chip">Sign-in/out</span><span class="chip">Laporan insiden</span></div></div>
+          <div class="doc">
+            <h3>Contoh Surat Kebenaran Ibu Bapa / Penjaga</h3>
+            <p><b>Program:</b> Book Glamping @ Sabak Bernam Digital Fest 2026<br>
+            <b>Tarikh:</b> 31 Julai – 2 Ogos 2026<br>
+            <b>Lokasi:</b> PPAS Daerah Sabak Bernam & Padang Dataran MDSB, Pekan Sabak Bernam</p><p><b>Nota masa:</b> Pendaftaran sebelum solat Jumaat; program rasmi bermula selepas solat Jumaat/Zohor. Pelan hujan/petir: peserta dipindahkan ke PPAS.</p>
+            <p>Saya, <span class="line"></span> No. KP <span class="line"></span>, ibu/bapa/penjaga kepada peserta bernama <span class="line"></span> No. KP/MyKid <span class="line"></span>, memberi kebenaran kepada anak/jagaan saya untuk menyertai program tersebut selama 3 hari 2 malam.</p>
+            <p>Saya mengesahkan bahawa anak/jagaan saya berada dalam keadaan kesihatan yang sesuai untuk menyertai aktiviti luar, perkhemahan, aktiviti berkumpulan dan tugasan lapangan yang dikendalikan oleh pihak penganjur. Saya juga bersetuju pihak penganjur mengambil tindakan rawatan kecemasan yang munasabah sekiranya berlaku kecemasan kesihatan.</p>
+            <p><b>Maklumat kesihatan / alergi / ubat:</b><br><span class="line"></span><br><span class="line"></span></p>
+            <p><b>Kebenaran tambahan:</b><br>☐ Aktiviti perkhemahan 3H2M<br>☐ Aktiviti berkumpulan terkawal di jalan raya sebelah Dataran MDSB<br>☐ Foto/video dokumentasi program<br>☐ Rawatan kecemasan jika perlu</p>
+            <p><b>Nama penjaga yang mengambil peserta selepas program:</b> <span class="line"></span><br>
+            <b>No. telefon kecemasan:</b> <span class="line"></span></p>
+            <p>Tandatangan: <span class="line"></span> Tarikh: <span class="line"></span></p>
+          </div>
+          <div class="box warn"><h3>Nota Penting</h3><ul><li>Media consent mesti jelas kerana peserta bawah 18 tahun.</li><li>Senarai orang yang dibenarkan mengambil peserta mesti direkod.</li><li>Jika peserta ada asthma, alergi, anxiety, gastrik atau ubat berkala, maklumat itu perlu disimpan di command post dan unit medic.</li></ul></div>
+        `
+      },
+      {
+        id:'media', num:'12', title:'Media & Dokumentasi', desc:'Pelan foto, video, live dan arkib program.',
+        body:`
+          <p class="lead">Dokumentasi bukan sekadar simpan gambar. Ia perlu menjadi bahan promosi PPAS, laporan impak SBDF dan bahan kenangan peserta.</p>
+          <div class="grid2"><div class="box"><h3>Output Media Rasmi</h3><ul><li>1 video highlight 2–3 minit.</li><li>4 video kumpulan 60–90 saat.</li><li>Album foto rasmi.</li><li>Caption kempen membaca.</li><li>Testimoni peserta, ibu bapa dan penganjur.</li><li>Laporan ringkas impak program.</li></ul></div><div class="box"><h3>Shot List Wajib</h3><ul><li>Pendaftaran & beg pack.</li><li>Setup khemah.</li><li>Kuliah dan circle malam.</li><li>Bedah buku di PPAS.</li><li>Treasure hunt mini jalan sebelah dataran.</li><li>Sukan rakyat.</li><li>Malam inspirasi / santai konsert dari kawasan khemah.</li><li>Presentasi dan penutup.</li></ul></div></div>
+          <div class="box"><h3>Folder Arkib Dicadangkan</h3><table><tbody><tr><th>01_Admin</th><td>Surat, permit, borang, senarai peserta.</td></tr><tr><th>02_Photo_Raw</th><td>Foto asal ikut hari.</td></tr><tr><th>03_Video_Raw</th><td>Video asal ikut kamera/phone.</td></tr><tr><th>04_Output</th><td>Video siap, poster, caption, laporan.</td></tr><tr><th>05_Testimoni</th><td>Audio/video pendek peserta & ibu bapa.</td></tr></tbody></table></div>
+        `
+      },
+      {
+        id:'jawatankuasa', num:'13', title:'Jawatankuasa', desc:'Unit kerja dan fungsi petugas.',
+        body:`
+          <p class="lead">Untuk 40 peserta bawah 18 tahun, struktur krew perlu jelas. Seorang ketua tidak boleh pegang semua risiko operasi.</p>
+          <div class="box"><h3>Struktur Unit</h3><table><thead><tr><th>Unit</th><th>Tugas Utama</th></tr></thead><tbody>
+            <tr><td>Pengarah Program</td><td>Keputusan utama, liaison PPAS/MDSB/VIP.</td></tr>
+            <tr><td>Kem Komandan</td><td>Disiplin, roll call, keselamatan peserta.</td></tr>
+            <tr><td>Urusetia Pendaftaran</td><td>Borang, beg pack, tag, sign-in/out.</td></tr>
+            <tr><td>Modul & Fasilitator</td><td>ADK, daurah, treasure hunt, presentasi.</td></tr>
+            <tr><td>Logistik Tapak</td><td>Khemah, lampu, meja, kerusi, signage, air.</td></tr>
+            <tr><td>Makanan</td><td>Jadual makan, alergi, air minuman.</td></tr>
+            <tr><td>Keselamatan & Medic</td><td>First aid, kecemasan, rondaan.</td></tr>
+            <tr><td>Warden Lelaki</td><td>Zon peserta lelaki dan disiplin malam.</td></tr>
+            <tr><td>Warden Perempuan</td><td>Zon peserta perempuan dan disiplin malam.</td></tr>
+            <tr><td>Media</td><td>Foto, video, live, arkib dan posting.</td></tr>
+            <tr><td>VIP & Protokol</td><td>Penutup, sijil, hadiah, tempat duduk.</td></tr>
+            <tr><td>Kebersihan</td><td>Sampah, tandas, tapak selepas program.</td></tr>
+          </tbody></table></div>
+        `
+      },
+
+      {
+        id:'bajet', num:'14', title:'Anggaran Bajet', desc:'Pecahan kos program, khemah, makan, kit peserta dan elaun team.',
+        body:`
+          <p class="lead">Anggaran ini ialah bajet kerja untuk Book Glamping @ SBDF 2026 berdasarkan kapasiti <b>40 peserta</b> dan anggaran <b>30–35 pax dewasa/krew/keluarga</b>. Jumlah operasi dikira sehingga <b>±75 pax</b> untuk makan minum, keselamatan dan logistik asas.</p>
+          <div class="budget-total"><span><b>Cadangan bajet kerja dikunci</b><br><span class="budget-note">Subtotal RM77,980 + kontingensi 10% RM7,798</span></span><b>RM85,778</b></div>
+          <div class="box warn"><h3>Nota Asas Anggaran</h3><ul><li>Program 3 hari 2 malam, 31 Julai – 2 Ogos 2026.</li><li>15 khemah keseluruhan: 8 khemah peserta + 7 khemah dewasa/family/krew.</li><li>Khemah dirujuk sebagai set glamping 3–5 pax. Anggaran sewa 3H2M: RM330/set, berdasarkan contoh RM280 untuk 2H1M + tambahan hari.</li><li>Bajet ini belum mengikat harga vendor. Ia sesuai untuk draf permohonan, rundingan PPAS/MDSB dan semakan pembekal.</li><li>Tidak termasuk kos artis/konsert besar jika ia ditanggung oleh penganjur festival induk. Add-on disediakan di bawah.</li></ul></div>
+          <div class="box"><h3>Ringkasan Bajet Mengikut Komponen</h3><table><thead><tr><th>Komponen</th><th>Anggaran</th><th>Catatan</th></tr></thead><tbody>
+            <tr><td>Kit peserta</td><td><b>RM8,560</b></td><td>Beg pack, t-shirt, windbreaker, topi, lanyard, tag nama, buku, nota dan botol air.</td></tr>
+            <tr><td>Khemah & glamping setup</td><td><b>RM8,850</b></td><td>15 set khemah, alas tambahan, lampu khemah, groundsheet, tali dan top-up tidur peserta.</td></tr>
+            <tr><td>Tapak & infrastruktur fizikal</td><td><b>RM15,500</b></td><td>Kanopi, meja, kerusi, AV asas, elektrik/genset, lampu limpah, tandas/mandi/wuduk, signage dan kebersihan.</td></tr>
+            <tr><td>Makan minum</td><td><b>RM9,000</b></td><td>Anggaran 75 pax, 3H2M, termasuk air 24 jam, snek dan jamuan penutup asas.</td></tr>
+            <tr><td>Elaun team & petugas</td><td><b>RM13,000</b></td><td>Fasilitator, warden, logistik, medic, keselamatan, media, urusetia, penceramah dan protokol.</td></tr>
+            <tr><td>Modul, aktiviti & hadiah</td><td><b>RM5,220</b></td><td>Buku Rehlah Imam Syafie, nota, props ADK, sukan rakyat, hadiah dan sijil.</td></tr>
+            <tr><td>Keselamatan, medic & BBQ drum</td><td><b>RM5,250</b></td><td>First aid, pemadam api, BBQ drum, arang/peralatan, insurans dan standby kecemasan.</td></tr>
+            <tr><td>Pengangkutan & logistik barang</td><td><b>RM3,200</b></td><td>Lori/van, minyak, toll, trip utiliti dan pergerakan barang PPAS–Dataran.</td></tr>
+            <tr><td>Media & dokumentasi</td><td><b>RM4,700</b></td><td>Foto/video, suntingan highlight, live/data, laporan ringkas dan arkib digital.</td></tr>
+            <tr><td>Admin, permit & protokol</td><td><b>RM4,700</b></td><td>Surat, cetakan, deposit/permit, protokol penutup dan kos pentadbiran kecil.</td></tr>
+            <tr><td><b>Subtotal</b></td><td><b>RM77,980</b></td><td>Belum termasuk kontingensi.</td></tr>
+            <tr><td><b>Kontingensi 10%</b></td><td><b>RM7,798</b></td><td>Untuk lebihan harga vendor, hujan, tambahan logistik dan keperluan kecemasan.</td></tr>
+            <tr><td><b>Jumlah Cadangan</b></td><td><b>RM85,778</b></td><td>Cadangan pembulatan kertas kerja: <b>RM86,000</b> atau mohon siling <b>RM90,000</b>.</td></tr>
+          </tbody></table></div>
+          <div class="grid2">
+            <div class="box"><h3>A. Kit Peserta — RM8,560</h3><table><tbody>
+              <tr><th>Item</th><th>Kiraan</th><th>Jumlah</th></tr>
+              <tr><td>T-shirt program</td><td>40 × RM35</td><td>RM1,400</td></tr>
+              <tr><td>Windbreaker</td><td>40 × RM75</td><td>RM3,000</td></tr>
+              <tr><td>Topi</td><td>40 × RM18</td><td>RM720</td></tr>
+              <tr><td>Lanyard + tag nama</td><td>40 × RM8</td><td>RM320</td></tr>
+              <tr><td>Beg pack / drawstring bag</td><td>40 × RM18</td><td>RM720</td></tr>
+              <tr><td>Buku Rehlah Imam Syafie</td><td>40 × RM35</td><td>RM1,400</td></tr>
+              <tr><td>Nota modul & cetakan</td><td>40 × RM10</td><td>RM400</td></tr>
+              <tr><td>Botol air / alat tulis kecil</td><td>40 × RM15</td><td>RM600</td></tr>
+            </tbody></table></div>
+            <div class="box"><h3>B. Khemah & Glamping — RM8,850</h3><table><tbody>
+              <tr><th>Item</th><th>Kiraan</th><th>Jumlah</th></tr>
+              <tr><td>Set khemah glamping</td><td>15 × RM330</td><td>RM4,950</td></tr>
+              <tr><td>Top-up alas tidur / air bed / sleeping mat</td><td>Lump sum</td><td>RM2,000</td></tr>
+              <tr><td>Lampu khemah / fairy light / extension top-up</td><td>Lump sum</td><td>RM900</td></tr>
+              <tr><td>Groundsheet spare, tali, pancang, marker khemah</td><td>Lump sum</td><td>RM1,000</td></tr>
+            </tbody></table></div>
+          </div>
+          <div class="grid2">
+            <div class="box"><h3>C. Tapak & Infrastruktur — RM15,500</h3><table><tbody>
+              <tr><td>Kanopi command post, solat, makan, medic</td><td>RM2,800</td></tr>
+              <tr><td>Meja, kerusi, tikar/sejadah tambahan</td><td>RM1,200</td></tr>
+              <tr><td>PA system, mic, projector/screen asas</td><td>RM2,200</td></tr>
+              <tr><td>Genset, DB, kabel dan soket selamat</td><td>RM2,500</td></tr>
+              <tr><td>Lampu limpah perimeter dan laluan tandas</td><td>RM1,500</td></tr>
+              <tr><td>Tandas/mandi/wuduk mobile atau top-up fasiliti</td><td>RM3,500</td></tr>
+              <tr><td>Signage, barrier, tali perimeter, caution tape</td><td>RM900</td></tr>
+              <tr><td>Kebersihan tapak, tong sampah, plastik, disposal</td><td>RM900</td></tr>
+            </tbody></table></div>
+            <div class="box"><h3>D. Makan Minum — RM9,000</h3><table><tbody>
+              <tr><td>7 sajian utama</td><td>75 pax × 7 × ±RM9</td><td>RM4,725</td></tr>
+              <tr><td>5 snek/minum</td><td>75 pax × 5 × ±RM5</td><td>RM1,875</td></tr>
+              <tr><td>Air minuman 24 jam, ais, refill station</td><td>Lump sum</td><td>RM800</td></tr>
+              <tr><td>Jamuan penutup asas</td><td>100 pax × ±RM10</td><td>RM1,000</td></tr>
+              <tr><td>Menu khas/alergi & buffer makanan</td><td>Lump sum</td><td>RM600</td></tr>
+            </tbody></table></div>
+          </div>
+          <div class="grid2">
+            <div class="box"><h3>E. Elaun Team — RM13,000</h3><table><tbody>
+              <tr><td>Pengarah program / lead operasi</td><td>RM700</td></tr>
+              <tr><td>Kem komandan</td><td>RM500</td></tr>
+              <tr><td>Fasilitator kumpulan</td><td>8 × RM300 = RM2,400</td></tr>
+              <tr><td>Warden lelaki/perempuan</td><td>4 × RM250 = RM1,000</td></tr>
+              <tr><td>Urusetia pendaftaran</td><td>4 × RM180 = RM720</td></tr>
+              <tr><td>Logistik tapak</td><td>6 × RM220 = RM1,320</td></tr>
+              <tr><td>Media</td><td>3 × RM450 = RM1,350</td></tr>
+              <tr><td>Medic</td><td>2 × RM350 = RM700</td></tr>
+              <tr><td>Keselamatan / marshal</td><td>6 × RM220 = RM1,320</td></tr>
+              <tr><td>Penceramah/kuliah/tausyiah</td><td>2 slot × RM600 = RM1,200</td></tr>
+              <tr><td>Emcee/protokol</td><td>2 × RM250 = RM500</td></tr>
+              <tr><td>Buffer elaun / makanan petugas / on-call</td><td>RM1,290</td></tr>
+            </tbody></table></div>
+            <div class="box"><h3>F. Modul, Aktiviti & Hadiah — RM5,220</h3><table><tbody>
+              <tr><td>Buku rujukan peserta</td><td>40 × RM35 = RM1,400</td></tr>
+              <tr><td>Nota, worksheet, folder aktiviti</td><td>RM600</td></tr>
+              <tr><td>Stationery, props ADK, treasure task</td><td>RM600</td></tr>
+              <tr><td>Peralatan sukan rakyat</td><td>RM800</td></tr>
+              <tr><td>Hadiah kumpulan / cabaran / token peserta</td><td>RM1,500</td></tr>
+              <tr><td>Sijil peserta, krew dan penghargaan</td><td>80 × RM4 = RM320</td></tr>
+            </tbody></table></div>
+          </div>
+          <div class="grid2">
+            <div class="box"><h3>G. Keselamatan, Medic & BBQ — RM5,250</h3><table><tbody>
+              <tr><td>First aid, ubat asas, ice pack, sanitasi</td><td>RM700</td></tr>
+              <tr><td>Pemadam api / fire blanket</td><td>RM600</td></tr>
+              <tr><td>BBQ drum untuk circle malam</td><td>4 × RM250 = RM1,000</td></tr>
+              <tr><td>Arang, lighter, grill tools, tong, glove</td><td>RM700</td></tr>
+              <tr><td>Insurans peserta & petugas</td><td>75 × RM10 = RM750</td></tr>
+              <tr><td>Standby medic/ambulans/APM/RELA token</td><td>RM1,500</td></tr>
+            </tbody></table></div>
+            <div class="box"><h3>H. Transport, Media & Admin — RM12,600</h3><table><tbody>
+              <tr><td>Lori/van barang, minyak, toll, utility run</td><td>RM3,200</td></tr>
+              <tr><td>Foto/video, suntingan highlight, data/live</td><td>RM4,700</td></tr>
+              <tr><td>Surat, permit/deposit, protokol, cetakan admin</td><td>RM4,700</td></tr>
+            </tbody></table></div>
+          </div>
+          <div class="box"><h3>Opsyen Add-On / Penjimatan</h3><table><thead><tr><th>Perkara</th><th>Anggaran</th><th>Status</th></tr></thead><tbody>
+            <tr><td>Jika PPAS/MDSB menaja venue, tandas, elektrik, PA dan sebahagian petugas</td><td>Potensi jimat RM12,000 – RM20,000</td><td>Rundingan</td></tr>
+            <tr><td>Jika khemah disponsor / barter branding</td><td>Potensi jimat RM4,950 – RM8,850</td><td>Rundingan vendor</td></tr>
+            <tr><td>Konsert/artis utama jika ditanggung bawah Book Glamping</td><td>TBC / asingkan bajet</td><td>Jangan campur dahulu tanpa skop rasmi</td></tr>
+            <tr><td>Siling selamat untuk kertas kerja</td><td><b>RM90,000</b></td><td>Disyorkan</td></tr>
+          </tbody></table></div>
+        `
+      },
+      {
+        id:'checklist', num:'15', title:'Checklist Pra-Program', desc:'Perkara perlu dikunci sebelum hari kejadian.',
+        body:`
+          <p class="lead">Checklist ini boleh digunakan dalam mesyuarat mingguan sehingga program bermula.</p>
+          <div class="box"><h3>Status Persediaan</h3><p><span class="pill">Draf program</span><span class="pill">Draf tentatif</span><span class="pill">Draf tapak</span><span class="pill">Draf dokumen ibu bapa</span></p><div class="progress"><i></i></div><p>Anggaran: 75% konsep. Baki utama: kelulusan, vendor, SOP, nama peserta, pengesahan BBQ drum, kawalan jalan sebelah dataran dan dry run tapak.</p></div>
+          <div class="grid2"><div class="box"><h3>Perlu Kunci Awal</h3><ul><li>Kelulusan PPAS dan MDSB.</li><li>Tapak khemah sebenar dan bekalan elektrik.</li><li>Kelulusan penggunaan BBQ drum dan pemadam api standby.</li><li>Tandas, mandi dan wuduk.</li><li>Pembekal makanan dan menu alergi.</li><li>Medic/ambulans/klinik rujukan.</li><li>Zon peserta stay di kawasan khemah semasa konsert.</li><li>Lokasi penutup di PPAS dan protokol MB/VIP.</li></ul></div><div class="box warn"><h3>Risiko Jika Lewat</h3><ul><li>Khemah tidak sesuai dengan tapak atau arah angin.</li><li>Aktiviti Jumaat bertindih solat.</li><li>Ibu bapa tidak lengkapkan consent.</li><li>Pergerakan mini di jalan sebelah dataran tidak cukup marshal.</li><li>Pelan pemindahan ke PPAS tidak jelas.</li></ul></div></div>
+        `
+      }
+    ]
+  </script>
   <!-- ===== Modul Bajet ===== -->
   <script>
   const ZRA_CFG = {
@@ -1996,6 +2381,7 @@
       if(isSA()){ renderReview(); openLayer("layerReview"); }
       else { toast("Master Dashboard untuk Superadmin sahaja", true); }
     }
+    if(pendingOpenBG){ pendingOpenBG=false; renderBG(); openLayer("layerBG"); }
   }
   function logout(){ role="guest"; sessionStorage.removeItem("zra_bajet_role"); applyRole(); toast("Log keluar"); if(currentKey) renderDetail(currentKey); if(currentCat) renderList(currentCat); }
 
@@ -2012,6 +2398,26 @@
     if(isSA()){ renderReview(); openLayer("layerReview"); }
     else { pendingOpenMaster = true; openPin(); }
   };
+
+  // ---- Book Glamping lock-in (komponen #08) ----
+  let pendingOpenBG = false;
+  const bgOpen = new Set();
+  window.openBGGate = function(){
+    if(typeof closeDrawer === "function") closeDrawer();
+    if(role === "guest"){ pendingOpenBG = true; openPin(); }
+    else { renderBG(); openLayer("layerBG"); }
+  };
+  function renderBG(){
+    const secs = window.BG_SECTIONS || [];
+    $("bgBody").innerHTML = secs.length ? secs.map(s=>{
+      const open = bgOpen.has(s.id);
+      return `<div class="act-day">
+        <button class="act-day-head" data-bg="${s.id}"><span><b>${s.num}.</b> ${s.title} <span class="audit" style="font-weight:400">· ${s.desc||""}</span></span><span>${open?"▾":"▸"}</span></button>
+        ${open?`<div class="act-day-body" style="padding:14px"><div class="bg-content">${s.body}</div></div>`:""}
+      </div>`;
+    }).join("") : `<p class="audit">Tiada modul.</p>`;
+    $("bgBody").querySelectorAll("[data-bg]").forEach(b=> b.addEventListener("click", ()=>{ const id=b.dataset.bg; if(bgOpen.has(id)) bgOpen.delete(id); else bgOpen.add(id); renderBG(); }));
+  }
 
   // ---- Layer nav ----
   function openLayer(id){ $("bjtBackdrop").classList.add("open"); $(id).classList.add("open"); $(id).setAttribute("aria-hidden","false"); document.body.style.overflow="hidden"; }
