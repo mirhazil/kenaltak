@@ -782,6 +782,62 @@
     @media (max-width: 560px) { .mc-edit { grid-template-columns: 1fr; } }
     .mc-type-tag { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
 
+    /* War-room hero + countdown */
+    .dash-hero {
+      display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+      border: 1px solid var(--line); border-radius: var(--radius);
+      background: linear-gradient(150deg, var(--panel), var(--panel-2));
+      padding: 18px; margin-bottom: 16px;
+    }
+    .dash-count { display: flex; gap: 10px; }
+    .dash-count > div { text-align: center; border: 1px solid var(--line-soft); border-radius: var(--radius-sm); padding: 10px 14px; min-width: 62px; }
+    .dash-count b { display: block; font-size: 1.5rem; font-variant-numeric: tabular-nums; color: var(--lime); }
+    .dash-count span { font-size: .64rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+
+    /* Action table */
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line-soft); border-radius: var(--radius-sm); }
+    .act-table { width: 100%; border-collapse: collapse; font-size: .85rem; min-width: 640px; }
+    .act-table th, .act-table td { padding: 11px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line-soft); }
+    .act-table th { color: var(--muted); font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; position: sticky; top: 0; background: #0c1213; }
+    .act-table tr.attn td { background: rgba(255,130,120,.05); }
+    .act-table tr.attn td:first-child { border-left: 3px solid var(--rose); }
+    .act-table .t-when { white-space: nowrap; color: var(--muted); font-size: .78rem; }
+    .src-tag { display: inline-block; font-weight: 800; font-size: .76rem; color: var(--cyan); }
+    .src-ref { font-size: .74rem; color: var(--muted); margin-top: 2px; }
+    .row-act { display: flex; gap: 6px; }
+
+    /* Charts */
+    .chart-grp { margin-bottom: 14px; }
+    .chart-grp-title { font-weight: 800; font-size: .85rem; margin-bottom: 8px; }
+    .chart-row { display: grid; grid-template-columns: 64px 1fr auto; align-items: center; gap: 10px; margin: 6px 0; }
+    .chart-lbl { font-size: .76rem; color: var(--muted); }
+    .chart-track { height: 16px; background: rgba(255,255,255,.05); border-radius: 999px; overflow: hidden; }
+    .chart-fill { height: 100%; border-radius: 999px; transition: width .4s ease; }
+    .chart-fill.f-budget { background: linear-gradient(90deg, var(--cyan), #3aa0c8); }
+    .chart-fill.f-actual { background: linear-gradient(90deg, var(--lime), #a9d63f); }
+    .chart-val { font-size: .78rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .status-bar { display: flex; height: 22px; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,.05); margin-bottom: 12px; }
+    .status-bar .seg.s-ok { background: var(--green); } .status-bar .seg.s-wait { background: var(--amber); }
+    .status-bar .seg.s-rej { background: var(--rose); } .status-bar .seg.s-draf { background: rgba(255,255,255,.18); }
+    .status-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .76rem; color: var(--muted); }
+    .status-legend i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
+    .status-legend i.s-ok { background: var(--green); } .status-legend i.s-wait { background: var(--amber); }
+    .status-legend i.s-rej { background: var(--rose); } .status-legend i.s-draf { background: rgba(255,255,255,.18); }
+
+    /* To-do */
+    .todo-add { display: flex; gap: 8px; flex-wrap: wrap; }
+    .todo-add .det-input { flex: 1; min-width: 180px; }
+    .todo-list { display: grid; gap: 8px; }
+    .todo { display: flex; align-items: flex-start; gap: 10px; border: 1px solid var(--line-soft); border-radius: var(--radius-sm); padding: 10px 12px; }
+    .todo.done { opacity: .55; }
+    .todo.done .todo-text { text-decoration: line-through; }
+    .todo-chk { background: none; color: var(--lime); font-size: 1.2rem; line-height: 1; padding: 0; }
+    .todo-body { flex: 1; min-width: 0; }
+    .todo-text { font-weight: 600; }
+    .todo .dl { display: inline-block; font-size: .72rem; color: var(--muted); margin-top: 3px; }
+    .todo .dl.over { color: var(--rose); font-weight: 800; }
+    .todo-by { font-size: .72rem; color: var(--muted); margin-left: 6px; }
+
     /* L2 detail */
     .det-grid { display: grid; gap: 16px; }
     .det-card { border: 1px solid var(--line-soft); border-radius: var(--radius); background: var(--panel); padding: 18px; }
@@ -1718,7 +1774,7 @@
   let sb = null;
   let role = sessionStorage.getItem("zra_bajet_role") || "guest"; // guest | admin | superadmin
   let actorName = sessionStorage.getItem("zra_bajet_actor") || "";
-  const state = { actuals: {}, receipts: {} }; // keyed by item_key
+  const state = { actuals: {}, receipts: {}, todos: [] }; // keyed by item_key
   let currentCat = null, currentKey = null;
   let pendingOpenBudget = false;
   let pendingOpenMaster = false;
@@ -1742,8 +1798,8 @@
 
   // ---- Local fallback ----
   const LKEY = "zra_bajet_state_v1";
-  function loadLocal(){ try{ const d = JSON.parse(localStorage.getItem(LKEY)||"{}"); state.actuals = d.actuals||{}; state.receipts = d.receipts||{}; }catch(e){} }
-  function saveLocal(){ localStorage.setItem(LKEY, JSON.stringify({actuals:state.actuals, receipts:state.receipts})); }
+  function loadLocal(){ try{ const d = JSON.parse(localStorage.getItem(LKEY)||"{}"); state.actuals = d.actuals||{}; state.receipts = d.receipts||{}; state.todos = d.todos||[]; }catch(e){} }
+  function saveLocal(){ localStorage.setItem(LKEY, JSON.stringify({actuals:state.actuals, receipts:state.receipts, todos:state.todos})); }
 
   // ---- Data load ----
   async function loadData(){
@@ -1754,6 +1810,8 @@
         if(acts){ state.actuals = {}; acts.forEach(a=> state.actuals[a.item_key]=a); }
         const {data:recs} = await sb.from(ZRA_CFG.receiptsTable).select("*").order("created_at",{ascending:true});
         if(recs){ state.receipts = {}; recs.forEach(r=>{ (state.receipts[r.item_key]=state.receipts[r.item_key]||[]).push(r); }); }
+        const {data:tds} = await sb.from("zra_todos").select("*");
+        if(tds){ state.todos = tds; }
         saveLocal();
       }catch(e){ /* keep local */ }
     }
@@ -2153,117 +2211,201 @@
     if($("detEntries")) $("detEntries").addEventListener("click", ()=>openEntry(key));
   }
 
-  // ---- Master Dashboard (kawalan penuh superadmin) ----
+  // ============ MASTER DASHBOARD — Ruang Kerja Superadmin ============
+  const EVENT_START = new Date("2026-07-31T00:00:00+08:00");
   let masterFilter = "attn"; // attn | approve | attach | items
 
+  function relTime(ts){
+    if(!ts) return "—";
+    const d = new Date(ts), diff = (Date.now() - d.getTime())/1000;
+    if(diff < 0) return d.toLocaleString("ms-MY");
+    if(diff < 60) return "baru je";
+    if(diff < 3600) return Math.floor(diff/60)+" min lalu";
+    if(diff < 86400) return Math.floor(diff/3600)+" jam lalu";
+    if(diff < 604800) return Math.floor(diff/86400)+" hari lalu";
+    return d.toLocaleDateString("ms-MY");
+  }
+
+  // Registry modul — setiap komponen boleh menyumbang event ke dashboard.
+  // Buat masa ini: MODUL BAJET (komponen #03). Modul lain tambah di sini kelak.
   function buildFeed(){
     const events = [];
     ALL_ITEMS.forEach(it=>{
       const a = getActual(it.key);
       const hasActivity = Number(a.actual_amount||0) > 0 || a.status !== "draf" || (a.admin_note||"") || (a.superadmin_note||"");
-      if(hasActivity) events.push({ type:"item", key:it.key, ts:a.updated_at||0, it, a });
+      if(hasActivity) events.push({ type:"item", key:it.key, ts:a.updated_at||0, it, a, source:{no:"03",name:"Bajet"}, ref:`${it.no}. ${it.title}` });
     });
-    Object.values(state.receipts).forEach(arr=> arr.forEach(r=> events.push({ type:"attach", key:r.item_key, ts:r.created_at, r })));
+    Object.values(state.receipts).forEach(arr=> arr.forEach(r=>{
+      const it = ALL_ITEMS.find(i=>i.key===r.item_key);
+      events.push({ type:"attach", key:r.item_key, ts:r.created_at, r, it, source:{no:"03",name:"Bajet"}, ref: it?`${it.no}. ${it.title}`:r.item_key });
+    }));
     events.sort((x,y)=> new Date(y.ts||0) - new Date(x.ts||0));
     return events;
   }
 
-  function masterItemCard(ev){
-    const { it, a, key } = ev;
-    const v = Number(a.actual_amount||0) - it.budget;
-    const attn = a.status === "menunggu";
-    return `<div class="mcard ${attn?"attn":""}">
-      <div class="mc-head">
-        <div><span class="mc-type-tag">💰 Item bajet · ${CATALOG[it.category].label}</span><div class="mc-title">${it.no}. ${it.title}</div></div>
-        <div style="text-align:right">${statusBadge(a.status)}<div class="mc-when">${a.updated_at?new Date(a.updated_at).toLocaleString("ms-MY"):"—"}</div></div>
-      </div>
-      <div class="audit" style="margin-top:6px">Bajet 🔒 ${fmt(it.budget)} · Actual ${fmt(a.actual_amount)} · Varian ${v>0?'<span class="neg">+'+fmt(v)+'</span>':(v<0?'<span class="pos">'+fmt(v)+'</span>':fmt(0))}</div>
-      ${a.admin_note?`<p style="margin:8px 0"><b class="mc-type-tag">Nota admin:</b> ${a.admin_note}</p>`:""}
-      <div class="mc-edit">
-        <div><label class="audit">Actual Kos (RM)</label><input class="det-input" id="m-actual-${key}" type="number" min="0" step="100" value="${a.actual_amount||""}" placeholder="0"></div>
-        <div><label class="audit">Nota Superadmin</label><input class="det-input" id="m-sanote-${key}" value="${(a.superadmin_note||"").replace(/"/g,'&quot;')}" placeholder="Maklum balas / sebab..."></div>
-      </div>
-      <div class="det-actions">
-        <button class="btn primary" data-m-save="${key}">💾 Simpan</button>
-        <button class="btn good" data-m-appr="${key}">✅ Lulus</button>
-        <button class="btn danger" data-m-rej="${key}">⛔ Tolak</button>
-        <button class="btn" data-m-open="${key}">🔎 Buka penuh</button>
-        <button class="btn" data-m-attach="${key}">📎 Lampiran</button>
-        <button class="btn danger" data-m-del="${key}">🗑️ Padam data</button>
-      </div>
-    </div>`;
+  function actionRow(ev){
+    const src = `<span class="src-tag">🧩 #${ev.source.no} ${ev.source.name}</span><div class="src-ref">${ev.ref}</div>`;
+    if(ev.type === "item"){
+      const { it, a, key } = ev; const v = Number(a.actual_amount||0)-it.budget; const attn = a.status==="menunggu";
+      const detail = `Actual <b>${fmt(a.actual_amount)}</b> vs Bajet ${fmt(it.budget)} · Var ${v>0?'<span class="neg">+'+fmt(v)+'</span>':(v<0?'<span class="pos">'+fmt(v)+'</span>':fmt(0))}${a.admin_note?`<div class="src-ref">📝 ${a.admin_note}</div>`:""}`;
+      const act = `${attn?`<button class="btn good" data-m-appr="${key}" style="padding:6px 10px">✅</button>`:""}<button class="btn" data-m-open="${key}" style="padding:6px 10px">🔎 Buka</button>`;
+      return `<tr class="${attn?"attn":""}"><td class="t-when">${relTime(ev.ts)}</td><td>💰 Bajet item<br>${src}</td><td>${detail}</td><td>${a.updated_by||"—"}</td><td>${statusBadge(a.status)}</td><td><div class="row-act">${act}</div></td></tr>`;
+    } else {
+      const r = ev.r; const k = r.kind||"lain";
+      const detail = `<span class="badge b-${k}">${KINDS[k]||k}</span> <b>${r.label||"(tanpa label)"}</b>${r.amount?` · ${fmt(r.amount)}`:""}${r.note?`<div class="src-ref">${r.note}</div>`:""}${r.image_url?`<div class="src-ref"><a href="${r.image_url}" target="_blank" rel="noopener" style="color:var(--cyan)">🖼️ buka gambar ↗</a></div>`:""}`;
+      const st = r.reviewed?'<span class="badge b-diluluskan">Disemak</span>':'<span class="badge b-ditolak">Baru</span>';
+      const act = `${!r.reviewed?`<button class="btn good" data-rev-rcpt="${r.item_key}|${r.id}" style="padding:6px 10px">✓</button>`:""}<button class="btn" data-m-attach="${r.item_key}" style="padding:6px 10px">🔎 Buka</button>`;
+      return `<tr class="${r.reviewed?"":"attn"}"><td class="t-when">${relTime(ev.ts)}</td><td>📎 Lampiran<br>${src}</td><td>${detail}</td><td>${r.uploaded_by||"—"}</td><td>${st}</td><td><div class="row-act">${act}</div></td></tr>`;
+    }
   }
 
-  function masterAttachCard(ev){
-    const r = ev.r;
-    return `<div class="mcard ${r.reviewed?"":"attn"}">
-      <span class="mc-type-tag">📎 Lampiran${r.reviewed?"":" · BARU"}</span>
-      ${entryCardHtml(r, true)}
-    </div>`;
-  }
-
-  function renderReview(){
+  function renderActionTable(){
     const feed = buildFeed();
+    const isAttn = e => (e.type==="item"&&e.a.status==="menunggu") || (e.type==="attach"&&!e.r.reviewed);
     const counts = {
-      attn: feed.filter(e=> (e.type==="item"&&e.a.status==="menunggu") || (e.type==="attach"&&!e.r.reviewed)).length,
+      attn: feed.filter(isAttn).length,
       approve: feed.filter(e=> e.type==="item"&&e.a.status==="menunggu").length,
       attach: feed.filter(e=> e.type==="attach").length,
       items: feed.filter(e=> e.type==="item").length
     };
     let shown = feed;
-    if(masterFilter==="attn") shown = feed.filter(e=> (e.type==="item"&&e.a.status==="menunggu") || (e.type==="attach"&&!e.r.reviewed));
+    if(masterFilter==="attn") shown = feed.filter(isAttn);
     else if(masterFilter==="approve") shown = feed.filter(e=> e.type==="item"&&e.a.status==="menunggu");
     else if(masterFilter==="attach") shown = feed.filter(e=> e.type==="attach");
     else if(masterFilter==="items") shown = feed.filter(e=> e.type==="item");
 
-    // ringkasan
-    let gB=0, gA=0; ["konten","logistik"].forEach(c=>{ const t=catTotals(c); gB+=t.budget; gA+=t.actual; });
     const chip = (id,label,n)=> `<button class="mchip ${masterFilter===id?"active":""}" data-mfilter="${id}">${label}${n?` <span class="notif">${n}</span>`:""}</button>`;
+    const rows = shown.length ? shown.map(actionRow).join("") : `<tr><td colspan="6" class="audit" style="text-align:center;padding:22px">Tiada rekod untuk tapisan ini. 🎉</td></tr>`;
+    return `
+      <div class="review-sec-title">📋 Jadual Tindakan</div>
+      <div class="mfilters">
+        ${chip("attn","🔔 Perlu perhatian",counts.attn)}
+        ${chip("approve","⏳ Menunggu lulus",counts.approve)}
+        ${chip("attach","📎 Lampiran",counts.attach)}
+        ${chip("items","📋 Item",counts.items)}
+      </div>
+      <div class="table-wrap">
+        <table class="act-table">
+          <thead><tr><th>Bila</th><th>Sumber</th><th>Butiran / Tindakan</th><th>Oleh</th><th>Status</th><th>Aksi</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
 
-    const body = shown.length ? shown.map(e=> e.type==="item"? masterItemCard(e) : masterAttachCard(e)).join("")
-      : `<p class="audit">Tiada rekod untuk tapisan ini. 🎉</p>`;
+  function renderCharts(){
+    const cats = ["konten","logistik"]; let maxv = 1;
+    cats.forEach(c=>{ const t=catTotals(c); maxv=Math.max(maxv,t.budget,t.actual); });
+    const bar = (label,val,cls)=>{ const pct=Math.min(100,(val/maxv)*100); return `<div class="chart-row"><span class="chart-lbl">${label}</span><div class="chart-track"><div class="chart-fill ${cls}" style="width:${pct}%"></div></div><span class="chart-val">${fmt(val)}</span></div>`; };
+    let bars = "";
+    cats.forEach(c=>{ const t=catTotals(c); bars += `<div class="chart-grp"><div class="chart-grp-title">${CATALOG[c].icon} ${CATALOG[c].label}</div>${bar("Bajet",t.budget,"f-budget")}${bar("Actual",t.actual,"f-actual")}</div>`; });
+    const sc = {draf:0,menunggu:0,diluluskan:0,ditolak:0};
+    ALL_ITEMS.forEach(it=> sc[getActual(it.key).status]++);
+    const total = ALL_ITEMS.length;
+    const seg = (n,cls)=> n?`<div class="seg ${cls}" style="flex:${n}" title="${n}"></div>`:"";
+    const statusBar = `<div class="status-bar">${seg(sc.diluluskan,"s-ok")}${seg(sc.menunggu,"s-wait")}${seg(sc.ditolak,"s-rej")}${seg(sc.draf,"s-draf")}</div>
+      <div class="status-legend">
+        <span><i class="s-ok"></i> Diluluskan ${sc.diluluskan}</span>
+        <span><i class="s-wait"></i> Menunggu ${sc.menunggu}</span>
+        <span><i class="s-rej"></i> Ditolak ${sc.ditolak}</span>
+        <span><i class="s-draf"></i> Draf ${sc.draf}</span>
+      </div>`;
+    return `
+      <div class="review-sec-title">📊 Carta & Graf</div>
+      <div class="det-card"><h3>Bajet vs Actual (setiap kategori)</h3>${bars}</div>
+      <div class="det-card"><h3>Status kelulusan (${total} item)</h3>${statusBar}</div>`;
+  }
 
+  function renderTodos(){
+    const todos = (state.todos||[]).slice().sort((a,b)=>{
+      if(a.done!==b.done) return a.done?1:-1;
+      const da=a.deadline?new Date(a.deadline).getTime():Infinity, db=b.deadline?new Date(b.deadline).getTime():Infinity;
+      return da-db;
+    });
+    const today = new Date(); today.setHours(0,0,0,0);
+    const rows = todos.length ? todos.map(t=>{
+      const overdue = t.deadline && !t.done && new Date(t.deadline) < today;
+      const dl = t.deadline ? `<span class="dl ${overdue?"over":""}">📅 ${new Date(t.deadline).toLocaleDateString("ms-MY")}${overdue?" (lewat)":""}</span>` : "";
+      return `<div class="todo ${t.done?"done":""}">
+        <button class="todo-chk" data-todo-toggle="${t.id}">${t.done?"☑":"☐"}</button>
+        <div class="todo-body"><div class="todo-text">${t.text}</div>${dl}${t.created_by?`<span class="todo-by">— ${t.created_by}</span>`:""}</div>
+        <button class="btn danger" data-todo-del="${t.id}" style="padding:5px 9px">✕</button>
+      </div>`;
+    }).join("") : `<p class="audit">Belum ada tugasan. Tambah perkara yang takut lupa di atas.</p>`;
+    return `
+      <div class="review-sec-title">✅ Senarai Tugasan / Pengingat</div>
+      <div class="det-card">
+        <div class="todo-add">
+          <input class="det-input" id="todoText" placeholder="cth: Selaras timeframe semua komponen, kejar resit katering...">
+          <input class="det-input" id="todoDate" type="date" style="max-width:170px">
+          <button class="btn primary" id="todoAdd">➕ Tambah</button>
+        </div>
+        <div class="todo-list" style="margin-top:14px">${rows}</div>
+      </div>`;
+  }
+
+  function updateDashCount(){
+    const d = Math.max(0, EVENT_START - Date.now());
+    const set=(id,val)=>{ const el=$(id); if(el) el.textContent=val; };
+    set("dHari", Math.floor(d/86400000));
+    set("dJam", String(Math.floor((d%86400000)/3600000)).padStart(2,"0"));
+    set("dMin", String(Math.floor((d%3600000)/60000)).padStart(2,"0"));
+  }
+
+  function renderReview(){
+    let gB=0, gA=0; ["konten","logistik"].forEach(c=>{ const t=catTotals(c); gB+=t.budget; gA+=t.actual; });
+    const attn = attnTotal() + ALL_ITEMS.filter(it=>getActual(it.key).status==="menunggu").length;
     $("reviewBody").innerHTML = `
+      <div class="dash-hero">
+        <div>
+          <span class="mc-type-tag">👑 Ruang Kerja Superadmin · Eagle-eye semua komponen</span>
+          <h3 style="margin:4px 0 2px;font-size:1.35rem">War Room — ZRA Digital Fest</h3>
+          <p class="audit" style="margin:0">Setiap tindakan admin dari mana-mana komponen muncul di sini untuk semakan, kelulusan &amp; rujukan.</p>
+        </div>
+        <div class="dash-count">
+          <div><b id="dHari">--</b><span>Hari</span></div>
+          <div><b id="dJam">--</b><span>Jam</span></div>
+          <div><b id="dMin">--</b><span>Minit</span></div>
+        </div>
+      </div>
       <div class="m-summary">
         <div class="sum-cell"><b>${fmt(gB)}</b><span>Jumlah Bajet</span></div>
         <div class="sum-cell"><b>${fmt(gA)}</b><span>Jumlah Actual</span></div>
         <div class="sum-cell"><b>${(gA-gB)>0?'<span class="neg">+'+fmt(gA-gB)+'</span>':'<span class="pos">'+fmt(gA-gB)+'</span>'}</b><span>Varian</span></div>
-        <div class="sum-cell"><b>${counts.attn}</b><span>Perlu perhatian</span></div>
+        <div class="sum-cell"><b style="color:${attn?'var(--rose)':'inherit'}">${attn}</b><span>Perlu perhatian</span></div>
       </div>
-      <div class="mfilters">
-        ${chip("attn","🔔 Perlu perhatian",counts.attn)}
-        ${chip("approve","⏳ Menunggu lulus",counts.approve)}
-        ${chip("attach","📎 Semua lampiran",counts.attach)}
-        ${chip("items","📋 Semua item",counts.items)}
-      </div>
-      <div>${body}</div>
+      ${renderActionTable()}
+      ${renderTodos()}
+      ${renderCharts()}
     `;
-
-    // filters
+    updateDashCount();
+    // Jadual tindakan
     $("reviewBody").querySelectorAll("[data-mfilter]").forEach(b=> b.addEventListener("click", ()=>{ masterFilter=b.dataset.mfilter; renderReview(); }));
-    // item actions
-    $("reviewBody").querySelectorAll("[data-m-save]").forEach(b=> b.addEventListener("click", ()=> saveMasterItem(b.dataset.mSave)));
-    $("reviewBody").querySelectorAll("[data-m-appr]").forEach(b=> b.addEventListener("click", async ()=>{ await saveMasterItem(b.dataset.mAppr, "diluluskan"); }));
-    $("reviewBody").querySelectorAll("[data-m-rej]").forEach(b=> b.addEventListener("click", async ()=>{ await saveMasterItem(b.dataset.mRej, "ditolak"); }));
+    $("reviewBody").querySelectorAll("[data-m-appr]").forEach(b=> b.addEventListener("click", async ()=>{ await saApprove(b.dataset.mAppr,true,""); renderSummary(); updateNotif(); renderReview(); }));
     $("reviewBody").querySelectorAll("[data-m-open]").forEach(b=> b.addEventListener("click", ()=> openDetail(b.dataset.mOpen)));
     $("reviewBody").querySelectorAll("[data-m-attach]").forEach(b=> b.addEventListener("click", ()=> openEntry(b.dataset.mAttach)));
-    $("reviewBody").querySelectorAll("[data-m-del]").forEach(b=> b.addEventListener("click", async ()=>{ await saDeleteItem(b.dataset.mDel); renderReview(); }));
-    // attachment actions (mark reviewed / delete / lightbox)
     bindEntryActions($("reviewBody"));
+    // To-do
+    if($("todoAdd")) $("todoAdd").addEventListener("click", addTodo);
+    if($("todoText")) $("todoText").addEventListener("keydown", e=>{ if(e.key==="Enter") addTodo(); });
+    $("reviewBody").querySelectorAll("[data-todo-toggle]").forEach(b=> b.addEventListener("click", ()=> toggleTodo(b.dataset.todoToggle)));
+    $("reviewBody").querySelectorAll("[data-todo-del]").forEach(b=> b.addEventListener("click", ()=> deleteTodo(b.dataset.todoDel)));
   }
 
-  // Simpan terus dari master: actual + nota SA (+ optional lulus/tolak). Auto-segerak ke menu asal.
-  async function saveMasterItem(key, status){
-    const actEl = $("m-actual-"+key), noteEl = $("m-sanote-"+key);
-    const noteVal = noteEl ? noteEl.value : undefined;
-    const patch = {};
-    if(actEl) patch.actual_amount = Number(actEl.value||0);
-    if(noteVal!==undefined) patch.superadmin_note = noteVal;
-    await saveActual(key, patch);                       // RPC zra_sa_set_actual (PIN di server)
-    if(status) await saApprove(key, status==="diluluskan", noteVal||"");  // rekod approved_by/at
-    renderSummary(); updateNotif(); renderReview();
-    if(currentCat && $("layerList").classList.contains("open")) renderList(currentCat);
-    if(currentKey===key && $("layerDetail").classList.contains("open")) renderDetail(key);
+  // ---- To-do CRUD ----
+  async function addTodo(){
+    const text = $("todoText").value.trim(); if(!text){ toast("Tulis tugasan dulu", true); return; }
+    const deadline = $("todoDate").value || null;
+    const t = { id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())), text, deadline, done:false, created_by:actorName||"", created_at:new Date().toISOString() };
+    (state.todos = state.todos||[]).push(t); saveLocal(); renderReview();
+    if(sbReady()){ try{ const {error}=await sb.from("zra_todos").insert({id:t.id,text,deadline,done:false,created_by:t.created_by}); if(error) throw error; }catch(e){ toast("Tugasan luar talian: "+(e.message||e.code), true); } }
+  }
+  async function toggleTodo(id){
+    const t = (state.todos||[]).find(x=>x.id===id); if(!t) return; t.done=!t.done; saveLocal(); renderReview();
+    if(sbReady()){ try{ await sb.from("zra_todos").update({done:t.done}).eq("id",id); }catch(e){} }
+  }
+  async function deleteTodo(id){
+    state.todos = (state.todos||[]).filter(x=>x.id!==id); saveLocal(); renderReview();
+    if(sbReady()){ try{ await sb.from("zra_todos").delete().eq("id",id); }catch(e){} }
   }
 
   // ---- Wire up ----
@@ -2282,6 +2424,7 @@
 
   applyRole();
   loadData();
+  setInterval(()=>{ if($("layerReview") && $("layerReview").classList.contains("open")) updateDashCount(); }, 1000);
   </script>
 </body>
 </html>
