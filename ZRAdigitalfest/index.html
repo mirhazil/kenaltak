@@ -965,10 +965,9 @@
       <div class="section-inner">
         <div class="section-head">
           <div>
-            <span class="eyebrow">Menu operasi & komponen</span>
-            <h2>Klik Kad Untuk Semak Isi Setiap Komponen</h2>
+            <h2>Komponen</h2>
           </div>
-          <p>Menu ini disusun seperti draf Book Glamping: setiap komponen ada tujuan, isi, output, bajet/keperluan dan perkara perlu sah.</p>
+          <button class="pin-btn" type="button" id="masterBtn">🗂️ Master Dashboard<span class="notif" id="masterNotif" style="display:none">0</span></button>
         </div>
         <div class="toolbar">
           <input class="search" id="searchInput" type="search" placeholder="Cari: SME, buku, filem, muzik, bajet, infra, influencer...">
@@ -1714,6 +1713,7 @@
   const state = { actuals: {}, receipts: {} }; // keyed by item_key
   let currentCat = null, currentKey = null;
   let pendingOpenBudget = false;
+  let pendingOpenMaster = false;
 
   const ALL_ITEMS = [...CATALOG.konten.items.map(i=>({...i,category:"konten"})), ...CATALOG.logistik.items.map(i=>({...i,category:"logistik"}))];
   const fmt = n => "RM " + Number(n||0).toLocaleString("en-MY", {minimumFractionDigits:0, maximumFractionDigits:2});
@@ -1814,6 +1814,10 @@
     closePin(); applyRole(); toast(role==="superadmin"?"Masuk sebagai Superadmin 👑":"Masuk sebagai Admin ✍️");
     if(currentKey) renderDetail(currentKey); if(currentCat) renderList(currentCat);
     if(pendingOpenBudget){ pendingOpenBudget=false; renderSummary(); openLayer("layerBudget"); }
+    if(pendingOpenMaster){ pendingOpenMaster=false;
+      if(isSA()){ renderReview(); openLayer("layerReview"); }
+      else { toast("Master Dashboard untuk Superadmin sahaja", true); }
+    }
   }
   function logout(){ role="guest"; sessionStorage.removeItem("zra_bajet_role"); applyRole(); toast("Log keluar"); if(currentKey) renderDetail(currentKey); if(currentCat) renderList(currentCat); }
 
@@ -1822,6 +1826,13 @@
     if(typeof closeDrawer === "function") closeDrawer();
     if(role === "guest"){ pendingOpenBudget = true; openPin(); }
     else { renderSummary(); openLayer("layerBudget"); }
+  };
+
+  // ---- Pintu masuk Master Dashboard (global, dari main page) ----
+  window.openMasterGate = function(){
+    if(typeof closeDrawer === "function") closeDrawer();
+    if(isSA()){ renderReview(); openLayer("layerReview"); }
+    else { pendingOpenMaster = true; openPin(); }
   };
 
   // ---- Layer nav ----
@@ -1944,8 +1955,11 @@
   function attnTotal(){ let n=0; Object.values(state.receipts).forEach(arr=> arr.forEach(r=>{ if(!r.reviewed) n++; })); return n; }
   function updateNotif(){
     const n = attnTotal();
-    const badge = $("reviewNotif");
-    if(badge){ badge.textContent = n; badge.style.display = n? "inline-grid":"none"; }
+    // badge hanya bermakna untuk superadmin; tunjuk di dua tempat
+    ["reviewNotif","masterNotif"].forEach(idb=>{
+      const badge = $(idb);
+      if(badge){ badge.textContent = n; badge.style.display = (n && isSA())? "inline-grid":"none"; }
+    });
   }
 
   async function saveEntry(key){
@@ -2251,6 +2265,7 @@
   $("bajetPinBtn").addEventListener("click", openPin);
   $("logoutBtn").addEventListener("click", logout);
   $("reviewBtn").addEventListener("click", ()=>{ renderReview(); openLayer("layerReview"); });
+  if($("masterBtn")) $("masterBtn").addEventListener("click", ()=> window.openMasterGate());
   $("pinClose").addEventListener("click", closePin);
   $("pinSubmit").addEventListener("click", submitPin);
   $("pinInput").addEventListener("keydown", e=>{ if(e.key==="Enter") submitPin(); });
