@@ -855,6 +855,17 @@
     .al-role.admin { color: var(--cyan); }
     .al-text { font-size: .84rem; }
 
+    /* Pos ke bajet — senarai item */
+    .post-list { max-height: 300px; overflow-y: auto; border: 1px solid var(--line-soft); border-radius: var(--radius-sm); }
+    .post-grp-title { font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--lime); padding: 8px 12px; background: rgba(255,255,255,.03); position: sticky; top: 0; }
+    .post-item { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--line-soft); cursor: pointer; }
+    .post-item:hover { background: rgba(255,255,255,.05); }
+    .post-item.sel { background: rgba(216,255,88,.12); box-shadow: inset 3px 0 0 var(--lime); }
+    .post-item .pi-title { font-weight: 700; font-size: .86rem; }
+    .post-item .pi-sub { font-size: .72rem; color: var(--muted); }
+    .post-item .pi-fig { font-size: .74rem; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
+    .posted-badge { display: inline-block; padding: 4px 9px; border-radius: 999px; font-size: .68rem; font-weight: 800; background: rgba(127,209,119,.16); color: var(--green); }
+
     /* L2 detail */
     .det-grid { display: grid; gap: 16px; }
     .det-card { border: 1px solid var(--line-soft); border-radius: var(--radius); background: var(--panel); padding: 18px; }
@@ -1350,6 +1361,21 @@
       <input id="pinInput" type="password" inputmode="text" placeholder="Masukkan PIN" autocomplete="off">
       <button class="btn primary" type="button" id="pinSubmit" style="width:100%">Masuk</button>
       <p class="modal-msg" id="pinMsg"></p>
+    </div>
+  </div>
+
+  <!-- Pos resit ke bajet -->
+  <div class="modal" id="postModal" aria-hidden="true">
+    <div class="modal-card" style="width:min(640px,100%)">
+      <button class="modal-close" type="button" id="postClose">×</button>
+      <h2>💵 Pos kos ke Bajet</h2>
+      <p id="postInfo" class="audit"></p>
+      <label class="audit">Jumlah untuk dipos (RM)</label>
+      <input id="postAmount" type="number" min="0" step="100" placeholder="0">
+      <label class="audit" style="display:block;margin:10px 0 6px">Pilih item bajet destinasi</label>
+      <div class="post-list" id="postList"></div>
+      <button class="btn primary" type="button" id="postConfirm" style="width:100%;margin-top:12px">✅ Pos ke item dipilih</button>
+      <p class="modal-msg" id="postMsg"></p>
     </div>
   </div>
 
@@ -2121,6 +2147,8 @@
   function entryCardHtml(r, withItem){
     const it = withItem ? ALL_ITEMS.find(i=>i.key===r.item_key) : null;
     const k = r.kind||"lain";
+    const postedTo = r.posted ? ALL_ITEMS.find(i=>i.key===r.posted_to) : null;
+    const canPost = isSA() && Number(r.amount||0) > 0 && r.reviewed && !r.posted;
     return `<div class="receipt">
       ${r.image_url?`<img src="${r.image_url}" data-lb="${r.image_url}" alt="lampiran">`:`<div class="receipt" style="width:86px;height:86px;border:1px dashed var(--line-soft);display:grid;place-items:center;color:var(--muted);font-size:1.6rem">📝</div>`}
       <div class="r-body">
@@ -2132,8 +2160,9 @@
         ${it?`<div class="r-meta">${it.no}. ${it.title} · ${CATALOG[it.category].label}</div>`:""}
         ${r.note?`<div style="margin:6px 0;white-space:pre-wrap">${r.note}</div>`:""}
         <div class="r-meta">${r.uploaded_by?("oleh "+r.uploaded_by+" · "):""}${new Date(r.created_at).toLocaleString("ms-MY")}${r.image_url?` · <a href="${r.image_url}" target="_blank" rel="noopener" style="color:var(--cyan)">buka gambar ↗</a>`:""}</div>
+        ${r.posted?`<div style="margin-top:6px"><span class="posted-badge">✅ Diposkan → ${postedTo?postedTo.title:r.posted_to} (${fmt(r.posted_amount)})</span></div>`:""}
       </div>
-      ${isSA()?`<div style="display:grid;gap:6px">${!r.reviewed?`<button class="btn good" data-rev-rcpt="${r.item_key}|${r.id}" style="padding:6px 10px">✓ Disemak</button>`:""}<button class="btn danger" data-delrcpt="${r.item_key}|${r.id}" style="padding:6px 10px">Padam</button></div>`:""}
+      ${isSA()?`<div style="display:grid;gap:6px">${!r.reviewed?`<button class="btn good" data-rev-rcpt="${r.item_key}|${r.id}" style="padding:6px 10px">✓ Disemak</button>`:""}${canPost?`<button class="btn primary" data-post="${r.item_key}|${r.id}" style="padding:6px 10px">💵 Pos ke Bajet</button>`:""}<button class="btn danger" data-delrcpt="${r.item_key}|${r.id}" style="padding:6px 10px">Padam</button></div>`:""}
     </div>`;
   }
 
@@ -2181,7 +2210,54 @@
   function bindEntryActions(scope){
     scope.querySelectorAll("[data-delrcpt]").forEach(b=> b.addEventListener("click", ()=>{ const [k,id]=b.dataset.delrcpt.split("|"); deleteEntry(k,id); }));
     scope.querySelectorAll("[data-rev-rcpt]").forEach(b=> b.addEventListener("click", ()=>{ const [k,id]=b.dataset.revRcpt.split("|"); markReviewed(k,id); }));
+    scope.querySelectorAll("[data-post]").forEach(b=> b.addEventListener("click", ()=>{ const [k,id]=b.dataset.post.split("|"); openPostModal(k,id); }));
     scope.querySelectorAll("[data-lb]").forEach(img=> img.addEventListener("click", ()=>{ $("lightboxImg").src = img.dataset.lb; $("lightbox").classList.add("open"); }));
+  }
+
+  // ---- Pos resit ke bajet ----
+  let postCtx = null, postTarget = null;
+  function openPostModal(key, id){
+    const r = (state.receipts[key]||[]).find(x=>x.id===id); if(!r) return;
+    postCtx = { key, id, r }; postTarget = key;
+    $("postInfo").innerHTML = `Resit: <b>${r.label||"(tanpa label)"}</b> · ${KINDS[r.kind]||r.kind} · asal: ${ (ALL_ITEMS.find(i=>i.key===key)||{}).title||key }`;
+    $("postAmount").value = r.amount || "";
+    $("postMsg").textContent = "";
+    renderPostList();
+    $("postModal").classList.add("open");
+  }
+  function closePostModal(){ $("postModal").classList.remove("open"); postCtx=null; }
+  function renderPostList(){
+    const grp = cat => CATALOG[cat].items.map(it=>{
+      const a = getActual(it.key);
+      return `<div class="post-item ${postTarget===it.key?"sel":""}" data-target="${it.key}">
+        <div><div class="pi-title">${it.no}. ${it.title}</div><div class="pi-sub">${CATALOG[cat].label}</div></div>
+        <div class="pi-fig">Bajet ${fmt(it.budget)}<br>Actual ${fmt(a.actual_amount)}</div>
+      </div>`;
+    }).join("");
+    $("postList").innerHTML = `<div class="post-grp-title">🎬 Konten / Pengisian</div>${grp("konten")}<div class="post-grp-title">🚚 Logistik / Fasiliti</div>${grp("logistik")}`;
+    $("postList").querySelectorAll("[data-target]").forEach(el=> el.addEventListener("click", ()=>{ postTarget = el.dataset.target; renderPostList(); }));
+  }
+  async function postReceipt(){
+    if(!postCtx || !isSA()) return;
+    const amount = Number($("postAmount").value||0);
+    if(amount<=0){ $("postMsg").innerHTML='<span style="color:var(--rose)">Masukkan jumlah sah.</span>'; return; }
+    const { key, id, r } = postCtx; const target = postTarget; const tItem = ALL_ITEMS.find(i=>i.key===target);
+    // optimistic
+    r.posted=true; r.posted_to=target; r.posted_amount=amount; r.posted_by=actorName||""; r.posted_at=new Date().toISOString(); r.reviewed=true;
+    const cur = getActual(target);
+    state.actuals[target] = { ...cur, item_key:target, category:tItem.category, actual_amount:Number(cur.actual_amount||0)+amount, updated_by:actorName||cur.updated_by, updated_at:new Date().toISOString() };
+    saveLocal();
+    if(sbReady()){
+      try{ const { error } = await sb.rpc("zra_sa_post_receipt", { p_pin:ZRA_CFG.superadminPin, p_receipt_id:id, p_target_item:target, p_category:tItem.category, p_amount:amount, p_by:actorName||"" }); if(error) throw error; toast("Diposkan ke bajet ✅"); }
+      catch(e){ toast("DB gagal: "+(e.message||e.code), true); }
+    } else toast("Diposkan (luar talian)");
+    logActivity("post_receipt", `Pos ${fmt(amount)} — resit "${r.label||"(tanpa label)"}" → ${tItem.title}`, `Bajet #03 · ${CATALOG[tItem.category].label}`);
+    closePostModal();
+    renderSummary(); updateNotif();
+    if($("layerEntry").classList.contains("open")) renderEntry(key);
+    if($("layerList").classList.contains("open") && currentCat) renderList(currentCat);
+    if($("layerDetail").classList.contains("open") && currentKey) renderDetail(currentKey);
+    if($("layerReview").classList.contains("open")) renderReview();
   }
 
   // ---- L2 detail ----
@@ -2192,6 +2268,7 @@
     const a = getActual(key);
     const recs = state.receipts[key]||[];
     const nEnt = recs.length;
+    const postedIn = []; Object.values(state.receipts).forEach(arr=>arr.forEach(r=>{ if(r.posted && r.posted_to===key) postedIn.push(r); }));
     const v = Number(a.actual_amount||0) - it.budget;
     const editable = canEdit() && (a.status!=="diluluskan" || isSA());
     $("detEyebrow").textContent = `${CATALOG[it.category].icon} ${CATALOG[it.category].label} · Item ${it.no}`;
@@ -2235,6 +2312,11 @@
         <p class="audit" style="margin-bottom:12px">${nEnt? nEnt+" lampiran direkod.":"Belum ada lampiran."}${(isSA()&&itemAttn(key))?` · <b style="color:var(--rose)">${itemAttn(key)} baru perlu disemak</b>`:""}</p>
         <button class="btn primary" id="detEntries">📎 Urus Resit & Nota${nEnt?` (${nEnt})`:""}</button>
       </div>
+
+      ${postedIn.length?`<div class="det-card">
+        <h3>💵 Kos Diposkan Masuk (${fmt(postedIn.reduce((s,r)=>s+Number(r.posted_amount||0),0))})</h3>
+        ${postedIn.map(r=>`<div class="r-meta" style="margin:4px 0">• ${r.label||"(resit)"} — <b style="color:var(--lime)">${fmt(r.posted_amount)}</b> · oleh ${r.posted_by||"—"} · ${r.posted_at?new Date(r.posted_at).toLocaleDateString("ms-MY"):""}</div>`).join("")}
+      </div>`:""}
     `;
 
     // bind
@@ -2396,7 +2478,7 @@
     return `${dd} ${bln[+mm-1]} ${yy}`;
   }
   function actionIcon(a){
-    return ({edit_actual:"✏️",isi_actual:"💰",approve:"✅",reject:"⛔",delete_item:"🗑️",add_attachment:"📎",delete_attachment:"🗑️",review_attachment:"✓",add_todo:"➕",toggle_todo:"☑️",delete_todo:"✕"})[a] || "•";
+    return ({edit_actual:"✏️",isi_actual:"💰",approve:"✅",reject:"⛔",delete_item:"🗑️",add_attachment:"📎",delete_attachment:"🗑️",review_attachment:"✓",post_receipt:"💵",add_todo:"➕",toggle_todo:"☑️",delete_todo:"✕"})[a] || "•";
   }
   function activityRow(a){
     const t=new Date(a.ts);
@@ -2502,10 +2584,12 @@
   $("reviewBtn").addEventListener("click", ()=>{ renderReview(); openLayer("layerReview"); });
   if($("masterBtn")) $("masterBtn").addEventListener("click", ()=> window.openMasterGate());
   $("pinClose").addEventListener("click", closePin);
+  $("postClose").addEventListener("click", closePostModal);
+  $("postConfirm").addEventListener("click", postReceipt);
   $("pinSubmit").addEventListener("click", submitPin);
   $("pinInput").addEventListener("keydown", e=>{ if(e.key==="Enter") submitPin(); });
   $("lightbox").addEventListener("click", ()=> $("lightbox").classList.remove("open"));
-  document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closePin(); $("lightbox").classList.remove("open"); const open=document.querySelector(".layer.open"); if(open) closeLayer(open.id); } });
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closePin(); closePostModal(); $("lightbox").classList.remove("open"); const open=document.querySelector(".layer.open"); if(open) closeLayer(open.id); } });
 
   applyRole();
   loadData();
