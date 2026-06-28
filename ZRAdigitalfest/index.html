@@ -932,9 +932,9 @@
         </span>
       </a>
       <nav class="nav" aria-label="Navigasi utama">
+        <a href="#menus">Komponen</a>
         <a href="#focus">Fokus</a>
         <a href="#flow">Aliran</a>
-        <a href="#menus">Menu</a>
         <a href="#schedule">Jadual</a>
         <a href="#presentation">Pembentangan</a>
       </nav>
@@ -977,6 +977,28 @@
             <div class="fact"><b>SME + Pelancongan + Buku + Live</b><span>Teras</span></div>
           </div>
         </aside>
+      </div>
+    </section>
+
+    <section id="menus">
+      <div class="section-inner">
+        <div class="section-head">
+          <div>
+            <h2>Komponen</h2>
+          </div>
+          <button class="pin-btn" type="button" id="masterBtn">🗂️ Master Dashboard<span class="notif" id="masterNotif" style="display:none">0</span></button>
+        </div>
+        <div class="toolbar">
+          <input class="search" id="searchInput" type="search" placeholder="Cari: SME, buku, filem, muzik, bajet, infra, influencer...">
+          <div class="filter-row" aria-label="Tapisan komponen">
+            <button class="filter-button active" type="button" data-filter="all">Semua</button>
+            <button class="filter-button" type="button" data-filter="program">Program</button>
+            <button class="filter-button" type="button" data-filter="digital">Digital</button>
+            <button class="filter-button" type="button" data-filter="ops">Operasi</button>
+            <button class="filter-button" type="button" data-filter="legacy">Legacy</button>
+          </div>
+        </div>
+        <div class="menu-grid" id="menuGrid"></div>
       </div>
     </section>
 
@@ -1050,28 +1072,6 @@
             <p>Laporan reach, jualan, video, live hours, cohort bulanan, Akademi Strim Buku, PLATS dan model Pekan Filem/Glamping.</p>
           </article>
         </div>
-      </div>
-    </section>
-
-    <section id="menus" class="band">
-      <div class="section-inner">
-        <div class="section-head">
-          <div>
-            <h2>Komponen</h2>
-          </div>
-          <button class="pin-btn" type="button" id="masterBtn">🗂️ Master Dashboard<span class="notif" id="masterNotif" style="display:none">0</span></button>
-        </div>
-        <div class="toolbar">
-          <input class="search" id="searchInput" type="search" placeholder="Cari: SME, buku, filem, muzik, bajet, infra, influencer...">
-          <div class="filter-row" aria-label="Tapisan komponen">
-            <button class="filter-button active" type="button" data-filter="all">Semua</button>
-            <button class="filter-button" type="button" data-filter="program">Program</button>
-            <button class="filter-button" type="button" data-filter="digital">Digital</button>
-            <button class="filter-button" type="button" data-filter="ops">Operasi</button>
-            <button class="filter-button" type="button" data-filter="legacy">Legacy</button>
-          </div>
-        </div>
-        <div class="menu-grid" id="menuGrid"></div>
       </div>
     </section>
 
