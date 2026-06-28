@@ -774,7 +774,6 @@
         <a href="#focus">Fokus</a>
         <a href="#flow">Aliran</a>
         <a href="#menus">Menu</a>
-        <a href="#bajet">Bajet</a>
         <a href="#schedule">Jadual</a>
         <a href="#presentation">Pembentangan</a>
       </nav>
@@ -913,68 +912,6 @@
           </div>
         </div>
         <div class="menu-grid" id="menuGrid"></div>
-      </div>
-    </section>
-
-    <section id="bajet" class="band">
-      <div class="section-inner">
-        <div class="section-head">
-          <div>
-            <span class="eyebrow">Bajet & sebutharga kawalan</span>
-            <h2>Bajet Terkunci vs Kos Sebenar</h2>
-          </div>
-          <p>Bajet dari sebutharga rasmi tidak boleh diubah. Admin isi kos sebenar, resit, gambar &amp; nota untuk semakan; Superadmin lulus, edit atau padam.</p>
-        </div>
-
-        <div class="bajet-bar">
-          <span class="role-chip" id="roleChip">👁️ Mode: Lihat sahaja</span>
-          <button class="pin-btn" type="button" id="bajetPinBtn">🔐 Masuk PIN</button>
-          <button class="pin-btn" type="button" id="logoutBtn" style="display:none">🚪 Log keluar</button>
-          <button class="pin-btn" type="button" id="reviewBtn" style="display:none">🗂️ Semakan Superadmin</button>
-        </div>
-
-        <div class="bajet-cats">
-          <button class="cat-tile" type="button" data-cat="konten">
-            <div class="cat-top">
-              <div>
-                <span class="cat-icon">🎬</span>
-                <h3>Konten / Pengisian</h3>
-                <div class="cat-count">14 item · talent, pemasaran &amp; kandungan</div>
-              </div>
-              <span class="badge b-menunggu" id="catStatusKonten">—</span>
-            </div>
-            <div class="cat-figs">
-              <span class="fig"><b id="catBudgetKonten">RM 266,000</b><span>Bajet</span></span>
-              <span class="fig"><b id="catActualKonten">RM —</b><span>Actual</span></span>
-              <span class="fig"><b id="catVarKonten">—</b><span>Varian</span></span>
-            </div>
-            <span class="cat-open">Buka senarai →</span>
-          </button>
-
-          <button class="cat-tile" type="button" data-cat="logistik">
-            <div class="cat-top">
-              <div>
-                <span class="cat-icon">🚚</span>
-                <h3>Logistik / Fasiliti</h3>
-                <div class="cat-count">10 item · fasiliti, promosi &amp; pengurusan</div>
-              </div>
-              <span class="badge b-menunggu" id="catStatusLogistik">—</span>
-            </div>
-            <div class="cat-figs">
-              <span class="fig"><b id="catBudgetLogistik">RM 348,000</b><span>Bajet</span></span>
-              <span class="fig"><b id="catActualLogistik">RM —</b><span>Actual</span></span>
-              <span class="fig"><b id="catVarLogistik">—</b><span>Varian</span></span>
-            </div>
-            <span class="cat-open">Buka senarai →</span>
-          </button>
-        </div>
-
-        <div class="bajet-summary">
-          <div class="sum-cell"><b id="sumBudget">RM 614,000</b><span>Jumlah Bajet</span></div>
-          <div class="sum-cell"><b id="sumActual">RM —</b><span>Jumlah Actual</span></div>
-          <div class="sum-cell"><b id="sumVar">—</b><span>Varian Keseluruhan</span></div>
-          <div class="sum-cell"><b id="sumStatus">—</b><span>Status Kelulusan</span></div>
-        </div>
       </div>
     </section>
 
@@ -1133,8 +1070,73 @@
     <div class="drawer-body" id="drawerBody"></div>
   </aside>
 
-  <!-- Bajet L1: senarai item -->
+  <!-- Bajet L0: home popup (terkunci) -->
   <div class="layer-backdrop" id="bjtBackdrop"></div>
+  <div class="layer" id="layerBudget" aria-hidden="true">
+    <div class="layer-inner">
+      <div class="layer-head">
+        <div>
+          <span class="eyebrow">🔒 P&amp;C · akses PIN</span>
+          <h2>Bajet Terkunci</h2>
+        </div>
+        <button class="layer-back" type="button" data-close-layer="layerBudget">✕ Tutup</button>
+      </div>
+
+      <p class="audit" style="margin:4px 0 16px">Bajet dari sebutharga rasmi tidak boleh diubah. Admin isi kos sebenar, resit, gambar &amp; nota untuk semakan; Superadmin lulus, edit atau padam.</p>
+
+      <div class="bajet-bar">
+        <span class="role-chip" id="roleChip">👁️ Mode: Lihat sahaja</span>
+        <button class="pin-btn" type="button" id="bajetPinBtn">🔐 Masuk PIN</button>
+        <button class="pin-btn" type="button" id="logoutBtn" style="display:none">🚪 Log keluar</button>
+        <button class="pin-btn" type="button" id="reviewBtn" style="display:none">🗂️ Semakan Superadmin</button>
+      </div>
+
+      <div class="bajet-cats">
+        <button class="cat-tile" type="button" data-cat="konten">
+          <div class="cat-top">
+            <div>
+              <span class="cat-icon">🎬</span>
+              <h3>Konten / Pengisian</h3>
+              <div class="cat-count">14 item · talent, pemasaran &amp; kandungan</div>
+            </div>
+            <span class="badge b-menunggu" id="catStatusKonten">—</span>
+          </div>
+          <div class="cat-figs">
+            <span class="fig"><b id="catBudgetKonten">RM 266,000</b><span>Bajet</span></span>
+            <span class="fig"><b id="catActualKonten">RM —</b><span>Actual</span></span>
+            <span class="fig"><b id="catVarKonten">—</b><span>Varian</span></span>
+          </div>
+          <span class="cat-open">Buka senarai →</span>
+        </button>
+
+        <button class="cat-tile" type="button" data-cat="logistik">
+          <div class="cat-top">
+            <div>
+              <span class="cat-icon">🚚</span>
+              <h3>Logistik / Fasiliti</h3>
+              <div class="cat-count">10 item · fasiliti, promosi &amp; pengurusan</div>
+            </div>
+            <span class="badge b-menunggu" id="catStatusLogistik">—</span>
+          </div>
+          <div class="cat-figs">
+            <span class="fig"><b id="catBudgetLogistik">RM 348,000</b><span>Bajet</span></span>
+            <span class="fig"><b id="catActualLogistik">RM —</b><span>Actual</span></span>
+            <span class="fig"><b id="catVarLogistik">—</b><span>Varian</span></span>
+          </div>
+          <span class="cat-open">Buka senarai →</span>
+        </button>
+      </div>
+
+      <div class="bajet-summary">
+        <div class="sum-cell"><b id="sumBudget">RM 614,000</b><span>Jumlah Bajet</span></div>
+        <div class="sum-cell"><b id="sumActual">RM —</b><span>Jumlah Actual</span></div>
+        <div class="sum-cell"><b id="sumVar">—</b><span>Varian Keseluruhan</span></div>
+        <div class="sum-cell"><b id="sumStatus">—</b><span>Status Kelulusan</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bajet L1: senarai item -->
   <div class="layer" id="layerList" aria-hidden="true">
     <div class="layer-inner">
       <div class="layer-head">
@@ -1234,9 +1236,9 @@
         group: "ops",
         status: "Dalaman",
         owner: "Kewangan / urusetia",
-        summary: "Gabungan sebutharga pengisian dan logistik untuk semakan dalaman.",
-        purpose: "Memisahkan kos pengisian, kos operasi, nilai tambah dan item yang perlu runding.",
-        items: ["Pengisian, talent, pemasaran dan kandungan: RM266,000", "Logistik, fasiliti, promosi dan pengurusan: RM348,000", "Jumlah gabungan dikesan: RM614,000", "Nota: angka bukan untuk hero atau paparan awam"],
+        summary: "Gabungan sebutharga pengisian dan logistik untuk semakan dalaman (P&C).",
+        purpose: "Memisahkan kos pengisian, kos operasi, nilai tambah dan item yang perlu runding. Butiran kos sebenar adalah sulit (P&C) dan diakses melalui modul Bajet Terkunci.",
+        items: ["Pakej pengisian: talent, pemasaran dan kandungan digital", "Pakej logistik: fasiliti, promosi dan pengurusan tapak", "Pecahan kos sebenar diurus dalam modul Bajet Terkunci", "Akses butiran kos memerlukan PIN — bukan paparan awam"],
         outputs: ["Ringkasan bajet dalaman", "Senarai item boleh runding", "Mapping kos kepada komponen"],
         checks: ["Sahkan jika ada kos tambahan luar sebutharga", "Bezakan bajet proposal dan bajet kelulusan"]
       },
@@ -1477,7 +1479,11 @@
       if (!item) return;
       drawerTitle.textContent = item.title;
       drawerTag.textContent = `Komponen ${item.no} / ${item.group}`;
+      const gate = item.no === "03"
+        ? `<button class="pin-btn" type="button" id="openBudgetGateBtn" style="width:100%;justify-content:center;padding:14px">🔐 Buka Bajet Terkunci</button>`
+        : "";
       drawerBody.innerHTML = `
+        ${gate}
         <section class="drawer-section">
           <h3>Tujuan</h3>
           <p>${item.purpose}</p>
@@ -1495,6 +1501,10 @@
           ${list(item.checks)}
         </section>
       `;
+      if (item.no === "03") {
+        const gb = document.getElementById("openBudgetGateBtn");
+        if (gb) gb.addEventListener("click", () => { if (window.openBudgetGate) window.openBudgetGate(); });
+      }
       drawer.classList.add("open");
       drawerBackdrop.classList.add("open");
       drawer.setAttribute("aria-hidden", "false");
@@ -1620,6 +1630,7 @@
   let actorName = sessionStorage.getItem("zra_bajet_actor") || "";
   const state = { actuals: {}, receipts: {} }; // keyed by item_key
   let currentCat = null, currentKey = null;
+  let pendingOpenBudget = false;
 
   const ALL_ITEMS = [...CATALOG.konten.items.map(i=>({...i,category:"konten"})), ...CATALOG.logistik.items.map(i=>({...i,category:"logistik"}))];
   const fmt = n => "RM " + Number(n||0).toLocaleString("en-MY", {minimumFractionDigits:0, maximumFractionDigits:2});
@@ -1718,8 +1729,16 @@
     }
     closePin(); applyRole(); toast(role==="superadmin"?"Masuk sebagai Superadmin 👑":"Masuk sebagai Admin ✍️");
     if(currentKey) renderDetail(currentKey); if(currentCat) renderList(currentCat);
+    if(pendingOpenBudget){ pendingOpenBudget=false; renderSummary(); openLayer("layerBudget"); }
   }
   function logout(){ role="guest"; sessionStorage.removeItem("zra_bajet_role"); applyRole(); toast("Log keluar"); if(currentKey) renderDetail(currentKey); if(currentCat) renderList(currentCat); }
+
+  // ---- Pintu masuk dari card #03 (Bajet Terkunci) ----
+  window.openBudgetGate = function(){
+    if(typeof closeDrawer === "function") closeDrawer();
+    if(role === "guest"){ pendingOpenBudget = true; openPin(); }
+    else { renderSummary(); openLayer("layerBudget"); }
+  };
 
   // ---- Layer nav ----
   function openLayer(id){ $("bjtBackdrop").classList.add("open"); $(id).classList.add("open"); $(id).setAttribute("aria-hidden","false"); document.body.style.overflow="hidden"; }
