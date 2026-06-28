@@ -733,6 +733,34 @@
     .b-menunggu { background: rgba(255,198,92,.16); color: var(--amber); }
     .b-diluluskan { background: rgba(127,209,119,.16); color: var(--green); }
     .b-ditolak { background: rgba(255,130,120,.16); color: var(--rose); }
+    .b-resit { background: rgba(97,212,255,.16); color: var(--cyan); }
+    .b-invoice { background: rgba(216,255,88,.16); color: var(--lime); }
+    .b-nota { background: rgba(255,198,92,.16); color: var(--amber); }
+    .b-gambar { background: rgba(127,209,119,.16); color: var(--green); }
+    .b-lain { background: rgba(255,255,255,.08); color: var(--muted); }
+
+    /* Butang lampiran pada row + notifikasi */
+    .row-attach {
+      display: inline-flex; align-items: center; gap: 6px; position: relative;
+      padding: 8px 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--line-soft); background: rgba(255,255,255,.05);
+      color: var(--text); font-weight: 700; font-size: .78rem; white-space: nowrap;
+    }
+    .row-attach:hover { border-color: var(--line); }
+    .attn-dot {
+      position: absolute; top: -5px; right: -5px;
+      min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px;
+      background: var(--rose); color: #2a0a07; font-size: .62rem; font-weight: 900;
+      display: grid; place-items: center; box-shadow: 0 0 0 2px #0b1011;
+    }
+    .notif {
+      display: inline-grid; place-items: center; min-width: 19px; height: 19px;
+      padding: 0 5px; margin-left: 7px; border-radius: 999px;
+      background: var(--rose); color: #2a0a07; font-size: .66rem; font-weight: 900;
+    }
+    .it-actions { display: flex; gap: 8px; align-items: center; }
+    .review-sec-title { color: var(--lime); font-size: .82rem; letter-spacing: .06em; text-transform: uppercase; margin: 22px 0 12px; display: flex; align-items: center; gap: 8px; }
+    .review-sec-title:first-child { margin-top: 4px; }
 
     /* L2 detail */
     .det-grid { display: grid; gap: 16px; }
@@ -1109,7 +1137,7 @@
         <span class="role-chip" id="roleChip">👁️ Mode: Lihat sahaja</span>
         <button class="pin-btn" type="button" id="bajetPinBtn">🔐 Masuk PIN</button>
         <button class="pin-btn" type="button" id="logoutBtn" style="display:none">🚪 Log keluar</button>
-        <button class="pin-btn" type="button" id="reviewBtn" style="display:none">🗂️ Semakan Superadmin</button>
+        <button class="pin-btn" type="button" id="reviewBtn" style="display:none">🗂️ Semakan Superadmin<span class="notif" id="reviewNotif" style="display:none">0</span></button>
       </div>
 
       <div class="bajet-cats">
@@ -1196,6 +1224,20 @@
         <button class="layer-back" type="button" data-close-layer="layerReview">✕ Tutup</button>
       </div>
       <div id="reviewBody"></div>
+    </div>
+  </div>
+
+  <!-- Lampiran & Nota (resit/invoice/gambar) -->
+  <div class="layer" id="layerEntry" aria-hidden="true">
+    <div class="layer-inner">
+      <div class="layer-head">
+        <div>
+          <span class="eyebrow" id="entEyebrow">Lampiran &amp; nota</span>
+          <h2 id="entTitle">Tajuk</h2>
+        </div>
+        <button class="layer-back" type="button" data-close-layer="layerEntry">← Kembali</button>
+      </div>
+      <div id="entBody" class="det-grid"></div>
     </div>
   </div>
 
@@ -1687,7 +1729,7 @@
         saveLocal();
       }catch(e){ /* keep local */ }
     }
-    renderSummary();
+    renderSummary(); updateNotif();
   }
 
   function getActual(key){ return state.actuals[key] || { item_key:key, actual_amount:0, status:"draf", admin_note:"", superadmin_note:"", updated_by:"", approved_by:"", approved_at:null }; }
@@ -1732,6 +1774,7 @@
     $("logoutBtn").style.display = role==="guest" ? "none" : "inline-flex";
     $("bajetPinBtn").style.display = role==="guest" ? "inline-flex" : "none";
     $("reviewBtn").style.display = role==="superadmin" ? "inline-flex" : "none";
+    updateNotif();
   }
   const canEdit = () => role==="admin" || role==="superadmin";
   const isSA = () => role==="superadmin";
@@ -1781,10 +1824,13 @@
       const actualCell = canEdit()
         ? `<input class="actual-input" type="number" min="0" step="100" value="${a.actual_amount||""}" data-key="${it.key}" ${editable?"":"disabled"} placeholder="0">`
         : `<b class="actual-static">${fmt(a.actual_amount)}</b>`;
+      const nEnt = (state.receipts[it.key]||[]).length;
+      const attn = itemAttn(it.key);
+      const attachBtn = `<button class="row-attach" data-attach="${it.key}" title="Lampiran & nota">📎 ${nEnt||""}${(isSA()&&attn)?`<span class="attn-dot">${attn}</span>`:""}</button>`;
       return `<div class="bjt-item">
         <div class="it-head">
           <button class="row-title" data-detail="${it.key}"><span class="bjt-num">${it.no}.</span> ${it.title}</button>
-          ${statusBadge(a.status)}
+          <div class="it-actions">${statusBadge(a.status)}${attachBtn}</div>
         </div>
         <div class="bjt-figs">
           <div class="fig-cell"><span>Bajet 🔒</span><b class="locked">${fmt(it.budget)}</b></div>
@@ -1803,6 +1849,7 @@
       ${canEdit()?'<p class="audit" style="margin-top:14px">Tip: edit Actual Kos lalu klik luar kotak untuk simpan. Klik tajuk untuk resit, gambar &amp; nota.</p>':'<p class="audit" style="margin-top:14px">Mode lihat sahaja. Masuk PIN untuk mengisi kos sebenar.</p>'}
     `;
     $("listBody").querySelectorAll(".row-title").forEach(b=> b.addEventListener("click", ()=> openDetail(b.dataset.detail)));
+    $("listBody").querySelectorAll("[data-attach]").forEach(b=> b.addEventListener("click", ()=> openEntry(b.dataset.attach)));
     $("listBody").querySelectorAll(".actual-input").forEach(inp=> inp.addEventListener("change", ()=> saveActualInline(inp.dataset.key, inp.value)));
   }
 
@@ -1870,13 +1917,25 @@
     renderDetail(key); renderSummary();
   }
 
-  // ---- Receipts ----
-  async function addReceipt(key){
-    const file = $("rcptFile").files[0];
-    const label = $("rcptLabel").value.trim();
-    const amount = Number($("rcptAmount").value||0);
-    const note = $("rcptNote").value.trim();
-    if(!file && !label && !amount && !note){ toast("Isi sekurang-kurangnya satu maklumat resit", true); return; }
+  // ---- Lampiran / Entri (resit, invoice, nota, gambar) ----
+  const KINDS = { resit:"Resit", invoice:"Invoice", nota:"Nota", gambar:"Gambar", lain:"Lain" };
+  function getEntries(key){ return (state.receipts[key]||[]).slice().sort((a,b)=> new Date(b.created_at) - new Date(a.created_at)); }
+  function itemAttn(key){ return (state.receipts[key]||[]).filter(r=> !r.reviewed).length; }
+  function attnTotal(){ let n=0; Object.values(state.receipts).forEach(arr=> arr.forEach(r=>{ if(!r.reviewed) n++; })); return n; }
+  function updateNotif(){
+    const n = attnTotal();
+    const badge = $("reviewNotif");
+    if(badge){ badge.textContent = n; badge.style.display = n? "inline-grid":"none"; }
+  }
+
+  async function saveEntry(key){
+    const file = $("entFile").files[0];
+    const kind = $("entKind").value;
+    const label = $("entLabel").value.trim();
+    const amount = Number($("entAmount").value||0);
+    const note = $("entNote").value.trim();
+    if(!file && !label && !amount && !note){ toast("Isi sekurang-kurangnya satu maklumat", true); return; }
+    const btn = $("entSave"); if(btn){ btn.disabled = true; btn.textContent = "Menyimpan…"; }
     let image_url = "";
     if(file && sbReady()){
       try{
@@ -1886,24 +1945,103 @@
         image_url = sb.storage.from(ZRA_CFG.bucket).getPublicUrl(path).data.publicUrl;
       }catch(e){ toast("Muat naik gambar gagal: "+(e.message||e.code), true); }
     } else if(file){
-      image_url = await new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(file); }); // local base64 fallback
+      image_url = await new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(file); }); // fallback base64
     }
-    const rec = { id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())), item_key:key, label, amount, image_url, note, uploaded_by:actorName||"", created_at:new Date().toISOString() };
+    const reviewed = isSA(); // superadmin sendiri = auto-disemak; admin = perlu perhatian
+    const rec = { id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())), item_key:key, kind, label, amount, image_url, note, uploaded_by:actorName||"", reviewed, reviewed_by:reviewed?(actorName||""):"", reviewed_at:reviewed?new Date().toISOString():null, created_at:new Date().toISOString() };
     (state.receipts[key]=state.receipts[key]||[]).push(rec); saveLocal();
     if(sbReady()){
-      try{ const { error } = await sb.from(ZRA_CFG.receiptsTable).insert({ id:rec.id, item_key:key, label, amount, image_url, note, uploaded_by:rec.uploaded_by }); if(error) throw error; toast("Resit ditambah ✓"); }
-      catch(e){ toast("Resit disimpan luar talian: "+(e.message||e.code), true); }
-    } else toast("Resit disimpan (luar talian)");
-    renderDetail(key);
+      try{ const { error } = await sb.from(ZRA_CFG.receiptsTable).insert({ id:rec.id, item_key:key, kind, label, amount, image_url, note, uploaded_by:rec.uploaded_by, reviewed:rec.reviewed, reviewed_by:rec.reviewed_by, reviewed_at:rec.reviewed_at }); if(error) throw error; toast("Lampiran disimpan ✓"); }
+      catch(e){ toast("Disimpan luar talian: "+(e.message||e.code), true); }
+    } else toast("Disimpan (luar talian)");
+    renderEntry(key); renderList(currentCat); updateNotif();
   }
 
-  async function deleteReceipt(key, id){
-    if(!isSA()){ toast("Hanya Superadmin boleh padam resit", true); return; }
+  async function deleteEntry(key, id){
+    if(!isSA()){ toast("Hanya Superadmin boleh padam", true); return; }
     state.receipts[key] = (state.receipts[key]||[]).filter(r=>r.id!==id); saveLocal();
     if(sbReady()){
       try{ const { error } = await sb.rpc("zra_sa_delete_receipt", { p_pin:ZRA_CFG.superadminPin, p_receipt_id:id }); if(error) throw error; }catch(e){ toast("DB gagal: "+(e.message||e.code), true); }
     }
-    renderDetail(key); toast("Resit dipadam");
+    renderEntry(key); updateNotif(); toast("Lampiran dipadam");
+  }
+
+  async function markReviewed(key, id){
+    if(!isSA()){ toast("Hanya Superadmin", true); return; }
+    const arr = state.receipts[key]||[]; const r = arr.find(x=>x.id===id); if(!r) return;
+    r.reviewed = true; r.reviewed_by = actorName||""; r.reviewed_at = new Date().toISOString(); saveLocal();
+    if(sbReady()){
+      try{ const { error } = await sb.rpc("zra_sa_review_receipt", { p_pin:ZRA_CFG.superadminPin, p_receipt_id:id, p_by:actorName||"" }); if(error) throw error; }catch(e){ toast("DB gagal: "+(e.message||e.code), true); }
+    }
+    updateNotif(); toast("Ditanda disemak ✓");
+    if($("layerEntry").classList.contains("open")) renderEntry(key);
+    if($("layerReview").classList.contains("open")) renderReview();
+  }
+
+  function entryCardHtml(r, withItem){
+    const it = withItem ? ALL_ITEMS.find(i=>i.key===r.item_key) : null;
+    const k = r.kind||"lain";
+    return `<div class="receipt">
+      ${r.image_url?`<img src="${r.image_url}" data-lb="${r.image_url}" alt="lampiran">`:`<div class="receipt" style="width:86px;height:86px;border:1px dashed var(--line-soft);display:grid;place-items:center;color:var(--muted);font-size:1.6rem">📝</div>`}
+      <div class="r-body">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="badge b-${k}">${KINDS[k]||k}</span>
+          ${!r.reviewed?'<span class="badge b-menunggu">Baru</span>':''}
+          <b>${r.label||"(tanpa label)"}</b> ${r.amount?`<span class="r-amt">${fmt(r.amount)}</span>`:""}
+        </div>
+        ${it?`<div class="r-meta">${it.no}. ${it.title} · ${CATALOG[it.category].label}</div>`:""}
+        ${r.note?`<div style="margin:6px 0;white-space:pre-wrap">${r.note}</div>`:""}
+        <div class="r-meta">${r.uploaded_by?("oleh "+r.uploaded_by+" · "):""}${new Date(r.created_at).toLocaleString("ms-MY")}${r.image_url?` · <a href="${r.image_url}" target="_blank" rel="noopener" style="color:var(--cyan)">buka gambar ↗</a>`:""}</div>
+      </div>
+      ${isSA()?`<div style="display:grid;gap:6px">${!r.reviewed?`<button class="btn good" data-rev-rcpt="${r.item_key}|${r.id}" style="padding:6px 10px">✓ Disemak</button>`:""}<button class="btn danger" data-delrcpt="${r.item_key}|${r.id}" style="padding:6px 10px">Padam</button></div>`:""}
+    </div>`;
+  }
+
+  // ---- L2.5 Lampiran popup ----
+  function openEntry(key){ renderEntry(key); openLayer("layerEntry"); }
+  function renderEntry(key){
+    const it = ALL_ITEMS.find(i=>i.key===key); if(!it) return;
+    currentKey = key;
+    $("entEyebrow").textContent = `${CATALOG[it.category].icon} ${CATALOG[it.category].label} · Item ${it.no}`;
+    $("entTitle").textContent = it.title;
+    const entries = getEntries(key);
+    const histHtml = entries.length ? entries.map(r=> entryCardHtml(r,false)).join("") : `<p class="audit">Belum ada lampiran atau nota.</p>`;
+    $("entBody").innerHTML = `
+      ${canEdit()?`
+      <div class="det-card">
+        <h3>➕ Tambah Lampiran / Nota</h3>
+        <div style="display:grid;gap:10px">
+          <div class="det-figs">
+            <div><label class="audit">Jenis</label>
+              <select class="det-input" id="entKind">
+                <option value="resit">Resit</option>
+                <option value="invoice">Invoice</option>
+                <option value="nota">Nota</option>
+                <option value="gambar">Gambar</option>
+                <option value="lain">Lain</option>
+              </select></div>
+            <div><label class="audit">Jumlah (RM) — pilihan</label><input class="det-input" id="entAmount" type="number" min="0" step="100" placeholder="0"></div>
+          </div>
+          <div><label class="audit">Label / tajuk ringkas</label><input class="det-input" id="entLabel" placeholder="cth: Resit deposit pentas, Invoice katering..."></div>
+          <div><label class="audit">Nota</label><textarea class="det-input" id="entNote" placeholder="Catatan untuk superadmin..."></textarea></div>
+          <div><label class="audit">Gambar (resit / invoice / dll)</label><input class="det-input" id="entFile" type="file" accept="image/*"></div>
+          <div><button class="btn primary" id="entSave">💾 Simpan</button></div>
+        </div>
+      </div>`:`<div class="det-card"><p class="audit">Mode lihat sahaja.</p></div>`}
+
+      <div class="det-card">
+        <h3>🗂️ Sejarah Lampiran (${entries.length}) — terbaru dahulu</h3>
+        <div class="receipts">${histHtml}</div>
+      </div>
+    `;
+    if(canEdit() && $("entSave")) $("entSave").addEventListener("click", ()=>saveEntry(key));
+    bindEntryActions($("entBody"));
+  }
+
+  function bindEntryActions(scope){
+    scope.querySelectorAll("[data-delrcpt]").forEach(b=> b.addEventListener("click", ()=>{ const [k,id]=b.dataset.delrcpt.split("|"); deleteEntry(k,id); }));
+    scope.querySelectorAll("[data-rev-rcpt]").forEach(b=> b.addEventListener("click", ()=>{ const [k,id]=b.dataset.revRcpt.split("|"); markReviewed(k,id); }));
+    scope.querySelectorAll("[data-lb]").forEach(img=> img.addEventListener("click", ()=>{ $("lightboxImg").src = img.dataset.lb; $("lightbox").classList.add("open"); }));
   }
 
   // ---- L2 detail ----
@@ -1913,21 +2051,11 @@
     const it = ALL_ITEMS.find(i=>i.key===key); if(!it) return;
     const a = getActual(key);
     const recs = state.receipts[key]||[];
+    const nEnt = recs.length;
     const v = Number(a.actual_amount||0) - it.budget;
     const editable = canEdit() && (a.status!=="diluluskan" || isSA());
     $("detEyebrow").textContent = `${CATALOG[it.category].icon} ${CATALOG[it.category].label} · Item ${it.no}`;
     $("detTitle").textContent = it.title;
-
-    const receiptsHtml = recs.length ? recs.map(r=>`
-      <div class="receipt">
-        ${r.image_url?`<img src="${r.image_url}" data-lb="${r.image_url}" alt="resit">`:""}
-        <div class="r-body">
-          <div><b>${r.label||"Resit"}</b> ${r.amount?`<span class="r-amt">${fmt(r.amount)}</span>`:""}</div>
-          ${r.note?`<div style="margin:4px 0;white-space:pre-wrap">${r.note}</div>`:""}
-          <div class="r-meta">${r.uploaded_by?("oleh "+r.uploaded_by+" · "):""}${new Date(r.created_at).toLocaleString("ms-MY")}</div>
-        </div>
-        ${isSA()?`<button class="btn danger" data-delrcpt="${r.id}" style="padding:6px 10px">Padam</button>`:""}
-      </div>`).join("") : `<p class="audit">Belum ada resit.</p>`;
 
     const auditHtml = `<p class="audit">${a.updated_by?("Dikemaskini oleh "+a.updated_by):"Belum dikemaskini"}${a.updated_at?(" · "+new Date(a.updated_at).toLocaleString("ms-MY")):""}${a.approved_by?(" · Diluluskan oleh "+a.approved_by):""}</p>`;
 
@@ -1963,18 +2091,9 @@
       </div>
 
       <div class="det-card">
-        <h3>🧾 Resit & Gambar</h3>
-        <div class="receipts" id="receiptList">${receiptsHtml}</div>
-        ${canEdit()?`
-          <div style="margin-top:16px;display:grid;gap:10px">
-            <div class="det-figs">
-              <div><label class="audit">Label resit</label><input class="det-input" id="rcptLabel" placeholder="cth: Bayaran deposit pentas"></div>
-              <div><label class="audit">Jumlah (RM)</label><input class="det-input" id="rcptAmount" type="number" min="0" step="100" placeholder="0"></div>
-            </div>
-            <div><label class="audit">Nota resit</label><textarea class="det-input" id="rcptNote" placeholder="Catatan resit..."></textarea></div>
-            <div><label class="audit">Gambar resit</label><input class="det-input" id="rcptFile" type="file" accept="image/*"></div>
-            <div><button class="btn primary" id="rcptAdd">➕ Tambah Resit</button></div>
-          </div>`:""}
+        <h3>🧾 Resit, Invoice & Nota</h3>
+        <p class="audit" style="margin-bottom:12px">${nEnt? nEnt+" lampiran direkod.":"Belum ada lampiran."}${(isSA()&&itemAttn(key))?` · <b style="color:var(--rose)">${itemAttn(key)} baru perlu disemak</b>`:""}</p>
+        <button class="btn primary" id="detEntries">📎 Urus Resit & Nota${nEnt?` (${nEnt})`:""}</button>
       </div>
     `;
 
@@ -1988,16 +2107,21 @@
       if($("detApprove")) $("detApprove").addEventListener("click", ()=>saApprove(key,true));
       if($("detReject")) $("detReject").addEventListener("click", ()=>saApprove(key,false));
       if($("detDelete")) $("detDelete").addEventListener("click", ()=>saDeleteItem(key));
-      if($("rcptAdd")) $("rcptAdd").addEventListener("click", ()=>addReceipt(key));
     }
-    $("detBody").querySelectorAll("[data-delrcpt]").forEach(b=> b.addEventListener("click", ()=>deleteReceipt(key, b.dataset.delrcpt)));
-    $("detBody").querySelectorAll("[data-lb]").forEach(img=> img.addEventListener("click", ()=>{ $("lightboxImg").src = img.dataset.lb; $("lightbox").classList.add("open"); }));
+    if($("detEntries")) $("detEntries").addEventListener("click", ()=>openEntry(key));
   }
 
-  // ---- Review dashboard ----
+  // ---- Review dashboard (besar) ----
   function renderReview(){
+    // A) Lampiran baru perlu perhatian (belum disemak), ikut tarikh terbaru
+    const newEntries = [];
+    Object.values(state.receipts).forEach(arr=> arr.forEach(r=>{ if(!r.reviewed) newEntries.push(r); }));
+    newEntries.sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
+    const attnHtml = newEntries.length ? newEntries.map(r=> entryCardHtml(r,true)).join("") : `<p class="audit">Tiada lampiran baru. 🎉</p>`;
+
+    // B) Item menunggu kelulusan
     const pend = ALL_ITEMS.filter(it=> getActual(it.key).status==="menunggu");
-    $("reviewBody").innerHTML = pend.length ? pend.map(it=>{
+    const apprHtml = pend.length ? pend.map(it=>{
       const a = getActual(it.key);
       return `<div class="det-card" style="margin-bottom:12px">
         <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
@@ -2009,7 +2133,15 @@
           </div>
         </div>
       </div>`;
-    }).join("") : `<p class="audit">Tiada item menunggu semakan. 🎉</p>`;
+    }).join("") : `<p class="audit">Tiada item menunggu kelulusan. 🎉</p>`;
+
+    $("reviewBody").innerHTML = `
+      <div class="review-sec-title">🔔 Lampiran baru perlu perhatian ${newEntries.length?`<span class="notif">${newEntries.length}</span>`:""}</div>
+      <div class="receipts">${attnHtml}</div>
+      <div class="review-sec-title">⏳ Item menunggu kelulusan ${pend.length?`<span class="notif">${pend.length}</span>`:""}</div>
+      ${apprHtml}
+    `;
+    bindEntryActions($("reviewBody"));
     $("reviewBody").querySelectorAll("[data-rev-open]").forEach(b=>b.addEventListener("click",()=>{ openDetail(b.dataset.revOpen); }));
     $("reviewBody").querySelectorAll("[data-rev-appr]").forEach(b=>b.addEventListener("click",async()=>{ await saApprove(b.dataset.revAppr,true); renderReview(); }));
     $("reviewBody").querySelectorAll("[data-rev-rej]").forEach(b=>b.addEventListener("click",async()=>{ await saApprove(b.dataset.revRej,false); renderReview(); }));
