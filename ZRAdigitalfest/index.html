@@ -707,6 +707,27 @@
     .actual-input:disabled { opacity: .5; cursor: not-allowed; }
     .actual-static { font-variant-numeric: tabular-nums; }
 
+    /* Senarai bajet — kad responsif (ganti jadual sempit) */
+    .bjt-list { display: grid; gap: 10px; }
+    .bjt-item {
+      border: 1px solid var(--line-soft); border-radius: var(--radius-sm);
+      background: var(--panel); padding: 14px; display: grid; gap: 12px;
+    }
+    .bjt-item .it-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .bjt-item .row-title { padding: 0; line-height: 1.35; }
+    .bjt-num { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 2px; }
+    .bjt-figs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .fig-cell { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+    .fig-cell > span { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+    .fig-cell > b { font-variant-numeric: tabular-nums; font-size: 1rem; }
+    .fig-cell .actual-input { width: 100%; max-width: 180px; text-align: left; }
+    .bjt-foot {
+      display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: flex-end;
+      margin-top: 14px; padding-top: 14px; border-top: 2px solid var(--line);
+      font-weight: 800; font-variant-numeric: tabular-nums;
+    }
+    .bjt-foot span:first-child { margin-right: auto; color: var(--muted); }
+
     .badge { display: inline-block; padding: 4px 9px; border-radius: 999px; font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
     .b-draf { background: rgba(255,255,255,.08); color: var(--muted); }
     .b-menunggu { background: rgba(255,198,92,.16); color: var(--amber); }
@@ -1757,22 +1778,29 @@
     const rows = c.items.map(it=>{
       const a = getActual(it.key);
       const editable = canEdit() && (a.status!=="diluluskan" || isSA());
-      const input = `<input class="actual-input" type="number" min="0" step="100" value="${a.actual_amount||""}" data-key="${it.key}" ${editable?"":"disabled"} placeholder="0">`;
-      return `<tr>
-        <td>${it.no}</td>
-        <td><button class="row-title" data-detail="${it.key}">${it.title}</button></td>
-        <td class="num locked">🔒 ${fmt(it.budget)}</td>
-        <td class="num">${canEdit()?input:('<span class="actual-static">'+fmt(a.actual_amount)+'</span>')}</td>
-        <td>${statusBadge(a.status)}</td>
-      </tr>`;
+      const actualCell = canEdit()
+        ? `<input class="actual-input" type="number" min="0" step="100" value="${a.actual_amount||""}" data-key="${it.key}" ${editable?"":"disabled"} placeholder="0">`
+        : `<b class="actual-static">${fmt(a.actual_amount)}</b>`;
+      return `<div class="bjt-item">
+        <div class="it-head">
+          <button class="row-title" data-detail="${it.key}"><span class="bjt-num">${it.no}.</span> ${it.title}</button>
+          ${statusBadge(a.status)}
+        </div>
+        <div class="bjt-figs">
+          <div class="fig-cell"><span>Bajet 🔒</span><b class="locked">${fmt(it.budget)}</b></div>
+          <div class="fig-cell"><span>Actual Kos ✎</span>${actualCell}</div>
+        </div>
+      </div>`;
     }).join("");
     $("listBody").innerHTML = `
-      <table class="bjt-table">
-        <thead><tr><th>#</th><th>Tajuk (klik untuk butiran)</th><th class="num">Bajet 🔒</th><th class="num">Actual Kos ✎</th><th>Status</th></tr></thead>
-        <tbody>${rows}</tbody>
-        <tfoot><tr><td></td><td>JUMLAH</td><td class="num">${fmt(t.budget)}</td><td class="num">${fmt(t.actual)}</td><td>${varHtml(t.actual-t.budget)}</td></tr></tfoot>
-      </table>
-      ${canEdit()?'<p class="audit" style="margin-top:14px">Tip: edit Actual Kos terus di sini lalu klik luar kotak untuk simpan. Klik tajuk untuk resit, gambar &amp; nota.</p>':'<p class="audit" style="margin-top:14px">Mode lihat sahaja. Masuk PIN untuk mengisi kos sebenar.</p>'}
+      <div class="bjt-list">${rows}</div>
+      <div class="bjt-foot">
+        <span>JUMLAH ${c.items.length} ITEM</span>
+        <span>Bajet: ${fmt(t.budget)}</span>
+        <span>Actual: ${fmt(t.actual)}</span>
+        <span>Varian: ${varHtml(t.actual-t.budget)}</span>
+      </div>
+      ${canEdit()?'<p class="audit" style="margin-top:14px">Tip: edit Actual Kos lalu klik luar kotak untuk simpan. Klik tajuk untuk resit, gambar &amp; nota.</p>':'<p class="audit" style="margin-top:14px">Mode lihat sahaja. Masuk PIN untuk mengisi kos sebenar.</p>'}
     `;
     $("listBody").querySelectorAll(".row-title").forEach(b=> b.addEventListener("click", ()=> openDetail(b.dataset.detail)));
     $("listBody").querySelectorAll(".actual-input").forEach(inp=> inp.addEventListener("change", ()=> saveActualInline(inp.dataset.key, inp.value)));
