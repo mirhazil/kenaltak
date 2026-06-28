@@ -1404,8 +1404,8 @@
       <p id="payInfo" class="audit"></p>
       <label class="audit">No. rujukan bayaran / resit</label>
       <input id="payRef" type="text" placeholder="cth: Cek 10023 / Resit #A-552">
-      <label class="audit" style="display:block;margin-top:8px">Lampir resit bayaran (gambar atau PDF)</label>
-      <input id="payFile" type="file" accept="image/*,application/pdf,.pdf">
+      <label class="audit" style="display:block;margin-top:8px">Lampir resit bayaran (gambar / PDF / Word / Excel · max 15MB)</label>
+      <input id="payFile" type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.csv">
       <button class="btn primary" type="button" id="payConfirm" style="width:100%;margin-top:14px">✅ Sahkan Dibayar &amp; Reconcile</button>
       <p class="modal-msg" id="payMsg"></p>
     </div>
@@ -2097,11 +2097,18 @@
 
   // ---- Lampiran / Entri (resit, invoice, nota, gambar) ----
   const KINDS = { resit:"Resit", invoice:"Invoice", nota:"Nota", gambar:"Gambar", lain:"Lain" };
+  const MAX_FILE = 15 * 1024 * 1024; // 15MB
   function isImg(u){ return !!u && (/^data:image/i.test(u) || /\.(png|jpe?g|gif|webp|bmp|svg)(\?|$)/i.test(u)); }
   function isPdf(u){ return !!u && (/^data:application\/pdf/i.test(u) || /\.pdf(\?|$)/i.test(u)); }
+  function fileLabel(u){
+    if(isPdf(u)) return "📄 PDF";
+    if(/\.(xlsx?|csv)(\?|$)/i.test(u)) return "📊 Excel";
+    if(/\.(docx?)(\?|$)/i.test(u)) return "📝 Word";
+    return "📎 Fail";
+  }
   function fileThumb(u, lb){
     if(isImg(u)) return `<img src="${u}"${lb?` data-lb="${u}"`:""} alt="lampiran">`;
-    if(u) return `<a href="${u}" target="_blank" rel="noopener" class="file-thumb">${isPdf(u)?"📄 PDF":"📎 Fail"}</a>`;
+    if(u) return `<a href="${u}" target="_blank" rel="noopener" class="file-thumb">${fileLabel(u)}</a>`;
     return `<div class="file-thumb empty">📝</div>`;
   }
   function getEntries(key){ return (state.receipts[key]||[]).slice().sort((a,b)=> new Date(b.created_at) - new Date(a.created_at)); }
@@ -2125,6 +2132,7 @@
     const amount = Number($("entAmount").value||0);
     const note = $("entNote").value.trim();
     if(!file && !label && !amount && !note){ toast("Isi sekurang-kurangnya satu maklumat", true); return; }
+    if(file && file.size > MAX_FILE){ toast("Fail terlalu besar (max 15MB)", true); return; }
     const btn = $("entSave"); if(btn){ btn.disabled = true; btn.textContent = "Menyimpan…"; }
     let image_url = "";
     if(file && sbReady()){
@@ -2205,7 +2213,7 @@
         </div>
         ${it?`<div class="r-meta">${it.no}. ${it.title} · ${CATALOG[it.category].label}</div>`:""}
         ${r.note?`<div style="margin:6px 0;white-space:pre-wrap">${r.note}</div>`:""}
-        <div class="r-meta">${r.uploaded_by?("oleh "+r.uploaded_by+" · "):""}${new Date(r.created_at).toLocaleString("ms-MY")}${r.image_url?` · <a href="${r.image_url}" target="_blank" rel="noopener" style="color:var(--cyan)">${isPdf(r.image_url)?"buka PDF":"buka fail"} ↗</a>`:""}</div>
+        <div class="r-meta">${r.uploaded_by?("oleh "+r.uploaded_by+" · "):""}${new Date(r.created_at).toLocaleString("ms-MY")}${r.image_url?` · <a href="${r.image_url}" target="_blank" rel="noopener" style="color:var(--cyan)">${isImg(r.image_url)?"buka gambar":"buka fail"} ↗</a>`:""}</div>
         ${r.pay_status==="paid"&&r.paid_at?`<div class="r-meta">💵 Dibayar ${new Date(r.paid_at).toLocaleDateString("ms-MY")}${r.paid_by?(" oleh "+r.paid_by):""}${r.paid_ref?(" · ruj: "+r.paid_ref):""}${r.paid_receipt_url?` · <a href="${r.paid_receipt_url}" target="_blank" rel="noopener" style="color:var(--cyan)">resit bayaran ↗</a>`:""}</div>`:""}
       </div>
       ${acts?`<div style="display:grid;gap:6px">${acts}</div>`:""}
@@ -2239,7 +2247,7 @@
           </div>
           <div><label class="audit">Label / tajuk ringkas</label><input class="det-input" id="entLabel" placeholder="cth: Resit deposit pentas, Invoice katering..."></div>
           <div><label class="audit">Nota</label><textarea class="det-input" id="entNote" placeholder="Catatan untuk superadmin..."></textarea></div>
-          <div><label class="audit">Gambar atau PDF (resit / invoice / dll)</label><input class="det-input" id="entFile" type="file" accept="image/*,application/pdf,.pdf"></div>
+          <div><label class="audit">Fail (gambar / PDF / Word / Excel · max 15MB)</label><input class="det-input" id="entFile" type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.csv"></div>
           <div><button class="btn primary" id="entSave">💾 Simpan</button></div>
         </div>
       </div>`:`<div class="det-card"><p class="audit">Mode lihat sahaja.</p></div>`}
@@ -2305,6 +2313,7 @@
   async function payInvoice(){
     if(!payCtx || !canEdit()) return;
     const {key,id,r}=payCtx; const ref=$("payRef").value.trim(); const file=$("payFile").files[0];
+    if(file && file.size > MAX_FILE){ toast("Fail terlalu besar (max 15MB)", true); return; }
     const btn=$("payConfirm"); if(btn){ btn.disabled=true; btn.textContent="Menyimpan…"; }
     let url="";
     if(file && sbReady()){
