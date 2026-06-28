@@ -888,6 +888,8 @@
     .receipts { display: grid; gap: 10px; }
     .receipt { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--line-soft); border-radius: var(--radius-sm); padding: 10px; }
     .receipt img { width: 86px; height: 86px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line-soft); cursor: pointer; }
+    .file-thumb { width: 86px; height: 86px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 8px; border: 1px solid var(--line-soft); background: rgba(255,255,255,.04); color: var(--cyan); font-weight: 800; font-size: .8rem; text-align: center; }
+    .file-thumb.empty { border-style: dashed; color: var(--muted); font-size: 1.6rem; }
     .receipt .r-body { flex: 1; min-width: 0; }
     .receipt .r-amt { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--lime); }
     .receipt .r-meta { font-size: .72rem; color: var(--muted); }
@@ -1402,8 +1404,8 @@
       <p id="payInfo" class="audit"></p>
       <label class="audit">No. rujukan bayaran / resit</label>
       <input id="payRef" type="text" placeholder="cth: Cek 10023 / Resit #A-552">
-      <label class="audit" style="display:block;margin-top:8px">Lampir resit bayaran (gambar)</label>
-      <input id="payFile" type="file" accept="image/*">
+      <label class="audit" style="display:block;margin-top:8px">Lampir resit bayaran (gambar atau PDF)</label>
+      <input id="payFile" type="file" accept="image/*,application/pdf,.pdf">
       <button class="btn primary" type="button" id="payConfirm" style="width:100%;margin-top:14px">✅ Sahkan Dibayar &amp; Reconcile</button>
       <p class="modal-msg" id="payMsg"></p>
     </div>
@@ -2095,6 +2097,13 @@
 
   // ---- Lampiran / Entri (resit, invoice, nota, gambar) ----
   const KINDS = { resit:"Resit", invoice:"Invoice", nota:"Nota", gambar:"Gambar", lain:"Lain" };
+  function isImg(u){ return !!u && (/^data:image/i.test(u) || /\.(png|jpe?g|gif|webp|bmp|svg)(\?|$)/i.test(u)); }
+  function isPdf(u){ return !!u && (/^data:application\/pdf/i.test(u) || /\.pdf(\?|$)/i.test(u)); }
+  function fileThumb(u, lb){
+    if(isImg(u)) return `<img src="${u}"${lb?` data-lb="${u}"`:""} alt="lampiran">`;
+    if(u) return `<a href="${u}" target="_blank" rel="noopener" class="file-thumb">${isPdf(u)?"📄 PDF":"📎 Fail"}</a>`;
+    return `<div class="file-thumb empty">📝</div>`;
+  }
   function getEntries(key){ return (state.receipts[key]||[]).slice().sort((a,b)=> new Date(b.created_at) - new Date(a.created_at)); }
   function itemAttn(key){ return (state.receipts[key]||[]).filter(r=> entryNeedsAction(r)).length; }
   function attnTotal(){ let n=0; Object.values(state.receipts).forEach(arr=> arr.forEach(r=>{ if(entryNeedsAction(r)) n++; })); return n; }
@@ -2187,7 +2196,7 @@
     if(canEdit() && k==="invoice" && r.pay_status==="to_pay") acts += `<button class="btn primary" data-pay="${r.item_key}|${r.id}" style="padding:6px 10px">💵 Tandai Dibayar</button>`;
     if(isSA()) acts += `<button class="btn danger" data-delrcpt="${r.item_key}|${r.id}" style="padding:6px 10px">Padam</button>`;
     return `<div class="receipt">
-      ${r.image_url?`<img src="${r.image_url}" data-lb="${r.image_url}" alt="lampiran">`:`<div class="receipt" style="width:86px;height:86px;border:1px dashed var(--line-soft);display:grid;place-items:center;color:var(--muted);font-size:1.6rem">📝</div>`}
+      ${fileThumb(r.image_url, true)}
       <div class="r-body">
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <span class="badge b-${k}">${KINDS[k]||k}</span>
@@ -2196,7 +2205,7 @@
         </div>
         ${it?`<div class="r-meta">${it.no}. ${it.title} · ${CATALOG[it.category].label}</div>`:""}
         ${r.note?`<div style="margin:6px 0;white-space:pre-wrap">${r.note}</div>`:""}
-        <div class="r-meta">${r.uploaded_by?("oleh "+r.uploaded_by+" · "):""}${new Date(r.created_at).toLocaleString("ms-MY")}${r.image_url?` · <a href="${r.image_url}" target="_blank" rel="noopener" style="color:var(--cyan)">buka gambar ↗</a>`:""}</div>
+        <div class="r-meta">${r.uploaded_by?("oleh "+r.uploaded_by+" · "):""}${new Date(r.created_at).toLocaleString("ms-MY")}${r.image_url?` · <a href="${r.image_url}" target="_blank" rel="noopener" style="color:var(--cyan)">${isPdf(r.image_url)?"buka PDF":"buka fail"} ↗</a>`:""}</div>
         ${r.pay_status==="paid"&&r.paid_at?`<div class="r-meta">💵 Dibayar ${new Date(r.paid_at).toLocaleDateString("ms-MY")}${r.paid_by?(" oleh "+r.paid_by):""}${r.paid_ref?(" · ruj: "+r.paid_ref):""}${r.paid_receipt_url?` · <a href="${r.paid_receipt_url}" target="_blank" rel="noopener" style="color:var(--cyan)">resit bayaran ↗</a>`:""}</div>`:""}
       </div>
       ${acts?`<div style="display:grid;gap:6px">${acts}</div>`:""}
@@ -2230,7 +2239,7 @@
           </div>
           <div><label class="audit">Label / tajuk ringkas</label><input class="det-input" id="entLabel" placeholder="cth: Resit deposit pentas, Invoice katering..."></div>
           <div><label class="audit">Nota</label><textarea class="det-input" id="entNote" placeholder="Catatan untuk superadmin..."></textarea></div>
-          <div><label class="audit">Gambar (resit / invoice / dll)</label><input class="det-input" id="entFile" type="file" accept="image/*"></div>
+          <div><label class="audit">Gambar atau PDF (resit / invoice / dll)</label><input class="det-input" id="entFile" type="file" accept="image/*,application/pdf,.pdf"></div>
           <div><button class="btn primary" id="entSave">💾 Simpan</button></div>
         </div>
       </div>`:`<div class="det-card"><p class="audit">Mode lihat sahaja.</p></div>`}
